@@ -136,6 +136,8 @@
             <div class="w-full md:w-auto">
                 <div class="flex items-center gap-2 mb-1">
                     <span id="login_type_tag" class="text-[10px] font-black px-2 py-0.5 rounded uppercase"></span>
+                    <span class="text-[10px] bg-indigo-500 text-white px-2 py-0.5 rounded font-black uppercase">總人數:
+                        <span id="total_member_count">0</span></span>
                 </div>
                 <input type="text" id="app_title"
                     class="text-4xl font-black text-slate-800 bg-transparent border-b-2 border-transparent hover:border-blue-300 focus:border-blue-500 outline-none transition w-full md:w-auto">
@@ -199,6 +201,8 @@
                 <div class="flex items-center justify-between border-b border-slate-200 pb-2">
                     <h3 class="text-xl font-black text-slate-700 flex items-center gap-2">
                         <span class="w-2 h-6 bg-blue-500 rounded-full"></span> 戰略分組
+                        <span class="text-xs font-normal text-slate-400 ml-2">已分配人數: <span
+                                id="assigned_member_count">0</span></span>
                     </h3>
                     <div class="flex gap-2">
                         <button onclick="addGroup()"
@@ -262,7 +266,7 @@
     <div id="allMembersModal"
         class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
         <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-8 max-h-[80vh] flex flex-col">
-            <h2 class="text-xl font-black mb-4 text-slate-800">公會冒險者名錄</h2>
+            <h2 class="text-xl font-black mb-4 text-slate-800">公會冒險者名錄 (<span id="modal_total_count">0</span>)</h2>
             <div class="overflow-y-auto flex-grow rounded-xl border border-slate-100">
                 <table class="w-full text-left text-sm">
                     <thead class="bg-slate-50 sticky top-0">
@@ -434,9 +438,18 @@
         };
 
         function renderUI() {
+            // 更新總人數顯示
+            document.getElementById('total_member_count').innerText = members.length;
+            document.getElementById('modal_total_count').innerText = members.length;
+
             const unList = document.getElementById('unassigned_list');
             const unassigned = members.filter(m => m.groupId === null);
             document.getElementById('unassigned_count').innerText = unassigned.length;
+
+            // 更新已分配人數顯示
+            const assignedCount = members.filter(m => m.groupId !== null).length;
+            document.getElementById('assigned_member_count').innerText = assignedCount;
+
             unList.innerHTML = unassigned.map(m => {
                 const cfg = jobsConfig[m.job];
                 return `<div class="member-item bg-white p-4 rounded-xl shadow-sm flex flex-col gap-3 ${cfg.border}">
