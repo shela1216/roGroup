@@ -80,9 +80,23 @@
                     </svg>
                     <span class="text-xl font-black tracking-tight">RO 公會分組助手 <span v-if="isGuestMode" class="text-[10px] bg-yellow-400 px-2 py-0.5 rounded ml-2 text-black">本地儲存</span></span>
                 </div>
-                <div class="flex items-center space-x-4" v-if="user">
+                <!-- <div class="flex items-center space-x-4" v-if="user">
                     <span class="hidden md:inline text-xs font-bold opacity-80">{{ user.email || '訪客' }}</span>
                     <button @click="handleLogout" class="text-xs font-bold border border-white/40 px-3 py-1 rounded-lg hover:bg-white hover:text-blue-500 transition-all">登出</button>
+                </div> -->
+
+                <div class="flex items-center space-x-2" v-if="user">
+                    <div class="relative group">
+                        <button class="flex items-center space-x-1 text-xs font-bold border border-white/40 px-3 py-1 rounded-lg hover:bg-white/10 transition-all">
+                            <span>{{ user.email || '訪客' }}</span>
+                            <span>▼</span>
+                        </button>
+                        <!-- 下拉選單 -->
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 hidden group-hover:block z-[60]">
+                            <button v-if="!user.isAnonymous" @click="ui.modal = 'changePassword'" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 font-bold">🔑 修改密碼</button>
+                            <button @click="handleLogout" class="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 font-bold">🚪 登出系統</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -207,6 +221,29 @@
                 <p class="text-blue-500 font-bold animate-pulse">連線伺服器中...</p>
             </div>
         </main>
+
+        <!-- 修改密碼 Modal -->
+        <div v-if="ui.modal === 'changePassword'" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[110] p-4 backdrop-blur-sm" @click.self="ui.modal = null">
+            <div class="ro-card max-w-sm w-full p-8">
+                <h2 class="text-xl font-black text-[#0d8de7] mb-6 flex items-center gap-2">
+                    <span>🔑</span> 修改登入密碼
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-gray-400 ml-1">新密碼</label>
+                        <input v-model="newPassword" type="password" class="w-full px-4 py-3 rounded-xl border-2 border-blue-50 outline-none font-bold focus:border-blue-400 bg-gray-50" placeholder="請輸入新密碼">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-400 ml-1">確認新密碼</label>
+                        <input v-model="confirmPassword" type="password" class="w-full px-4 py-3 rounded-xl border-2 border-blue-50 outline-none font-bold focus:border-blue-400 bg-gray-50" placeholder="再次輸入新密碼">
+                    </div>
+                    <div class="flex space-x-3 pt-4">
+                        <button @click="ui.modal = null" class="flex-1 py-3 font-bold text-gray-400 bg-gray-100 rounded-xl">取消</button>
+                        <button @click="handleChangePassword" class="flex-1 py-3 font-bold text-white bg-[#0d8de7] rounded-xl ro-btn">確認變更</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- 成員管理列表 -->
         <div v-if="ui.modal === 'memberList'" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-0 md:p-4 backdrop-blur-sm" @click.self="ui.modal = null">
@@ -372,7 +409,7 @@
     </script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInAnonymously, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword,updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const { createApp, ref, computed, onMounted } = Vue;
@@ -388,7 +425,8 @@
                 const toast = ref({ msg: '' });
                 const authForm = ref({ email: '', password: '' });
                 const form = ref({ name: '', job: 'priest' });
-                
+                const newPassword = ref('');
+                const confirmPassword = ref('');
                 // 排序與篩選
                 const listFilters = ref({ search: '', sortKey: 'group', sortDir: 1 });
                 const sortOptions = [
@@ -539,6 +577,18 @@
                     showToast("已成功保存");
                 };
 
+                
+                const handleChangePassword = async () => {
+                    if (newPassword.value !== confirmPassword.value) return showToast("密碼不一致");
+                    if (newPassword.value.length < 6) return showToast("密碼長度需大於 6 位");
+                    try {
+                        await updatePassword(auth.currentUser, newPassword.value);
+                        showToast("密碼已更新！");
+                        ui.value.modal = null;
+                        newPassword.value = confirmPassword.value = '';
+                    } catch(e) { showToast("變更失敗 (可能需要重新登入)"); }
+                };
+
                 const editMember = (m) => { form.value = { ...m }; ui.value.editingId = m.id; ui.value.lastModal = ui.value.modal; ui.value.modal = 'memberEdit'; };
                 const askDeleteMember = (m) => { if(confirm(`確定刪除 ${m.name}？`)) { members.value = members.value.filter(x => x.id !== m.id); groups.value.forEach(g => g.members = g.members.filter(id => id !== m.id)); syncData(); } };
                 const openAddMember = () => { form.value = { name: '', job: 'priest' }; ui.value.editingId = null; ui.value.modal = 'memberEdit'; };
@@ -576,7 +626,7 @@
                     getJobLabel, getJobIcon, getJobClass, findMember, getMemberGroupName,
                     saveMember, editMember, askDeleteMember, handleCancelEdit, openAddMember,
                     addNewGroup, deleteGroup, removeFromGroup, moveToGroup, setSort,
-                    downloadCSV, loginAsGuest, handleLogout, handleAuth, syncData
+                    downloadCSV, loginAsGuest, handleLogout, handleAuth, syncData,handleChangePassword
                 };
             }
         }).mount('#app');
