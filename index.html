@@ -118,6 +118,14 @@
             background: #cbd5e1;
             border-radius: 10px;
         }
+
+        .icon-svg {
+            width: 1em;
+            height: 1em;
+            fill: currentColor;
+            display: inline-block;
+            vertical-align: middle;
+        }
     </style>
 </head>
 
@@ -268,9 +276,13 @@
                             </div>
                         </div>
                     </div>
-                    <button @click="addNewGroup" class="ro-card border-dashed border-gray-300 flex flex-col items-center justify-center p-12 text-gray-400 hover:border-[#0d8de7] hover:text-[#0d8de7] hover:bg-blue-50 transition-all group min-h-[250px]">
-                        <div class="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center mb-3 group-hover:border-blue-400 group-hover:bg-blue-100 transition-all">
-                            <svg class="icon-svg text-2xl group-hover:scale-110 transition-transform"><use xlink:href="#icon-plus"></use></svg>
+                    <button @click="addNewGroup"
+                        class="ro-card border-dashed border-gray-300 flex flex-col items-center justify-center p-12 text-gray-400 hover:border-[#0d8de7] hover:text-[#0d8de7] hover:bg-blue-50 transition-all group min-h-[250px]">
+                        <div
+                            class="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center mb-3 group-hover:border-blue-400 group-hover:bg-blue-100 transition-all">
+                            <svg class="icon-svg text-2xl group-hover:scale-110 transition-transform">
+                                <use xlink:href="#icon-plus"></use>
+                            </svg>
                         </div>
                         <span class="font-black text-sm">建立新的公會小隊</span>
                     </button>
