@@ -3,616 +3,571 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RO 公會管理系統 - 專業版</title>
+    <title>RO公會分組雲端版</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="icon" href="https://api.dicebear.com/7.x/bottts/svg?seed=Poring&backgroundColor=ffb7c5">
     
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        window.initFirebase = async function() {
-            let config = null;
-            try {
-                if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-                    config = JSON.parse(__firebase_config);
-                } else {
-                    const res = await fetch('config.json');
-                    if (res.ok) config = await res.json();
-                }
-            } catch (e) { console.warn("Firebase config not found."); }
-
-            if (config) {
-                const app = initializeApp(config);
-                const auth = getAuth(app);
-                const db = getFirestore(app);
-                const appId = typeof __app_id !== 'undefined' ? __app_id : 'ro-guild-pro-v1';
-                window.FB_RESOURCES = { db, auth, appId, doc, setDoc, onSnapshot, collection, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut };
-                return true;
-            }
-            return false;
-        };
-    </script>
-
+    
     <style>
-        :root { --ro-blue: #0d8de7; --ro-bg: #f8fafc; }
-        body { font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif; background-color: var(--ro-bg); }
-        .ro-card { background: white; border-radius: 1rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .ro-btn { background: var(--ro-blue); color: white; border-radius: 0.5rem; padding: 0.6rem 1.2rem; font-weight: 600; transition: all 0.2s; cursor: pointer; }
-        .ro-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-        .job-tag { padding: 4px 10px; border-radius: 9999px; font-size: 11px; color: white; font-weight: bold; display: flex; align-items: center; gap: 4px; }
-        
-        /* 職業顏色定義 */
-        .job-priest { background: #60a5fa; } 
-        .job-hunter { background: #fbbf24; } 
-        .job-blacksmith { background: #92400e; } 
-        .job-wizard { background: #a855f7; } 
-        .job-assassin { background: #4b5563; } 
-        .job-knight { background: #ef4444; } 
-        .job-gunner { background: #10b981; }
-
-        .job-icon-priest::before { content: "\f067"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
-        .job-icon-hunter::before { content: "\f005"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
-        .job-icon-wizard::before { content: "\f0d0"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
-        .job-icon-blacksmith::before { content: "\f7d9"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
-        .job-icon-assassin::before { content: "\f6ed"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
-        .job-icon-knight::before { content: "\f3ed"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
-        .job-icon-gunner::before { content: "\f05b"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+        :root { --primary: #0d8de7; --secondary: #f7d582; --accent: #e2817c; --bg-light: #f0f7ff; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: var(--bg-light); color: #334155; -webkit-tap-highlight-color: transparent; }
+        .ro-shadow { box-shadow: 0 8px 0px rgba(13, 141, 231, 0.1); }
+        .poring-float { animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .ro-btn { transition: all 0.2s; border-bottom-width: 4px; border-style: solid; }
+        .ro-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+        .badge-牧師 { color: #f7d582; background-color: #fdf6e3; border: 1px solid #f7d582; }
+        .badge-獵人 { color: #16a34a; background-color: #f0fdf4; border: 1px solid #4ade80; }
+        .badge-鐵匠 { color: #64748b; background-color: #f8fafc; border: 1px solid #94a3b8; }
+        .badge-巫師 { color: #9333ea; background-color: #faf5ff; border: 1px solid #a855f7; }
+        .badge-刺客 { color: #e11d48; background-color: #fff1f2; border: 1px solid #f43f5e; }
+        .badge-騎士 { color: #2563eb; background-color: #eff6ff; border: 1px solid #0d8de7; }
+        .badge-槍手 { color: #ea580c; background-color: #fff7ed; border: 1px solid #fb923c; }
+        .modal-overlay { background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); }
+        th.sortable { cursor: pointer; user-select: none; }
+        th.sortable:hover { background-color: #f1f5f9; }
     </style>
 </head>
 <body>
+    <div id="app" class="min-h-screen">
+        <svg style="display: none;">
+            <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></symbol>
+            <symbol id="icon-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></symbol>
+            <symbol id="icon-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></symbol>
+            <symbol id="icon-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></symbol>
+        </svg>
 
-<div id="app" class="min-h-screen flex flex-col">
-    <!-- Toast 通知 -->
-    <div v-if="toast.show" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] bg-gray-800 text-white px-6 py-3 rounded-xl shadow-2xl transition-all">
-        {{ toast.msg }}
-    </div>
-
-    <!-- 1. 登入介面 -->
-    <div v-if="view === 'auth'" class="flex-1 flex items-center justify-center p-4">
-        <div class="ro-card p-8 w-full max-w-sm">
-            <div class="text-center mb-8">
-                <i class="fas fa-shield-halved text-5xl text-blue-500 mb-2"></i>
-                <h1 class="text-2xl font-bold text-gray-800">RO 公會管理系統</h1>
-            </div>
-            <div class="space-y-4">
-                <input v-model="authForm.email" type="email" placeholder="電子信箱" class="w-full border p-3 rounded-lg outline-none focus:ring-2 ring-blue-500">
-                <input v-model="authForm.password" type="password" placeholder="密碼" class="w-full border p-3 rounded-lg outline-none focus:ring-2 ring-blue-500">
-                <div class="flex gap-2">
-                    <button @click="handleAuth('login')" class="flex-1 ro-btn">登入</button>
-                    <button @click="handleAuth('register')" class="flex-1 ro-btn bg-gray-600">註冊</button>
+        <!-- 1. 登入階段 -->
+        <div v-if="view === 'login'" class="min-h-screen flex items-center justify-center p-6">
+            <div class="bg-white w-full max-w-md rounded-[2.5rem] p-10 ro-shadow border-2 border-gray-100 text-center">
+                <div class="mb-6 poring-float">
+                    <svg width="80" height="70" viewBox="0 0 100 80" class="mx-auto">
+                        <ellipse cx="50" cy="50" rx="45" ry="30" fill="#ffb7c5" />
+                        <circle cx="35" cy="45" r="4" fill="#333" />
+                        <circle cx="65" cy="45" r="4" fill="#333" />
+                        <path d="M40 60 Q50 70 60 60" fill="none" stroke="#e2817c" stroke-width="3" stroke-linecap="round" />
+                    </svg>
                 </div>
-                <button @click="enterGuestMode" class="w-full py-3 rounded-lg border-2 border-dashed border-gray-300 text-gray-500 hover:bg-gray-50 font-bold mt-4">訪客登入 (本地測試模式)</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. 模式選擇 -->
-    <div v-else-if="view === 'mode-select'" class="flex-1 flex items-center justify-center p-4">
-        <div class="ro-card p-8 w-full max-w-md">
-            <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                <i class="fas fa-user-circle text-blue-500"></i> {{ currentUser?.email }}
-            </h2>
-            <div class="space-y-4">
-                <button @click="enterPrivateMode" class="w-full p-6 border-2 border-blue-500 rounded-2xl hover:bg-blue-50 text-left transition group">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="font-bold text-blue-700 text-lg">管理我的公會</span>
-                        <i class="fas fa-chevron-right text-blue-300 group-hover:translate-x-1 transition"></i>
-                    </div>
-                    <p class="text-xs text-gray-500">存取您的專屬雲端資料庫</p>
-                </button>
-
-                <div class="p-6 border-2 border-amber-400 rounded-2xl bg-amber-50/30">
-                    <p class="font-bold text-amber-700 mb-3 text-lg">進入共編模式</p>
-                    <div class="space-y-3">
-                        <input v-model="collabForm.code" placeholder="公會編碼 (RO-XXXX)" class="w-full p-3 border rounded-lg text-sm uppercase font-mono">
-                        <input v-model="collabForm.pass" type="password" placeholder="共編密碼" class="w-full p-3 border rounded-lg text-sm">
-                        <button @click="enterCollabMode" class="w-full ro-btn bg-amber-500">進入編輯</button>
+                <h2 class="text-3xl font-black text-[#0d8de7] mb-6">RO 公會分組</h2>
+                
+                <div v-if="hasFirebase" class="space-y-4">
+                    <input v-model="email" placeholder="信箱帳號" class="w-full h-12 px-5 rounded-xl bg-gray-50 border-2 border-transparent focus:border-[#0d8de7] outline-none font-bold" />
+                    <input v-model="password" type="password" placeholder="密碼" class="w-full h-12 px-5 rounded-xl bg-gray-50 border-2 border-transparent focus:border-[#0d8de7] outline-none font-bold" />
+                    <button @click="handleAuth" :disabled="loading" class="w-full h-12 rounded-xl bg-[#0d8de7] text-white font-black ro-btn border-[#066db5] flex items-center justify-center">
+                        <span v-if="loading" class="animate-spin mr-2">⏳</span>
+                        {{ loading ? '處理中...' : '登入 / 註冊帳號' }}
+                    </button>
+                    <div class="flex items-center gap-2 my-4 text-gray-300">
+                        <hr class="flex-grow"><span>或</span><hr class="flex-grow">
                     </div>
                 </div>
-                <button @click="handleLogout" class="w-full text-center text-gray-400 text-xs mt-4 hover:underline">登出帳號</button>
+                
+                <button @click="enterMyGuild" class="w-full h-12 rounded-xl bg-[#ffb7c5] text-white font-black ro-btn border-[#e2817c]">
+                    {{ hasFirebase ? '直接進入(匿名/本地)' : '進入公會分組管理' }}
+                </button>
+                <p v-if="error" class="text-red-400 text-xs font-bold mt-4">{{ error }}</p>
+                <div v-if="!hasFirebase" class="mt-4 p-4 bg-gray-50 rounded-2xl">
+                    <p class="text-gray-400 text-xs font-bold">偵測到本地模式</p>
+                    <p class="text-gray-300 text-[10px] mt-1">無法讀取 config.json，資料將僅保存在本機瀏覽器</p>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- 3. 管理看板 -->
-    <div v-else class="flex-1 flex flex-col h-screen overflow-hidden">
-        <header class="bg-white border-b p-4 flex justify-between items-center shadow-sm shrink-0">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-500 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg">
-                    <i :class="isGuest ? 'fas fa-vial' : (isCollab ? 'fas fa-users' : 'fas fa-crown')"></i>
-                </div>
-                <div>
-                    <h2 class="font-bold text-gray-800 text-sm md:text-base">{{ isGuest ? '訪客測試' : (isCollab ? '協作編輯' : '我的公會') }}</h2>
-                    <p class="text-[10px] font-mono text-gray-400 leading-tight">{{ currentGuildId }}</p>
-                </div>
-            </div>
-            <div class="flex gap-2">
-                <button @click="showStats = true" class="w-9 h-9 flex items-center justify-center text-gray-500 hover:text-blue-500"><i class="fas fa-chart-pie"></i></button>
-                <button @click="showList = true" class="w-9 h-9 flex items-center justify-center text-gray-500 hover:text-blue-500"><i class="fas fa-list-ul"></i></button>
-                <button v-if="!isCollab && !isGuest" @click="showSettings = true" class="w-9 h-9 flex items-center justify-center text-gray-500 hover:text-blue-500"><i class="fas fa-cog"></i></button>
-                <button @click="exitToMenu" class="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-red-500"><i class="fas fa-sign-out-alt"></i></button>
-            </div>
-        </header>
-
-        <main class="flex-1 overflow-auto p-4 md:p-6 bg-slate-50 space-y-6">
-            <!-- 待分配成員面板 -->
-            <div v-if="unassigned.length > 0" class="ro-card overflow-hidden">
-                <button @click="unassignedExpand = !unassignedExpand" class="w-full p-4 flex justify-between items-center bg-blue-50/50">
-                    <span class="font-bold text-blue-600 flex items-center gap-2">
-                        <i class="fas fa-user-clock"></i> 待分配成員 ({{ unassigned.length }})
-                    </span>
-                    <i class="fas" :class="unassignedExpand ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                </button>
-                <div v-show="unassignedExpand" class="p-4 flex flex-wrap gap-3">
-                    <div v-for="m in unassigned" :key="m.id" class="p-3 border rounded-xl bg-white shadow-sm flex flex-col gap-2 min-w-[140px]">
-                        <div class="flex items-center gap-2">
-                            <span class="job-tag" :class="getJobClass(m.job)">
-                                <i :class="getJobIcon(m.job)"></i>
-                            </span>
-                            <span class="font-bold text-sm">{{ m.name }}</span>
+        <!-- 2. 大廳階段 -->
+        <div v-else-if="view === 'lobby'" class="min-h-screen flex items-center justify-center p-6">
+            <div class="bg-white w-full max-w-md rounded-[2.5rem] p-10 ro-shadow border-2 border-gray-100 text-center">
+                <h2 class="text-2xl font-black text-gray-700 mb-8">歡迎回來，冒險者！</h2>
+                <div class="grid grid-cols-1 gap-4">
+                    <button @click="enterMyGuild" :disabled="loading" class="p-6 bg-blue-50 rounded-3xl border-2 border-blue-100 text-left group">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-black text-[#0d8de7]">我的公會資料</h3>
+                                <p class="text-xs text-blue-400">進入您的專屬管理頁面</p>
+                            </div>
+                            <span class="text-2xl transition-transform group-hover:translate-x-1">➜</span>
                         </div>
-                        <select @change="assignMember(m.id, $event.target.value)" class="text-xs border rounded p-1">
-                            <option value="">選擇分組...</option>
-                            <option v-for="g in groups" :value="g.id">{{ g.name }}</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+                    </button>
 
-            <!-- 分組網格 -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <div v-for="group in groups" :key="group.id" class="ro-card flex flex-col min-h-[250px] relative">
-                    <div class="p-4 border-b bg-gray-50/50 flex justify-between items-center">
-                        <input v-model="group.name" class="font-bold bg-transparent border-none focus:ring-0 w-2/3 truncate" @change="saveData">
-                        <button @click="deleteGroup(group.id)" class="text-gray-300 hover:text-red-500"><i class="fas fa-times"></i></button>
+                    <!-- 僅在有 Firebase 時顯示共編 -->
+                    <div v-if="hasFirebase" class="p-6 bg-amber-50 rounded-3xl border-2 border-amber-100 text-left">
+                        <h3 class="font-black text-amber-500 mb-2">共編登入</h3>
+                        <div class="space-y-3">
+                            <input v-model="collabCode" placeholder="輸入公會編碼" class="w-full p-3 bg-white rounded-xl border-none text-sm font-bold uppercase" />
+                            <input v-model="collabPass" type="password" placeholder="輸入共編密碼" class="w-full p-3 bg-white rounded-xl border-none text-sm font-bold" />
+                            <button @click="enterCollab" :disabled="loading" class="w-full py-3 bg-[#f7d582] text-white font-black rounded-xl ro-btn border-[#d4b159]">加入協作</button>
+                        </div>
                     </div>
                     
-                    <div class="p-3 flex-1 space-y-2">
-                        <div v-for="m in getGroupMembers(group.id)" :key="m.id" class="flex justify-between items-center p-2 rounded-lg border bg-white shadow-sm group">
-                            <div class="flex items-center gap-2">
-                                <span class="job-tag" :class="getJobClass(m.job)">
-                                    <i :class="getJobIcon(m.job)"></i>
-                                </span>
-                                <span class="text-sm font-medium">{{ m.name }}</span>
-                            </div>
-                            <button @click="unassignMember(m.id)" class="text-gray-300 opacity-0 group-hover:opacity-100 hover:text-red-400 transition-opacity px-1"><i class="fas fa-minus-circle"></i></button>
-                        </div>
-                    </div>
-
-                    <!-- 人數顯示與上限編輯整合區 -->
-                    <div class="p-3 border-t bg-gray-50 flex justify-between items-center">
-                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">小組狀態</span>
-                        <div class="flex items-center bg-white border rounded-full px-3 py-1 shadow-inner gap-2 group/limit">
-                            <span class="text-xs font-black" :class="getGroupMembers(group.id).length >= group.max ? 'text-red-500' : 'text-blue-500'">
-                                {{ getGroupMembers(group.id).length }}
-                            </span>
-                            <span class="text-[10px] text-gray-300">/</span>
-                            <div class="flex items-center">
-                                <input v-model.number="group.max" type="number" 
-                                    class="w-8 text-xs text-center border-none p-0 focus:ring-0 font-bold text-gray-600 bg-transparent" 
-                                    @change="saveData">
-                                <i class="fas fa-pen text-[8px] text-gray-300 opacity-0 group-hover/limit:opacity-100 transition-opacity"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 新增分組按鈕 -->
-                <button @click="addGroup" class="border-2 border-dashed border-gray-300 rounded-2xl flex flex-col items-center justify-center py-12 text-gray-400 hover:bg-white hover:border-blue-400 hover:text-blue-500 transition-all">
-                    <i class="fas fa-plus-circle text-3xl mb-2"></i>
-                    <span class="font-bold">新增分組</span>
-                </button>
-            </div>
-        </main>
-
-        <div class="fixed bottom-6 right-6">
-            <button @click="showAddMember = true" class="w-14 h-14 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all">
-                <i class="fas fa-user-plus text-xl"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- 彈窗: 新增成員 -->
-    <div v-if="showAddMember" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="ro-card p-6 w-full max-w-sm">
-            <h3 class="text-xl font-bold mb-6 text-gray-800">公會成員資料</h3>
-            <div class="space-y-4">
-                <div>
-                    <label class="text-xs font-bold text-gray-400 block mb-1 uppercase">Name</label>
-                    <input v-model="memberForm.name" placeholder="輸入遊戲暱稱" class="w-full border p-3 rounded-lg outline-none focus:ring-2 ring-blue-500">
-                </div>
-                <div>
-                    <label class="text-xs font-bold text-gray-400 block mb-1 uppercase">Job Class</label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button v-for="j in jobTypes" :key="j" @click="memberForm.job = j"
-                            class="flex items-center gap-2 p-3 border rounded-lg transition-all"
-                            :class="memberForm.job === j ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'hover:bg-gray-50'">
-                            <span class="job-tag scale-75" :class="getJobClass(j)"><i :class="getJobIcon(j)"></i></span>
-                            <span class="text-sm font-bold" :class="memberForm.job === j ? 'text-blue-600' : 'text-gray-600'">{{ j }}</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="flex gap-2 pt-4">
-                    <button @click="showAddMember = false" class="flex-1 py-3 text-gray-500 font-bold">取消</button>
-                    <button @click="addMember" class="flex-1 ro-btn">確認儲存</button>
+                    <button @click="signOutAction" class="text-xs font-bold text-gray-400 mt-4 underline">
+                        {{ hasFirebase ? '登出帳號' : '回到首頁' }}
+                    </button>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- 彈窗: 統計數據 -->
-    <div v-if="showStats" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="ro-card p-6 w-full max-w-sm relative">
-            <button @click="showStats = false" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times"></i></button>
-            <h3 class="text-xl font-bold mb-6 text-gray-800">公會職業統計</h3>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center pb-2 border-b">
-                    <span class="font-bold text-gray-500">公會總人數</span>
-                    <span class="text-2xl font-black text-blue-600">{{ members.length }} <span class="text-xs font-normal text-gray-400">PPL</span></span>
+        <!-- 3. 主管理介面 -->
+        <div v-else-if="view === 'main'" class="pb-20">
+            <nav class="bg-white border-b-4 border-[#0d8de7] p-4 sticky top-0 z-40 shadow-sm flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-[#ffb7c5] rounded-full poring-float"></div>
+                    <span class="font-black text-gray-700">{{ guildData.name }}</span>
+                    <span v-if="!isOwner" class="text-[10px] bg-amber-100 text-amber-500 px-2 py-0.5 rounded-full font-bold">共編模式</span>
                 </div>
-                <div v-for="(count, job) in stats" :key="job" class="space-y-1">
-                    <div class="flex justify-between text-xs font-bold">
-                        <span class="flex items-center gap-2">
-                            <i :class="getJobIcon(job)" class="text-[10px] w-4 text-center"></i> {{ job }}
-                        </span>
-                        <span>{{ count }} 人 ({{ members.length ? (count/members.length*100).toFixed(1) : 0 }}%)</span>
-                    </div>
-                    <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                        <div class="h-full transition-all duration-500" :class="getJobClass(job)" :style="{ width: (members.length ? (count/members.length*100) : 0) + '%' }"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 彈窗: 成員清單表格 -->
-    <div v-if="showList" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="ro-card p-6 w-full max-w-4xl h-[85vh] flex flex-col">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-gray-800">成員名單列表</h3>
                 <div class="flex gap-2">
-                    <button @click="downloadCSV" class="text-xs bg-green-50 text-green-600 px-3 py-1 rounded-lg border border-green-200 font-bold hover:bg-green-100"><i class="fas fa-file-csv"></i> 下載 CSV</button>
-                    <button @click="showList = false" class="text-gray-400 w-8 h-8 hover:bg-gray-100 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
+                    <!-- 本地模式隱藏設定按鈕 -->
+                    <button v-if="isOwner && hasFirebase" @click="showSettings = true" class="text-xs font-bold text-gray-400 px-3 py-1 bg-gray-50 rounded-lg">設定</button>
+                    <button @click="exitMain" class="text-xs font-bold text-red-400 px-3 py-1 bg-red-50 rounded-lg">退出</button>
                 </div>
-            </div>
+            </nav>
 
-            <div class="mb-4 flex flex-wrap gap-3">
-                <div class="flex-1 min-w-[150px] relative">
-                    <i class="fas fa-search absolute left-3 top-3 text-gray-300 text-xs"></i>
-                    <input v-model="listFilter.search" placeholder="搜尋暱稱..." class="w-full text-sm border p-2 pl-8 rounded-lg outline-none focus:ring-1 ring-blue-500">
-                </div>
-                <select v-model="listFilter.job" class="text-sm border p-2 rounded-lg outline-none">
-                    <option value="">所有職業</option>
-                    <option v-for="j in jobTypes" :value="j">{{ j }}</option>
-                </select>
-                <select v-model="listFilter.group" class="text-sm border p-2 rounded-lg outline-none">
-                    <option value="">所有分組</option>
-                    <option value="none">未分組成員</option>
-                    <option v-for="g in groups" :value="g.id">{{ g.name }}</option>
-                </select>
-            </div>
-
-            <div class="flex-1 overflow-auto border rounded-xl bg-white shadow-inner">
-                <table class="w-full text-left text-sm border-collapse">
-                    <thead class="bg-gray-50 sticky top-0 z-10">
-                        <tr class="border-b">
-                            <th class="p-4 font-bold text-gray-500">成員名稱</th>
-                            <th class="p-4 font-bold text-gray-500 cursor-pointer hover:text-blue-500" @click="toggleSort('job')">職業 <i class="fas fa-sort text-[10px] ml-1"></i></th>
-                            <th class="p-4 font-bold text-gray-500 cursor-pointer hover:text-blue-500" @click="toggleSort('groupId')">分組狀態 <i class="fas fa-sort text-[10px] ml-1"></i></th>
-                            <th class="p-4 font-bold text-gray-500 text-center">操作</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y">
-                        <tr v-for="m in filteredMembers" :key="m.id" class="hover:bg-slate-50 transition-colors">
-                            <td class="p-4 font-bold text-gray-700">{{ m.name }}</td>
-                            <td class="p-4">
-                                <span class="job-tag" :class="getJobClass(m.job)">
-                                    <i :class="getJobIcon(m.job)"></i> {{ m.job }}
-                                </span>
-                            </td>
-                            <td class="p-4">
-                                <span v-if="m.groupId" class="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-md font-bold">
-                                    {{ groups.find(g=>g.id===m.groupId)?.name || '未知小組' }}
-                                </span>
-                                <span v-else class="text-xs bg-gray-100 text-gray-400 px-2 py-1 rounded-md">
-                                    <i class="fas fa-exclamation-triangle mr-1"></i> 待分組
-                                </span>
-                            </td>
-                            <td class="p-4 text-center">
-                                <div class="flex justify-center gap-1">
-                                    <button @click="editMember(m)" class="text-blue-500 hover:bg-blue-50 w-8 h-8 rounded-lg flex items-center justify-center transition-colors"><i class="fas fa-edit"></i></button>
-                                    <button @click="confirmDelete(m.id)" class="text-red-400 hover:bg-red-50 w-8 h-8 rounded-lg flex items-center justify-center transition-colors"><i class="fas fa-trash-alt"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr v-if="filteredMembers.length === 0">
-                            <td colspan="4" class="p-12 text-center text-gray-400 italic">找不到符合條件的成員...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- 彈窗: 密碼設定 -->
-    <div v-if="showSettings" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="ro-card p-6 w-full max-w-sm">
-            <h3 class="text-xl font-bold mb-6">公會資料設定</h3>
-            <div class="space-y-4">
-                <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                    <p class="text-[10px] font-bold text-blue-400 mb-1 uppercase tracking-tighter">Collab Code</p>
-                    <div class="flex gap-2">
-                        <span class="flex-1 font-mono font-bold text-blue-700 bg-white border border-blue-200 p-2 rounded-lg text-sm text-center">{{ currentGuildId }}</span>
-                        <button @click="copyCode" class="bg-blue-500 text-white px-3 rounded-lg hover:bg-blue-600 transition-colors"><i class="fas fa-copy"></i></button>
+            <main class="max-w-6xl mx-auto p-4 space-y-6">
+                <!-- 功能快選 -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <button @click="showAddModal = true" class="p-6 bg-white rounded-3xl ro-shadow border-2 border-gray-50 text-left hover:scale-[1.02] transition-transform">
+                        <div class="text-[#e2817c] mb-2"><svg class="w-6 h-6"><use xlink:href="#icon-plus"/></svg></div>
+                        <h3 class="font-black text-gray-700">新增成員</h3>
+                    </button>
+                    <button @click="showStatsModal = true" class="p-6 bg-white rounded-3xl ro-shadow border-2 border-gray-50 text-left hover:scale-[1.02] transition-transform">
+                        <div class="text-[#0d8de7] mb-2"><svg class="w-6 h-6"><use xlink:href="#icon-chart"/></svg></div>
+                        <h3 class="font-black text-gray-700">職業統計</h3>
+                    </button>
+                    <button @click="showListModal = true" class="p-6 bg-white rounded-3xl ro-shadow border-2 border-gray-50 text-left hover:scale-[1.02] transition-transform">
+                        <div class="text-[#f7d582] mb-2"><svg class="w-6 h-6"><use xlink:href="#icon-users"/></svg></div>
+                        <h3 class="font-black text-gray-700">名單管理</h3>
+                    </button>
+                    <div class="p-6 bg-[#0d8de7] rounded-3xl ro-shadow text-white flex flex-col justify-center">
+                        <span class="text-[10px] font-bold opacity-80 uppercase tracking-widest">Total Members</span>
+                        <h3 class="text-2xl font-black">{{ members.length }} 人</h3>
                     </div>
                 </div>
-                <div>
-                    <label class="text-xs font-bold text-gray-400 block mb-1 uppercase">Collab Password</label>
-                    <input v-model="guildPassword" type="password" class="w-full border p-3 rounded-lg outline-none focus:ring-2 ring-blue-500">
-                    <p class="text-[10px] text-gray-400 mt-2">* 僅限擁有此密碼的人員共編您的資料</p>
+
+                <!-- 待分組名單 (優化：如果為0則最小化) -->
+                <div class="bg-white rounded-3xl border-2 border-gray-100 overflow-hidden">
+                    <button @click="showUnassigned = !showUnassigned" class="w-full p-5 flex justify-between items-center font-black text-gray-600 bg-gray-50/50">
+                        <span class="flex items-center gap-2 text-lg">待分配冒險者 <span class="text-sm px-3 py-1 bg-[#0d8de7] text-white rounded-full">{{ unassigned.length }}</span></span>
+                        <span class="text-2xl" v-if="unassigned.length > 0">{{ showUnassigned ? '−' : '+' }}</span>
+                    </button>
+                    <div v-show="unassigned.length > 0 && showUnassigned" class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div v-for="m in unassigned" :key="m.id" class="p-4 bg-white border-2 border-gray-50 rounded-2xl flex flex-col gap-3 hover:border-[#0d8de7] transition-all hover:shadow-md">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-black text-gray-700 truncate">{{ m.name }}</span>
+                                <span :class="'badge-'+m.job" class="text-[10px] px-2 py-0.5 rounded-full font-bold">{{ m.job }}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="text-xl">{{ getJobIcon(m.job) }}</div>
+                                <select @change="assignToGroup(m, $event.target.value)" class="flex-grow text-[11px] bg-gray-50 p-2 rounded-xl outline-none font-bold cursor-pointer border border-transparent focus:border-[#0d8de7]">
+                                    <option value="">指派至隊伍...</option>
+                                    <option v-for="(g, idx) in groups" :value="idx">{{ g.title }} ({{ g.members.length }}/{{ g.max }})</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex gap-2 pt-4">
-                    <button @click="showSettings = false" class="flex-1 py-3 text-gray-400">關閉</button>
-                    <button @click="saveData(); showSettings = false" class="flex-1 ro-btn">儲存設定</button>
+
+                <!-- 分組工作區 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div v-for="(g, idx) in groups" :key="idx" class="bg-white rounded-[2rem] p-6 ro-shadow border-2 border-gray-50 flex flex-col min-h-[350px]">
+                        <div class="space-y-3 mb-4">
+                            <div class="flex justify-between items-center">
+                                <input v-model="g.title" @blur="saveData" class="font-black text-lg bg-transparent border-b-2 border-transparent focus:border-blue-100 outline-none w-2/3">
+                                <div class="flex items-center gap-1 font-black text-sm text-gray-400">
+                                    <span :class="g.members.length >= g.max ? 'text-red-500' : 'text-[#0d8de7]'">{{ g.members.length }}</span>
+                                    <span>/</span>
+                                    <input v-model.number="g.max" @blur="saveData" type="number" class="w-8 bg-transparent outline-none">
+                                </div>
+                            </div>
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full transition-all duration-500" 
+                                     :class="g.members.length >= g.max ? 'bg-red-400' : g.members.length >= g.max - 1 ? 'bg-amber-400' : 'bg-green-400'"
+                                     :style="{ width: Math.min((g.members.length / g.max) * 100, 100) + '%' }"></div>
+                            </div>
+                        </div>
+                        <div class="flex-grow space-y-2">
+                            <div v-for="(m, midx) in g.members" :key="midx" class="flex justify-between items-center p-3 rounded-xl bg-gray-50 group hover:bg-white hover:shadow-sm">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-lg">{{ getJobIcon(m.job) }}</span>
+                                    <div class="flex flex-col">
+                                        <span class="text-xs font-black text-gray-700 leading-none">{{ m.name }}</span>
+                                        <span class="text-[9px] font-bold text-gray-400 mt-1 uppercase">{{ m.job }}</span>
+                                    </div>
+                                </div>
+                                <button @click="unassign(idx, midx)" class="text-gray-300 hover:text-red-400 opacity-0 group-hover:opacity-100 p-1">✕</button>
+                            </div>
+                        </div>
+                        <button @click="confirmDeleteGroup(idx)" class="mt-4 text-[10px] font-black text-gray-300 hover:text-red-300 self-end">刪除此小組</button>
+                    </div>
+                    <button @click="addGroup" class="h-[350px] border-4 border-dashed border-gray-100 rounded-[2rem] flex flex-col items-center justify-center text-gray-300 hover:text-[#0d8de7] hover:border-blue-100 group">
+                        <div class="w-12 h-12 rounded-full border-2 border-gray-100 flex items-center justify-center group-hover:scale-110">
+                            <span class="text-2xl font-black">+</span>
+                        </div>
+                        <span class="text-xs font-black tracking-widest mt-4">建立新小組</span>
+                    </button>
+                </div>
+            </main>
+        </div>
+
+        <!-- 名單管理彈窗 -->
+        <div v-if="showListModal" class="fixed inset-0 z-50 flex items-center justify-center p-6 modal-overlay" @click.self="showListModal = false">
+            <div class="bg-white w-full max-w-5xl rounded-[2.5rem] p-8 shadow-2xl flex flex-col max-h-[90vh]">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                    <h3 class="text-2xl font-black text-gray-800">公會成員總表 ({{ members.length }})</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <input v-model="searchTerm" placeholder="搜尋名稱..." class="bg-gray-100 text-xs font-bold px-3 py-2 rounded-xl outline-none">
+                        <select v-model="filterJob" class="text-[10px] font-bold bg-gray-100 px-3 py-2 rounded-xl">
+                            <option value="">所有職業</option>
+                            <option v-for="j in jobOptions" :value="j">{{ j }}</option>
+                        </select>
+                        <button @click="downloadCSV" class="p-2 bg-[#0d8de7] text-white rounded-xl px-4 text-xs font-bold">下載 CSV</button>
+                    </div>
+                </div>
+                <div class="flex-grow overflow-auto bg-white rounded-2xl border border-gray-100">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="sticky top-0 bg-gray-50 z-10 text-nowrap">
+                            <tr>
+                                <th class="p-4 text-xs font-black text-gray-400 sortable" @click="toggleSort('name')">冒險者暱稱 ⇅</th>
+                                <th class="p-4 text-xs font-black text-gray-400 sortable" @click="toggleSort('job')">職業 ⇅</th>
+                                <th class="p-4 text-xs font-black text-gray-400 sortable" @click="toggleSort('group')">分組 ⇅</th>
+                                <th class="p-4 text-xs font-black text-gray-400 text-center">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            <tr v-for="m in sortedFilteredMembers" :key="m.id" class="hover:bg-blue-50/30">
+                                <td class="p-4"><input v-model="m.name" @blur="saveData" class="font-bold text-gray-700 bg-transparent outline-none w-full border-b border-transparent focus:border-blue-200"></td>
+                                <td class="p-4">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-base">{{ getJobIcon(m.job) }}</span>
+                                        <select v-model="m.job" @change="updateMemberJob(m)" class="text-[10px] px-2 py-0.5 rounded-full font-bold border-none bg-gray-100" :class="'badge-'+m.job">
+                                            <option v-for="j in jobOptions" :value="j">{{ j }}</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td class="p-4"><span class="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">{{ getGroupName(m.id) }}</span></td>
+                                <td class="p-4 text-center">
+                                    <button @click="confirmDeleteMember(m.id)" class="text-gray-300 hover:text-red-400">✕</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button @click="showListModal = false" class="w-full h-12 mt-6 rounded-xl bg-[#f7d582] text-white font-black">返回</button>
+            </div>
+        </div>
+
+        <!-- 確認刪除彈窗 -->
+        <div v-if="confirmDialog.show" class="fixed inset-0 z-[60] flex items-center justify-center p-6 modal-overlay" @click.self="confirmDialog.show = false">
+            <div class="bg-white w-full max-w-xs rounded-[2rem] p-8 shadow-2xl text-center">
+                <div class="text-4xl mb-4">⚠️</div>
+                <h3 class="text-xl font-black text-gray-800 mb-2">確定要刪除嗎？</h3>
+                <p class="text-xs text-gray-400 font-bold mb-6">{{ confirmDialog.message }}</p>
+                <div class="flex gap-3">
+                    <button @click="confirmDialog.show = false" class="flex-grow h-11 bg-gray-100 rounded-xl font-black text-gray-400">取消</button>
+                    <button @click="executeConfirmedAction" class="flex-grow h-11 bg-red-400 rounded-xl font-black text-white ro-btn border-red-600">確定刪除</button>
                 </div>
             </div>
         </div>
+
+        <!-- 新增成員彈窗 -->
+        <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center p-6 modal-overlay" @click.self="showAddModal = false">
+            <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-10 shadow-2xl">
+                <h3 class="text-2xl font-black text-gray-800 mb-6 flex items-center gap-2">
+                    <span class="w-8 h-8 bg-[#e2817c] text-white rounded-xl flex items-center justify-center text-lg">+</span>新增成員
+                </h3>
+                <div class="space-y-4">
+                    <input v-model="newMember.name" placeholder="請輸入遊戲暱稱" class="w-full h-12 px-5 rounded-xl bg-gray-50 border-none outline-none font-bold" />
+                    <select v-model="newMember.job" class="w-full h-12 px-5 rounded-xl bg-gray-50 border-none font-bold">
+                        <option v-for="job in jobOptions" :value="job">{{ job }}</option>
+                    </select>
+                    <button @click="addMember" class="w-full h-12 rounded-xl bg-[#e2817c] text-white font-black ro-btn border-[#b35e59] mt-4">完成登記</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 統計彈窗 -->
+        <div v-if="showStatsModal" class="fixed inset-0 z-50 flex items-center justify-center p-6 modal-overlay" @click.self="showStatsModal = false">
+            <div class="bg-white w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl">
+                <h3 class="text-2xl font-black text-gray-800 mb-6">職業分佈</h3>
+                <div class="space-y-5">
+                    <div v-for="(count, job) in jobStats" :key="job">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="font-black text-gray-600 text-sm">{{ getJobIcon(job) }} {{ job }}</span>
+                            <span class="text-xs font-black" :style="{ color: getJobColor(job) }">{{ count }} 名</span>
+                        </div>
+                        <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full rounded-full transition-all duration-1000" :style="{ width: (members.length ? (count/members.length*100) : 0) + '%', backgroundColor: getJobColor(job) }"></div>
+                        </div>
+                    </div>
+                </div>
+                <button @click="showStatsModal = false" class="w-full h-12 mt-8 rounded-xl bg-gray-100 text-gray-500 font-black">返回</button>
+            </div>
+        </div>
+
+        <!-- 設定彈窗 -->
+        <div v-if="showSettings" class="fixed inset-0 z-50 flex items-center justify-center p-6 modal-overlay" @click.self="showSettings = false">
+            <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-10 shadow-2xl">
+                <h3 class="text-2xl font-black text-gray-800 mb-6 text-center">設定</h3>
+                <div class="space-y-4">
+                    <input v-model="guildData.name" @blur="saveData" placeholder="公會名稱" class="w-full h-12 px-5 rounded-xl bg-gray-50 border-none font-bold" />
+                    <input v-model="guildData.password" @blur="saveData" type="password" placeholder="共編密碼" class="w-full h-12 px-5 rounded-xl bg-gray-50 border-none font-bold" />
+                    <div class="p-5 bg-blue-50 rounded-[2rem] text-center">
+                        <p class="text-[10px] text-blue-400 font-bold mb-2 uppercase">Share Code</p>
+                        <p class="text-3xl font-black text-[#0d8de7]">{{ guildData.code }}</p>
+                    </div>
+                </div>
+                <button @click="showSettings = false" class="w-full h-12 mt-8 rounded-xl bg-[#0d8de7] text-white font-black">完成</button>
+            </div>
+        </div>
     </div>
-</div>
 
-<script type="module">
-const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-createApp({
-    setup() {
-        // --- 核心狀態 ---
-        const view = ref('auth');
-        const currentUser = ref(null);
-        const isGuest = ref(false);
-        const isCollab = ref(false);
-        const currentGuildId = ref('');
-        const guildPassword = ref('123456');
+        const { createApp, ref, computed, onMounted } = Vue;
 
-        // --- 資料狀態 ---
-        const members = ref([]);
-        const groups = ref([]);
-        const toast = reactive({ show: false, msg: '' });
+        createApp({
+            setup() {
+                const view = ref('login');
+                const hasFirebase = ref(false);
+                const user = ref(null);
+                const isOwner = ref(true);
+                const loading = ref(false);
+                const error = ref('');
+                const email = ref('');
+                const password = ref('');
+                const collabCode = ref('');
+                const collabPass = ref('');
+                const currentGuildId = ref(null);
+                const guildData = ref({ name: '我的公會', code: 'LOCAL-ONLY', password: '' });
+                const members = ref([]);
+                const groups = ref([]);
+                const showUnassigned = ref(true);
+                const showAddModal = ref(false);
+                const showStatsModal = ref(false);
+                const showListModal = ref(false);
+                const showSettings = ref(false);
+                const filterJob = ref('');
+                const sortKey = ref('name');
+                const sortOrder = ref(1);
+                const searchTerm = ref('');
+                const newMember = ref({ name: '', job: '牧師' });
+                const confirmDialog = ref({ show: false, message: '', action: null });
 
-        // --- 表單與 UI 狀態 ---
-        const authForm = reactive({ email: '', password: '' });
-        const collabForm = reactive({ code: '', pass: '' });
-        const memberForm = reactive({ id: null, name: '', job: '牧師' });
-        const listFilter = reactive({ search: '', job: '', group: '', sortKey: 'name', sortOrder: 1 });
-        
-        const showAddMember = ref(false);
-        const showStats = ref(false);
-        const showList = ref(false);
-        const showSettings = ref(false);
-        const unassignedExpand = ref(true);
+                const jobOptions = ['牧師', '獵人', '鐵匠', '巫師', '刺客', '騎士', '槍手'];
+                const jobIcons = { '牧師': '✨', '獵人': '🏹', '鐵匠': '⚒️', '巫師': '🔮', '刺客': '🗡️', '騎士': '🛡️', '槍手': '🔫' };
+                const jobColors = { '牧師': '#f7d582', '獵人': '#16a34a', '鐵匠': '#94a3b8', '巫師': '#a855f7', '刺客': '#f43f5e', '騎士': '#0d8de7', '槍手': '#ea580c' };
 
-        const jobTypes = ['牧師', '獵人', '巫師', '鐵匠', '刺客', '騎士', '槍手'];
-        let unsubscribeSync = null;
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'ro-guild-v3';
+                let db, auth;
+                let syncUnsubscribe = null;
 
-        // --- 初始化與 Firebase ---
-        onMounted(async () => {
-            const success = await window.initFirebase();
-            if (success) {
-                window.FB_RESOURCES.onAuthStateChanged(window.FB_RESOURCES.auth, (user) => {
-                    currentUser.value = user;
-                    if (user) view.value = 'mode-select';
-                    else view.value = 'auth';
-                });
-            } else {
-                view.value = 'auth';
-            }
-        });
+                // 核心邏輯：嘗試從外部 JSON 載入 Firebase 配置
+                const initFirebase = async () => {
+                    try {
+                        const response = await fetch('config.json');
+                        if (!response.ok) throw new Error("Config not found");
+                        
+                        const config = await response.json();
+                        const app = initializeApp(config);
+                        auth = getAuth(app);
+                        db = getFirestore(app);
+                        hasFirebase.value = true;
 
-        const showToast = (msg) => { toast.msg = msg; toast.show = true; setTimeout(() => toast.show = false, 2500); };
+                        onAuthStateChanged(auth, (u) => {
+                            user.value = u;
+                            if (u && view.value === 'login') view.value = 'lobby';
+                            if (u && currentGuildId.value) setupSync(currentGuildId.value);
+                        });
+                    } catch (e) { 
+                        console.warn("Switching to local mode:", e.message);
+                        hasFirebase.value = false;
+                    }
+                };
 
-        const handleAuth = async (type) => {
-            if (!authForm.email || !authForm.password) return showToast("請填寫 Email 與密碼");
-            const { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword } = window.FB_RESOURCES;
-            try {
-                if (type === 'login') await signInWithEmailAndPassword(auth, authForm.email, authForm.password);
-                else await createUserWithEmailAndPassword(auth, authForm.email, authForm.password);
-            } catch (e) { showToast("認證失敗: " + e.message); }
-        };
+                const handleAuth = async () => {
+                    if (!hasFirebase.value) return;
+                    if (!email.value || !password.value) { error.value = "請填寫完整資訊"; return; }
+                    loading.value = true; error.value = '';
+                    try {
+                        try {
+                            await signInWithEmailAndPassword(auth, email.value, password.value);
+                        } catch (err) {
+                            if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+                                await createUserWithEmailAndPassword(auth, email.value, password.value);
+                            } else throw err;
+                        }
+                    } catch (e) { error.value = "驗證失敗：" + e.message; } finally { loading.value = false; }
+                };
 
-        const enterGuestMode = () => {
-            isGuest.value = true;
-            const local = localStorage.getItem('ro_guild_local_v1');
-            if (local) {
-                const d = JSON.parse(local);
-                members.value = d.members || [];
-                groups.value = d.groups || [];
-            } else {
-                groups.value = [{ id: 'g1', name: '預設第一組', max: 5 }];
-            }
-            view.value = 'dashboard';
-        };
-
-        const enterPrivateMode = () => {
-            if (!currentUser.value) return;
-            isCollab.value = false;
-            const path = `users/${currentUser.value.uid}/guilds/my_guild_data`;
-            currentGuildId.value = `RO-${currentUser.value.uid.substring(0, 6).toUpperCase()}`;
-            startSync(path);
-        };
-
-        const enterCollabMode = () => {
-            if (!collabForm.code || !collabForm.pass) return showToast("請填寫編碼與密碼");
-            isCollab.value = true;
-            const code = collabForm.code.trim().toUpperCase();
-            const path = `public/shared_guilds/${code}`;
-            startSync(path, collabForm.pass);
-        };
-
-        const startSync = (path, requiredPass = null) => {
-            if (unsubscribeSync) unsubscribeSync();
-            const { db, appId, doc, onSnapshot } = window.FB_RESOURCES;
-            const docRef = doc(db, 'artifacts', appId, ...path.split('/'));
-
-            unsubscribeSync = onSnapshot(docRef, (snap) => {
-                if (snap.exists()) {
-                    const data = snap.data();
-                    if (requiredPass && data.password !== requiredPass) {
-                        showToast("密碼錯誤，拒絕存取");
-                        exitToMenu();
+                const enterMyGuild = async () => {
+                    if (!hasFirebase.value) {
+                        currentGuildId.value = 'local_user';
+                        isOwner.value = true;
+                        loadLocalData();
+                        view.value = 'main';
                         return;
                     }
-                    members.value = data.members || [];
-                    groups.value = data.groups || [];
-                    guildPassword.value = data.password || '123456';
-                    if (isCollab.value) currentGuildId.value = snap.id;
-                    view.value = 'dashboard';
-                } else {
-                    if (!isCollab.value) { 
-                        groups.value = [{ id: 'g1', name: '第一小組', max: 5 }];
-                        saveData(path);
-                        view.value = 'dashboard';
-                    } else {
-                        showToast("編碼不存在");
+                    
+                    loading.value = true;
+                    try {
+                        let currentUser = auth.currentUser;
+                        if (!currentUser) currentUser = (await signInAnonymously(auth)).user;
+                        currentGuildId.value = `personal_${currentUser.uid}`;
+                        isOwner.value = true;
+                        await fetchOrCreateGuild(currentGuildId.value);
+                        view.value = 'main';
+                    } catch (e) { error.value = "進入失敗"; } finally { loading.value = false; }
+                };
+
+                const fetchOrCreateGuild = async (gid) => {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'guild_configs', gid);
+                    const snap = await getDoc(docRef);
+                    if (!snap.exists()) {
+                        await setDoc(docRef, {
+                            name: '我的公會',
+                            code: Math.random().toString(36).substring(2, 8).toUpperCase(),
+                            password: '123',
+                            members: [],
+                            groups: [{ title: '第一小隊', members: [], max: 5 }]
+                        });
                     }
-                }
-            }, (err) => showToast("資料載入失敗"));
-        };
+                    setupSync(gid);
+                };
 
-        const saveData = async (overridePath = null) => {
-            if (isGuest.value) {
-                localStorage.setItem('ro_guild_local_v1', JSON.stringify({ members: members.value, groups: groups.value }));
-                return;
-            }
-            if (!currentUser.value) return;
-            const { db, appId, doc, setDoc } = window.FB_RESOURCES;
-            let path = isCollab.value ? `public/shared_guilds/${currentGuildId.value}` : `users/${currentUser.value.uid}/guilds/my_guild_data`;
-            if (overridePath) path = overridePath;
+                const setupSync = (gid) => {
+                    if (!hasFirebase.value || !auth.currentUser) return;
+                    if (syncUnsubscribe) syncUnsubscribe();
+                    syncUnsubscribe = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'guild_configs', gid), (d) => {
+                        if (d.exists()) {
+                            const data = d.data();
+                            guildData.value = { name: data.name, code: data.code, password: data.password };
+                            members.value = data.members || [];
+                            groups.value = data.groups || [];
+                        }
+                    }, (err) => {
+                        console.error("Sync error:", err);
+                    });
+                };
 
-            try {
-                await setDoc(doc(db, 'artifacts', appId, ...path.split('/')), {
-                    members: JSON.parse(JSON.stringify(members.value)),
-                    groups: JSON.parse(JSON.stringify(groups.value)),
-                    password: guildPassword.value,
-                    lastUpdate: Date.now()
+                const loadLocalData = () => {
+                    const saved = localStorage.getItem('ro_guild_local_data');
+                    if (saved) {
+                        const data = JSON.parse(saved);
+                        guildData.value = data.guildData || { name: '本地公會', code: 'LOCAL' };
+                        members.value = data.members || [];
+                        groups.value = data.groups || [{ title: '本地隊伍', members: [], max: 5 }];
+                    }
+                };
+
+                const saveData = async () => {
+                    if (!currentGuildId.value) return;
+                    if (!hasFirebase.value || currentGuildId.value === 'local_user') {
+                        localStorage.setItem('ro_guild_local_data', JSON.stringify({
+                            guildData: guildData.value,
+                            members: members.value,
+                            groups: groups.value
+                        }));
+                        return;
+                    }
+                    if (!auth.currentUser) return;
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'guild_configs', currentGuildId.value);
+                    try {
+                        await updateDoc(docRef, {
+                            name: guildData.value.name,
+                            password: guildData.value.password,
+                            members: JSON.parse(JSON.stringify(members.value)),
+                            groups: JSON.parse(JSON.stringify(groups.value))
+                        });
+                    } catch (e) {
+                        console.warn("Firestore update failed.");
+                    }
+                };
+
+                const unassigned = computed(() => {
+                    const assignedIds = groups.value.flatMap(g => g.members.map(m => m.id));
+                    return members.value.filter(m => !assignedIds.includes(m.id));
                 });
-            } catch (e) { showToast("儲存失敗"); }
-        };
 
-        // --- 功能邏輯 ---
-        const addMember = () => {
-            if (!memberForm.name) return;
-            if (memberForm.id) {
-                const idx = members.value.findIndex(m => m.id === memberForm.id);
-                if (idx !== -1) members.value[idx] = { ...memberForm, id: memberForm.id };
-            } else {
-                members.value.push({ id: Date.now(), name: memberForm.name, job: memberForm.job, groupId: null });
+                const sortedFilteredMembers = computed(() => {
+                    let res = members.value.filter(m => (!filterJob.value || m.job === filterJob.value) && (!searchTerm.value || m.name.includes(searchTerm.value)));
+                    res.sort((a, b) => {
+                        let va, vb;
+                        if (sortKey.value === 'name') { va = a.name; vb = b.name; }
+                        else if (sortKey.value === 'job') { va = a.job; vb = b.job; }
+                        else { va = getGroupName(a.id); vb = getGroupName(b.id); }
+                        return va.localeCompare(vb) * sortOrder.value;
+                    });
+                    return res;
+                });
+
+                const jobStats = computed(() => {
+                    const s = {}; jobOptions.forEach(j => s[j] = 0);
+                    members.value.forEach(m => { if (s[m.job] !== undefined) s[m.job]++; });
+                    return s;
+                });
+
+                const toggleSort = (k) => { if (sortKey.value === k) sortOrder.value *= -1; else { sortKey.value = k; sortOrder.value = 1; } };
+                const addMember = () => { if (!newMember.value.name) return; members.value.push({ id: Date.now().toString(), ...newMember.value }); newMember.value.name = ''; showAddModal.value = false; saveData(); };
+                
+                const confirmDeleteMember = (id) => {
+                    confirmDialog.value = {
+                        show: true,
+                        message: '這將會從公會中永久移除此成員。',
+                        action: () => {
+                            members.value = members.value.filter(m => m.id !== id);
+                            groups.value.forEach(g => { g.members = g.members.filter(m => m.id !== id); });
+                            saveData();
+                        }
+                    };
+                };
+
+                const updateMemberJob = (member) => {
+                    groups.value.forEach(g => {
+                        g.members.forEach(m => { if (m.id === member.id) m.job = member.job; });
+                    });
+                    saveData();
+                };
+
+                const addGroup = () => { groups.value.push({ title: '新隊伍', members: [], max: 5 }); saveData(); };
+                const confirmDeleteGroup = (i) => {
+                    confirmDialog.value = {
+                        show: true,
+                        message: '這將會刪除整支隊伍，隊員將回到待分配名單。',
+                        action: () => { groups.value.splice(i, 1); saveData(); }
+                    };
+                };
+
+                const executeConfirmedAction = () => {
+                    if (confirmDialog.value.action) confirmDialog.value.action();
+                    confirmDialog.value.show = false;
+                };
+
+                const assignToGroup = (m, i) => { if (i !== "" && groups.value[i].members.length < groups.value[i].max) { groups.value[i].members.push({ ...m }); saveData(); } };
+                const unassign = (gi, mi) => { groups.value[gi].members.splice(mi, 1); saveData(); };
+                const getGroupName = (id) => { const g = groups.value.find(g => g.members.some(m => m.id === id)); return g ? g.title : '未分組'; };
+                const downloadCSV = () => { let c = "暱稱,職業,分組\n"; members.value.forEach(m => c += `${m.name},${m.job},${getGroupName(m.id)}\n`); const b = new Blob(["\uFEFF" + c], { type: 'text/csv' }); const l = document.createElement("a"); l.href = URL.createObjectURL(b); l.download = `${guildData.value.name}.csv`; l.click(); };
+                const exitMain = () => { if (syncUnsubscribe) syncUnsubscribe(); view.value = hasFirebase.value ? 'lobby' : 'login'; };
+                const signOutAction = async () => { if (hasFirebase.value) await signOut(auth); view.value = 'login'; };
+
+                onMounted(() => initFirebase());
+
+                return {
+                    view, user, hasFirebase, isOwner, loading, error, email, password, collabCode, collabPass,
+                    guildData, members, groups, unassigned, sortedFilteredMembers, jobStats,
+                    showUnassigned, showAddModal, showStatsModal, showListModal, showSettings, 
+                    filterJob, sortKey, sortOrder, searchTerm, newMember, jobOptions,
+                    confirmDialog, getJobIcon: (j) => jobIcons[j] || '👤', getJobColor: (j) => jobColors[j],
+                    handleAuth, signOutAction, enterMyGuild, saveData, toggleSort,
+                    addMember, confirmDeleteMember, updateMemberJob, addGroup, confirmDeleteGroup, 
+                    executeConfirmedAction, assignToGroup, unassign, getGroupName, downloadCSV, exitMain
+                };
             }
-            showAddMember.value = false;
-            memberForm.name = ''; memberForm.id = null;
-            saveData();
-        };
-
-        const editMember = (m) => {
-            memberForm.id = m.id;
-            memberForm.name = m.name;
-            memberForm.job = m.job;
-            showAddMember.value = true;
-        };
-
-        const confirmDelete = (id) => {
-            if (confirm("確定刪除這位成員？此操作無法還原。")) {
-                members.value = members.value.filter(m => m.id !== id);
-                saveData();
-            }
-        };
-
-        const addGroup = () => { groups.value.push({ id: 'g'+Date.now(), name: '小組', max: 5 }); saveData(); };
-        const deleteGroup = (id) => {
-            if (confirm("確定解散此小組？")) {
-                members.value.forEach(m => { if(m.groupId === id) m.groupId = null; });
-                groups.value = groups.value.filter(g => g.id !== id);
-                saveData();
-            }
-        };
-
-        const assignMember = (mid, gid) => {
-            const m = members.value.find(x => x.id === mid);
-            if (m) m.groupId = gid || null;
-            saveData();
-        };
-        const unassignMember = (mid) => assignMember(mid, null);
-
-        // --- 輔助函式 ---
-        const getJobClass = (job) => ({
-            '牧師': 'job-priest', '獵人': 'job-hunter', '鐵匠': 'job-blacksmith',
-            '巫師': 'job-wizard', '刺客': 'job-assassin', '騎士': 'job-knight', '槍手': 'job-gunner'
-        }[job]);
-
-        const getJobIcon = (job) => ({
-            '牧師': 'fas fa-plus', '獵人': 'fas fa-star', '鐵匠': 'fas fa-hammer',
-            '巫師': 'fas fa-magic', '刺客': 'fas fa-khanda', '騎士': 'fas fa-shield-alt', '槍手': 'fas fa-crosshairs'
-        }[job]);
-
-        const stats = computed(() => {
-            const res = {};
-            jobTypes.forEach(j => res[j] = members.value.filter(m => m.job === j).length);
-            return res;
-        });
-
-        const filteredMembers = computed(() => {
-            let list = [...members.value];
-            if (listFilter.search) list = list.filter(m => m.name.toLowerCase().includes(listFilter.search.toLowerCase()));
-            if (listFilter.job) list = list.filter(m => m.job === listFilter.job);
-            if (listFilter.group === 'none') list = list.filter(m => !m.groupId);
-            else if (listFilter.group) list = list.filter(m => m.groupId === listFilter.group);
-
-            list.sort((a, b) => {
-                let valA = a[listFilter.sortKey] || '';
-                let valB = b[listFilter.sortKey] || '';
-                return valA.toString().localeCompare(valB.toString()) * listFilter.sortOrder;
-            });
-            return list;
-        });
-
-        const toggleSort = (key) => {
-            if (listFilter.sortKey === key) listFilter.sortOrder *= -1;
-            else { listFilter.sortKey = key; listFilter.sortOrder = 1; }
-        };
-
-        const downloadCSV = () => {
-            let csv = "Nickname,Job,Group\n";
-            filteredMembers.value.forEach(m => {
-                const gName = groups.value.find(g => g.id === m.groupId)?.name || 'Unassigned';
-                csv += `${m.name},${m.job},${gName}\n`;
-            });
-            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `Guild_Report_${new Date().getTime()}.csv`;
-            link.click();
-        };
-
-        const exitToMenu = () => { if (unsubscribeSync) unsubscribeSync(); view.value = 'mode-select'; isGuest.value = false; };
-        const handleLogout = () => window.FB_RESOURCES.signOut(window.FB_RESOURCES.auth);
-        const copyCode = () => { navigator.clipboard.writeText(currentGuildId.value); showToast("編碼已複製"); };
-
-        return {
-            view, currentUser, isGuest, isCollab, currentGuildId, guildPassword,
-            members, groups, toast, authForm, collabForm, memberForm, listFilter,
-            showAddMember, showStats, showList, showSettings, unassignedExpand,
-            jobTypes, stats, filteredMembers,
-            unassigned: computed(() => members.value.filter(m => !m.groupId)),
-            getGroupMembers: (gid) => members.value.filter(m => m.groupId === gid),
-            handleAuth, handleLogout, enterGuestMode, enterPrivateMode, enterCollabMode, exitToMenu,
-            saveData, addMember, editMember, confirmDelete, addGroup, deleteGroup, assignMember, unassignMember,
-            toggleSort, downloadCSV, getJobClass, getJobIcon, copyCode
-        };
-    }
-}).mount('#app');
-</script>
+        }).mount('#app');
+    </script>
 </body>
 </html>
