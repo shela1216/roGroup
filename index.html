@@ -86,19 +86,24 @@
                 </div> -->
 
                 <div class="flex items-center space-x-2" v-if="user">
-                    <!-- 改進的下拉選單容器，增加透明填充區防止滑鼠移開時消失 -->
-                    <div class="relative group py-2">
-                        <button class="flex items-center space-x-1 text-xs font-bold border border-white/40 px-3 py-1 rounded-lg hover:bg-white/10 transition-all">
+                    <!-- 改進的下拉選單容器：支援 Hover (PC) 與 Click (Mobile) -->
+                    <div class="relative group py-2" @click.stop>
+                        <button 
+                            @click="ui.userMenuOpen = !ui.userMenuOpen"
+                            class="flex items-center space-x-1 text-xs font-bold border border-white/40 px-3 py-1 rounded-lg hover:bg-white/10 transition-all active:scale-95">
                             <span>{{ user.email || '訪客' }}</span>
-                            <span>▼</span>
+                            <span :class="{'rotate-180': ui.userMenuOpen}" class="transition-transform duration-200">▼</span>
                         </button>
-                        <!-- 下拉選單：調整 mt 值並使用 group-hover 觸發 -->
-                        <div class="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 hidden group-hover:block z-[60] animate-fade-in">
-                            <button v-if="!user.isAnonymous" @click="ui.modal = 'changePassword'" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 font-bold transition-colors flex items-center gap-2">
-                                <span>🔑</span> 修改密碼
+                        
+                        <!-- 下拉選單：同時響應 group-hover (PC) 與 ui.userMenuOpen (Mobile) -->
+                        <div 
+                            :class="{'block': ui.userMenuOpen, 'hidden group-hover:block': !ui.userMenuOpen}"
+                            class="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[60] animate-fade-in">
+                            <button v-if="!user.isAnonymous" @click="ui.modal = 'changePassword'; ui.userMenuOpen = false" class="w-full text-left px-4 py-3 md:py-2 text-sm text-gray-700 hover:bg-blue-50 font-bold transition-colors flex items-center gap-2">
+                                <span class="text-lg">🔑</span> 修改密碼
                             </button>
-                            <button @click="handleLogout" class="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 font-bold transition-colors flex items-center gap-2 border-t border-gray-50 mt-1 pt-3">
-                                <span>🚪</span> 登出系統
+                            <button @click="handleLogout" class="w-full text-left px-4 py-3 md:py-2 text-sm text-red-500 hover:bg-red-50 font-bold transition-colors flex items-center gap-2 border-t border-gray-50 mt-1 pt-3">
+                                <span class="text-lg">🚪</span> 登出系統
                             </button>
                         </div>
                     </div>
@@ -426,7 +431,7 @@
                 const isGuestMode = ref(false);
                 const members = ref([]);
                 const groups = ref([]);
-                const ui = ref({ modal: null, lastModal: null, editingId: null, showUnassigned: true, showAuth: false, isSignUp: false });
+                const ui = ref({ modal: null, lastModal: null, editingId: null, showUnassigned: true, showAuth: false, isSignUp: false, userMenuOpen: false });
                 const toast = ref({ msg: '' });
                 const authForm = ref({ email: '', password: '' });
                 const form = ref({ name: '', job: 'priest' });
