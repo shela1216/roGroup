@@ -8,8 +8,6 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
         :root {
@@ -61,18 +59,14 @@
             100% { transform: translateY(0px); }
         }
 
-        .fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
-        .fade-enter-from, .fade-leave-to { opacity: 0; }
-        
         .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        .sort-active {
-            background-color: #0d8de7;
-            color: white;
-            border-color: #0d8de7;
-        }
+        /* 排序圖示 */
+        .sort-icon::after { content: ' ↕'; font-size: 0.8em; opacity: 0.3; }
+        .sort-asc::after { content: ' ▲'; opacity: 1; color: var(--ro-blue); }
+        .sort-desc::after { content: ' ▼'; opacity: 1; color: var(--ro-blue); }
     </style>
 </head>
 <body>
@@ -87,34 +81,33 @@
                         <circle cx="65" cy="45" r="5" fill="black" />
                         <path d="M 40 65 Q 50 75 60 65" stroke="black" fill="none" stroke-width="3" />
                     </svg>
-                    <span class="text-xl font-black tracking-tight">RO 公會分組助手 <span v-if="isGuestMode" class="text-[10px] bg-yellow-400 px-2 py-0.5 rounded ml-2">訪客模式</span></span>
+                    <span class="text-xl font-black tracking-tight">RO 公會分組助手 <span v-if="isGuestMode" class="text-[10px] bg-yellow-400 px-2 py-0.5 rounded ml-2 text-black">本地儲存模式</span></span>
                 </div>
                 <div class="flex items-center space-x-4" v-if="user">
                     <span class="hidden md:inline text-xs font-bold opacity-80">{{ user.email || '訪客用戶' }}</span>
-                    <button @click="handleLogout" class="text-xs font-bold border border-white/40 px-3 py-1 rounded-lg hover:bg-white hover:text-blue-500 transition-all">登出</button>
+                    <button @click="handleLogout" class="text-xs font-bold border border-white/40 px-3 py-1 rounded-lg hover:bg-white hover:text-blue-500 transition-all">登出 🚪</button>
                 </div>
             </div>
         </nav>
 
         <main class="max-w-6xl mx-auto p-4 md:p-6">
-            <!-- 登入後內容 -->
             <template v-if="user">
                 <!-- 數據看板 -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     <div class="ro-card p-4 flex flex-col items-center justify-center border-[#0d8de7]">
                         <span class="text-xs font-bold text-gray-400 mb-1">公會總人數</span>
-                        <div class="text-3xl font-black text-[#0d8de7]">{{ members.length }}</div>
+                        <div class="text-3xl font-black text-[#0d8de7]">👥 {{ members.length }}</div>
                     </div>
                     <button @click="ui.modal = 'stats'" class="ro-card p-4 flex flex-col items-center justify-center border-[#f7d582] hover:bg-yellow-50 transition-colors">
-                        <i data-lucide="pie-chart" class="text-yellow-600 mb-1"></i>
+                        <span class="text-xl mb-1">📊</span>
                         <span class="text-sm font-bold text-yellow-700">職業分佈</span>
                     </button>
                     <button @click="ui.modal = 'memberList'" class="ro-card p-4 flex flex-col items-center justify-center border-[#e2817c] hover:bg-red-50 transition-colors">
-                        <i data-lucide="users" class="text-red-500 mb-1"></i>
+                        <span class="text-xl mb-1">📜</span>
                         <span class="text-sm font-bold text-red-700">成員管理</span>
                     </button>
                     <button @click="openAddMember" class="ro-card p-4 flex flex-col items-center justify-center bg-[#0d8de7] text-white hover:bg-blue-600 transition-colors border-transparent">
-                        <i data-lucide="user-plus" class="mb-1"></i>
+                        <span class="text-xl mb-1">➕</span>
                         <span class="text-sm font-bold">新增成員</span>
                     </button>
                 </div>
@@ -125,28 +118,28 @@
                          class="ro-card bg-white p-4 cursor-pointer flex justify-between items-center transition-all"
                          :class="unassignedMembers.length === 0 ? 'opacity-50 border-gray-200' : 'border-dashed border-[#e2817c]'">
                         <div class="flex items-center space-x-2" :class="unassignedMembers.length > 0 ? 'text-[#e2817c]' : 'text-gray-400'">
-                            <i data-lucide="user-minus"></i>
-                            <span class="font-bold text-sm md:text-base">待分組成員 ({{ unassignedMembers.length }})</span>
+                            <span>📦</span>
+                            <span class="font-bold text-sm md:text-base">待指派成員 ({{ unassignedMembers.length }})</span>
                         </div>
-                        <i :data-lucide="ui.showUnassigned ? 'chevron-up' : 'chevron-down'"></i>
+                        <span class="text-xs">{{ ui.showUnassigned ? '▲' : '▼' }}</span>
                     </div>
-                    <transition name="fade">
-                        <div v-show="ui.showUnassigned && unassignedMembers.length > 0" class="mt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-white/50 rounded-xl border-2 border-dashed border-gray-200">
-                            <div v-for="member in unassignedMembers" :key="member.id" class="ro-card p-3 shadow-sm border bg-white flex flex-col space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-black text-gray-800 truncate">{{ member.name }}</span>
-                                    <span class="text-[9px] px-1.5 py-0.5 rounded-full font-bold border flex items-center gap-1 shadow-sm" :class="getJobClass(member.job)">
-                                        <span>{{ getJobIcon(member.job) }}</span>
-                                        <span>{{ getJobLabel(member.job) }}</span>
-                                    </span>
-                                </div>
-                                <select @change="moveToGroup(member.id, $event.target.value)" class="w-full text-xs p-2 border rounded-lg bg-gray-50 text-blue-600 font-bold outline-none cursor-pointer">
-                                    <option value="" disabled selected>指派至小組...</option>
-                                    <option v-for="group in groups" :key="group.id" :value="group.id">{{ group.name }}</option>
-                                </select>
+                    
+                    <div v-show="ui.showUnassigned && unassignedMembers.length > 0" 
+                         class="mt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-white/50 rounded-xl border-2 border-dashed border-gray-200">
+                        <div v-for="member in unassignedMembers" :key="member.id" class="ro-card p-3 shadow-sm border bg-white flex flex-col space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-black text-gray-800 truncate">{{ member.name }}</span>
+                                <span class="text-[9px] px-1.5 py-0.5 rounded-full font-bold border flex items-center gap-1 shadow-sm" :class="getJobClass(member.job)">
+                                    <span>{{ getJobIcon(member.job) }}</span>
+                                    <span>{{ getJobLabel(member.job) }}</span>
+                                </span>
                             </div>
+                            <select @change="moveToGroup(member.id, $event.target.value)" class="w-full text-xs p-2 border rounded-lg bg-gray-50 text-blue-600 font-bold outline-none cursor-pointer">
+                                <option value="" disabled selected>指派至小組...</option>
+                                <option v-for="group in groups" :key="group.id" :value="group.id">{{ group.name }}</option>
+                            </select>
                         </div>
-                    </transition>
+                    </div>
                 </div>
 
                 <!-- 小組展示區域 -->
@@ -157,7 +150,7 @@
                                 <input v-model="group.name" @blur="syncData" class="text-base font-black bg-transparent border-none focus:ring-0 text-blue-700 w-full outline-none hover:bg-blue-50 p-1 rounded transition-colors" placeholder="小組名稱">
                                 <div class="flex items-center mt-2">
                                     <div class="inline-flex items-center bg-blue-50 rounded-full px-3 py-1 border border-blue-100">
-                                        <i data-lucide="users" class="w-3 h-3 text-blue-400 mr-2"></i>
+                                        <span class="text-[10px] mr-2">👥</span>
                                         <span class="text-xs font-black mr-1" :class="group.members.length > group.max ? 'text-red-500' : 'text-blue-700'">
                                             {{ group.members.length }}
                                         </span>
@@ -166,7 +159,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button @click="deleteGroup(gIndex)" class="text-gray-300 hover:text-red-400 transition-colors p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <button @click="deleteGroup(gIndex)" class="text-gray-300 hover:text-red-400 transition-colors p-1" title="解散小組">🗑️</button>
                         </div>
                         <div class="space-y-2 flex-1 overflow-y-auto max-h-[300px] pr-1 custom-scroll">
                             <div v-for="(mId, mIndex) in group.members" :key="mId" class="flex justify-between items-center p-2 rounded-lg bg-gray-50 border border-gray-100 group transition-all hover:border-blue-200">
@@ -174,13 +167,13 @@
                                     <span class="text-xs">{{ getJobIcon(findMember(mId)?.job) }}</span>
                                     <span class="text-sm font-bold truncate">{{ findMember(mId)?.name }}</span>
                                 </div>
-                                <button @click="removeFromGroup(group, mIndex)" class="text-gray-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"><i data-lucide="x-circle" class="w-4 h-4"></i></button>
+                                <button @click="removeFromGroup(group, mIndex)" class="text-gray-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all">❌</button>
                             </div>
                             <div v-if="group.members.length === 0" class="h-full flex items-center justify-center text-gray-300 text-xs italic py-8">尚無成員</div>
                         </div>
                     </div>
                     <button @click="addNewGroup" class="ro-card border-dashed border-gray-300 flex flex-col items-center justify-center p-12 text-gray-400 hover:border-[#0d8de7] hover:text-[#0d8de7] hover:bg-blue-50 transition-all group">
-                        <i data-lucide="plus-circle" class="w-10 h-10 mb-2 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-4xl mb-2 group-hover:scale-110 transition-transform">🚩</span>
                         <span class="font-bold">新增小組</span>
                     </button>
                 </div>
@@ -192,12 +185,12 @@
                     <div class="text-6xl mb-4 poring-float inline-block">🏰</div>
                     <h1 class="text-2xl font-black text-blue-700 mb-2">RO 冒險者公會</h1>
                     <p class="text-gray-400 text-sm font-bold mb-6">管理您的公會分組與職業配置</p>
-                    
                     <div v-if="!ui.showAuth" class="space-y-4">
-                        <button @click="ui.showAuth = true" class="w-full py-4 bg-[#0d8de7] text-white font-black rounded-xl shadow-lg ro-btn border-b-[#0a6fb8]">帳號登入 / 註冊</button>
-                        <button @click="loginAsGuest" class="w-full py-4 bg-white text-blue-500 font-bold rounded-xl border-2 border-blue-100 hover:bg-blue-50 transition-all">訪客模式進入</button>
+                        <button v-if="!isGuestMode" @click="ui.showAuth = true" class="w-full py-4 bg-[#0d8de7] text-white font-black rounded-xl shadow-lg ro-btn border-b-[#0a6fb8]">帳號登入 / 註冊</button>
+                        <button @click="loginAsGuest" class="w-full py-4 bg-white text-blue-500 font-bold rounded-xl border-2 border-blue-100 hover:bg-blue-50 transition-all">
+                            {{ isGuestMode ? '直接進入本地管理' : '訪客模式進入' }}
+                        </button>
                     </div>
-
                     <div v-else class="space-y-4 text-left">
                         <div class="flex items-center justify-between mb-2">
                             <h3 class="font-black text-blue-700">{{ ui.isSignUp ? '建立新帳號' : '會員登入' }}</h3>
@@ -208,116 +201,115 @@
                         <button @click="handleAuth" class="w-full py-4 bg-[#0d8de7] text-white font-black rounded-xl shadow-lg ro-btn border-b-[#0a6fb8] mt-2">
                             {{ ui.isSignUp ? '註冊帳號' : '登入' }}
                         </button>
-                        <p class="text-center text-xs text-gray-400 font-bold">
-                            {{ ui.isSignUp ? '已有帳號？' : '還沒有帳號？' }}
-                            <button @click="ui.isSignUp = !ui.isSignUp" class="text-blue-500 underline ml-1">{{ ui.isSignUp ? '點此登入' : '點此註冊' }}</button>
-                        </p>
                     </div>
                 </div>
-                <p v-if="isGuestMode" class="text-center text-[10px] text-gray-400">目前為訪客模式，資料將僅儲存在您的瀏覽器中。</p>
             </div>
             
-            <!-- 載入中 -->
             <div v-else class="flex flex-col items-center justify-center py-20">
                 <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin mb-4"></div>
-                <p class="text-blue-500 font-bold animate-pulse">連線至普隆德拉...</p>
+                <p class="text-blue-500 font-bold animate-pulse">連線伺服器中...</p>
             </div>
         </main>
 
-        <!-- 彈窗內容省略 (與前一版相同) -->
-        <!-- ... (Statistics Modal, MemberList Modal, MemberEdit Modal, Toast) ... -->
-        
-        <!-- 彈窗：全體成員管理 (高度優化版) -->
+        <!-- 成員管理列表 -->
         <div v-if="ui.modal === 'memberList'" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-0 md:p-4 backdrop-blur-sm" @click.self="ui.modal = null">
             <div class="ro-card w-full h-full md:h-auto md:max-w-5xl md:max-h-[90vh] flex flex-col overflow-hidden !rounded-none md:!rounded-[20px]">
                 <div class="p-4 md:p-6 border-b bg-white">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div class="flex items-center justify-between md:justify-start md:space-x-4">
-                            <div class="flex items-center space-x-2">
-                                <h2 class="text-xl md:text-2xl font-black text-[#0d8de7]">公會成員管理</h2>
-                                <span class="bg-blue-50 text-blue-500 px-2 py-0.5 rounded-full text-[10px] md:text-xs font-bold border border-blue-100">總數: {{ members.length }}</span>
-                            </div>
-                            <button @click="ui.modal = null" class="md:hidden text-gray-400 p-2"><i data-lucide="x"></i></button>
+                            <h2 class="text-xl md:text-2xl font-black text-[#0d8de7]">公會成員管理</h2>
+                            <button @click="ui.modal = null" class="md:hidden text-gray-400 p-2 text-2xl">✕</button>
                         </div>
                         <div class="flex flex-row items-center space-x-2">
                             <div class="relative flex-1">
-                                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300"></i>
-                                <input v-model="listFilters.search" type="text" placeholder="搜尋..." class="w-full pl-9 pr-4 py-2 text-sm rounded-xl border-2 border-gray-50 outline-none focus:border-blue-400 font-bold bg-gray-50">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs">🔍</span>
+                                <input v-model="listFilters.search" type="text" placeholder="搜尋姓名..." class="w-full pl-9 pr-4 py-2 text-sm rounded-xl border-2 border-gray-50 outline-none focus:border-blue-400 font-bold bg-gray-50">
                             </div>
-                            <button @click="downloadCSV" class="hidden md:flex items-center space-x-2 px-4 py-2 bg-green-500 text-white text-sm font-black rounded-xl shadow-sm">
-                                <i data-lucide="download" class="w-4 h-4"></i><span>CSV</span>
+                            <button @click="downloadCSV" class="hidden md:flex items-center space-x-2 px-4 py-2 bg-green-500 text-white text-sm font-black rounded-xl shadow-sm hover:bg-green-600">
+                                <span>📥 CSV匯出</span>
                             </button>
                         </div>
                     </div>
                 </div>
-                <div class="overflow-y-auto flex-1 custom-scroll p-4 md:p-6 bg-gray-50/50">
-                    <div class="hidden md:block">
-                        <table class="w-full text-left border-collapse bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-                            <thead class="bg-blue-50/50 font-black text-blue-800 text-xs">
-                                <tr><th class="p-4">暱稱</th><th class="p-4">職業</th><th class="p-4">分組</th><th class="p-4 text-right">動作</th></tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50 text-sm">
-                                <tr v-for="member in sortedMembers" :key="member.id" class="hover:bg-blue-50/30 transition-colors">
-                                    <td class="p-4 font-bold">{{ member.name }}</td>
-                                    <td class="p-4"><span :class="getJobClass(member.job)" class="px-2 py-0.5 rounded-full text-[10px] font-black border flex items-center gap-1 w-fit"><span>{{ getJobIcon(member.job) }}</span><span>{{ getJobLabel(member.job) }}</span></span></td>
-                                    <td class="p-4"><span v-if="getMemberGroupName(member.id)" class="text-blue-500 font-bold bg-blue-50 px-2 py-1 rounded-lg text-xs">{{ getMemberGroupName(member.id) }}</span><span v-else class="text-gray-300 italic text-xs">尚未指派</span></td>
-                                    <td class="p-4 text-right space-x-1"><button @click="editMember(member)" class="text-blue-500 p-2 hover:bg-blue-100 rounded-xl"><i data-lucide="edit-3" class="w-4 h-4"></i></button><button @click="askDeleteMember(member)" class="text-red-300 hover:text-red-500 p-2 hover:bg-red-50 rounded-xl"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="grid grid-cols-1 gap-4 md:hidden pb-10">
-                        <div v-for="member in sortedMembers" :key="member.id" class="bg-white border-2 border-gray-100 rounded-2xl p-4 shadow-sm flex flex-col space-y-3">
-                            <div class="flex justify-between items-start">
-                                <div class="space-y-2">
-                                    <div class="text-lg font-black text-gray-800">{{ member.name }}</div>
-                                    <div class="flex flex-wrap gap-2">
-                                        <span :class="getJobClass(member.job)" class="px-2 py-1 rounded-lg text-[10px] font-black border flex items-center gap-1"><span>{{ getJobIcon(member.job) }}</span><span>{{ getJobLabel(member.job) }}</span></span>
-                                        <span v-if="getMemberGroupName(member.id)" class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">{{ getMemberGroupName(member.id) }}</span>
-                                    </div>
-                                </div>
-                                <div class="flex space-x-1">
-                                    <button @click="editMember(member)" class="w-10 h-10 flex items-center justify-center bg-blue-50 text-blue-600 rounded-xl"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
-                                    <button @click="askDeleteMember(member)" class="w-10 h-10 flex items-center justify-center bg-red-50 text-red-500 rounded-xl"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="overflow-y-auto flex-1 custom-scroll bg-gray-50/50">
+                    <table class="w-full text-left border-collapse bg-white">
+                        <thead class="bg-blue-50/50 font-black text-blue-800 text-xs sticky top-0 z-10 select-none">
+                            <tr>
+                                <th @click="setSort('name')" class="p-4 cursor-pointer hover:bg-blue-100 whitespace-nowrap">
+                                    暱稱 <span :class="getSortClass('name')"></span>
+                                </th>
+                                <th @click="setSort('job')" class="p-4 cursor-pointer hover:bg-blue-100 whitespace-nowrap">
+                                    職業 <span :class="getSortClass('job')"></span>
+                                </th>
+                                <th @click="setSort('group')" class="p-4 cursor-pointer hover:bg-blue-100 whitespace-nowrap">
+                                    分組 <span :class="getSortClass('group')"></span>
+                                </th>
+                                <th class="p-4 text-right">動作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50 text-sm">
+                            <tr v-for="member in sortedMembers" :key="member.id" class="hover:bg-blue-50/30 transition-colors">
+                                <td class="p-4 font-bold">{{ member.name }}</td>
+                                <td class="p-4">
+                                    <span :class="getJobClass(member.job)" class="px-2 py-0.5 rounded-full text-[10px] font-black border flex items-center gap-1 w-fit shadow-sm">
+                                        {{ getJobIcon(member.job) }} {{ getJobLabel(member.job) }}
+                                    </span>
+                                </td>
+                                <td class="p-4">
+                                    <span v-if="getMemberGroupName(member.id)" class="text-blue-500 font-bold">🚩 {{ getMemberGroupName(member.id) }}</span>
+                                    <span v-else class="text-gray-300 italic text-xs">未指派</span>
+                                </td>
+                                <td class="p-4 text-right space-x-3">
+                                    <button @click="editMember(member)" class="text-blue-500 hover:scale-110 transition-transform">📝</button>
+                                    <button @click="askDeleteMember(member)" class="text-red-300 hover:text-red-500 hover:scale-110 transition-transform">🗑️</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- 彈窗：新增/編輯成員 -->
+        <!-- 編輯彈窗 -->
         <div v-if="ui.modal === 'memberEdit'" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[110] p-4 backdrop-blur-sm" @click.self="handleCancelEdit">
             <div class="ro-card max-w-md w-full p-8">
-                <div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-black text-[#0d8de7]">{{ ui.editingId ? '修改成員' : '新增成員' }}</h2><button @click="handleCancelEdit" class="text-gray-400"><i data-lucide="x"></i></button></div>
+                <h2 class="text-2xl font-black text-[#0d8de7] mb-6">{{ ui.editingId ? '📝 修改成員' : '➕ 新增成員' }}</h2>
                 <div class="space-y-4">
-                    <div><label class="block text-xs font-bold text-gray-400 mb-1">成員暱稱</label><input v-model="form.name" type="text" class="w-full px-4 py-3 rounded-xl border-2 border-blue-100 outline-none font-bold"></div>
-                    <div><label class="block text-xs font-bold text-gray-400 mb-1">選擇職業</label><select v-model="form.job" class="w-full px-4 py-3 rounded-xl border-2 border-blue-100 outline-none font-bold bg-white"><option v-for="job in jobs" :key="job.val" :value="job.val">{{ job.icon }} {{ job.label }}</option></select></div>
-                    <div class="flex space-x-3 pt-4"><button @click="handleCancelEdit" class="flex-1 py-3 font-bold text-gray-400 bg-gray-100 rounded-xl">取消</button><button @click="saveMember" class="flex-1 py-3 font-bold text-white bg-[#0d8de7] rounded-xl shadow-lg ro-btn">儲存</button></div>
+                    <input v-model="form.name" type="text" class="w-full px-4 py-3 rounded-xl border-2 border-blue-50 outline-none font-bold focus:border-blue-400 bg-gray-50" placeholder="成員暱稱">
+                    <select v-model="form.job" class="w-full px-4 py-3 rounded-xl border-2 border-blue-50 outline-none font-bold bg-white focus:border-blue-400">
+                        <option v-for="job in jobs" :key="job.val" :value="job.val">{{ job.icon }} {{ job.label }}</option>
+                    </select>
+                    <div class="flex space-x-3 pt-4">
+                        <button @click="handleCancelEdit" class="flex-1 py-3 font-bold text-gray-400 bg-gray-100 rounded-xl">取消</button>
+                        <button @click="saveMember" class="flex-1 py-3 font-bold text-white bg-[#0d8de7] rounded-xl ro-btn">確認</button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 彈窗：統計 -->
+        <!-- 統計報告 -->
         <div v-if="ui.modal === 'stats'" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4 backdrop-blur-sm" @click.self="ui.modal = null">
             <div class="ro-card max-w-md w-full p-8 relative">
-                <button @click="ui.modal = null" class="absolute top-4 right-4 text-gray-400"><i data-lucide="x"></i></button>
-                <div class="flex items-center space-x-3 mb-6 border-b pb-4"><i data-lucide="bar-chart-2" class="text-blue-500"></i><h2 class="text-2xl font-black text-[#0d8de7]">職業分佈報告</h2></div>
+                <button @click="ui.modal = null" class="absolute top-4 right-4 text-gray-400 text-xl">✕</button>
+                <h2 class="text-2xl font-black text-[#0d8de7] mb-6">職業分佈報告 📜</h2>
                 <div class="space-y-5">
                     <div v-for="stat in jobStats" :key="stat.val" class="space-y-1.5">
                         <div class="flex justify-between text-sm font-bold items-center">
-                            <span class="flex items-center space-x-2"><span class="w-8 h-8 flex items-center justify-center rounded-lg text-sm border bg-white" :style="{ borderColor: stat.color, color: stat.color }">{{ stat.icon }}</span><span>{{ stat.label }}</span></span>
+                            <span>{{ stat.icon }} {{ stat.label }}</span>
                             <span class="text-gray-500 text-xs">{{ stat.count }} 人 ({{ stat.percent }}%)</span>
                         </div>
-                        <div class="w-full bg-gray-100 h-3 rounded-full overflow-hidden border"><div class="h-full transition-all duration-700" :style="{ width: stat.percent + '%', backgroundColor: stat.color }"></div></div>
+                        <div class="w-full bg-gray-100 h-3 rounded-full overflow-hidden border">
+                            <div class="h-full transition-all duration-700" :style="{ width: stat.percent + '%', backgroundColor: stat.color }"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Toast -->
-        <div v-if="toast.msg" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-gray-900/90 text-white px-8 py-3 rounded-full shadow-2xl z-[300] font-bold text-sm backdrop-blur-md">{{ toast.msg }}</div>
+        <div v-if="toast.msg" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-gray-900/90 text-white px-8 py-3 rounded-full shadow-2xl z-[300] font-bold text-sm animate-bounce">
+            {{ toast.msg }}
+        </div>
     </div>
 
     <script type="module">
@@ -325,9 +317,9 @@
         import { getAuth, onAuthStateChanged, signInAnonymously, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const { createApp, ref, computed, onMounted, watch } = Vue;
+        const { createApp, ref, computed, onMounted } = Vue;
 
-        const app = createApp({
+        createApp({
             setup() {
                 const user = ref(null);
                 const loading = ref(true);
@@ -338,7 +330,7 @@
                 const toast = ref({ msg: '' });
                 const authForm = ref({ email: '', password: '' });
                 const form = ref({ name: '', job: 'priest' });
-                const listFilters = ref({ search: '', sortKey: 'name', sortDir: 1 });
+                const listFilters = ref({ search: '', sortKey: 'group', sortDir: 1 });
 
                 const jobs = [
                     { val: 'priest', label: '牧師', icon: '⛪', color: '#0d8de7' },
@@ -353,138 +345,112 @@
                 let db, auth, unsubscribeSnapshot;
                 const appId = typeof __app_id !== 'undefined' ? __app_id : 'ro-guild-manager';
 
-                // --- Firebase 初始化邏輯優化 ---
-                const initSystem = async () => {
-                    let config = null;
-
-                    // 1. 嘗試載入內部變數
-                    if (typeof __firebase_config !== 'undefined') {
-                        try { config = JSON.parse(__firebase_config); } catch (e) {}
-                    }
-
-                    // 2. 如果沒載入成功，嘗試載入外部 config.json
-                    if (!config) {
-                        try {
-                            const response = await fetch('config.json');
-                            if (response.ok) {
-                                config = await response.json();
-                                console.log("Firebase config loaded from config.json");
-                            }
-                        } catch (e) {
-                            console.warn("External config.json not found or failed to load");
-                        }
-                    }
-
-                    // 3. 最終初始化
-                    if (config && config.apiKey) {
-                        try {
-                            const fbApp = initializeApp(config);
-                            auth = getAuth(fbApp);
-                            db = getFirestore(fbApp);
-                            setupAuthListener();
-                        } catch (err) {
-                            console.error("Firebase init failed, falling back to guest mode", err);
-                            enableGuestMode();
-                        }
-                    } else {
-                        console.log("No valid Firebase config found, enabling Guest Mode");
-                        enableGuestMode();
-                    }
-                };
-
-                const enableGuestMode = () => {
-                    isGuestMode.value = true;
-                    loading.value = false;
-                    loadLocalData();
-                };
-
-                const setupAuthListener = () => {
-                    onAuthStateChanged(auth, (u) => {
-                        user.value = u; 
-                        loading.value = false;
-                        if (unsubscribeSnapshot) unsubscribeSnapshot();
-                        if (u) {
-                            isGuestMode.value = u.isAnonymous;
-                            if (u.isAnonymous) loadLocalData();
-                            else {
-                                const userDoc = doc(db, 'artifacts', appId, 'users', u.uid, 'data', 'guild');
-                                unsubscribeSnapshot = onSnapshot(userDoc, (snap) => {
-                                    if (snap.exists()) {
-                                        const data = snap.data();
-                                        members.value = data.members || [];
-                                        groups.value = data.groups || [];
-                                    }
-                                }, (err) => console.error("Firestore error", err));
-                            }
-                        } else {
-                            members.value = [];
-                            groups.value = [];
-                        }
-                    });
-                };
-
+                // --- 數據同步 ---
                 const syncData = async () => {
                     const data = { members: JSON.parse(JSON.stringify(members.value)), groups: JSON.parse(JSON.stringify(groups.value)) };
                     if (isGuestMode.value) {
                         localStorage.setItem(`ro_data_${appId}`, JSON.stringify(data));
                     } else if (user.value) {
-                        await setDoc(doc(db, 'artifacts', appId, 'users', user.value.uid, 'data', 'guild'), data);
+                        try {
+                            await setDoc(doc(db, 'artifacts', appId, 'users', user.value.uid, 'data', 'guild'), data);
+                        } catch(e) { console.error("Firebase Sync Error", e); }
                     }
+                };
+
+                // --- Firebase 初始化邏輯 ---
+                const initSystem = async () => {
+                    let config = null;
+                    
+                    // 1. 嘗試從環境變數讀取
+                    if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                        try { config = JSON.parse(__firebase_config); } catch (e) {}
+                    }
+
+                    // 2. 如果環境變數無效，嘗試讀取 config.json
+                    if (!config || !config.apiKey) {
+                        try {
+                            const res = await fetch('config.json');
+                            if (res.ok) config = await res.json();
+                        } catch (e) {
+                            console.log("No config.json found, falling back to guest mode.");
+                        }
+                    }
+
+                    // 3. 如果有 Config 則初始化 Firebase
+                    if (config && config.apiKey) {
+                        try {
+                            const fbApp = initializeApp(config);
+                            auth = getAuth(fbApp);
+                            db = getFirestore(fbApp);
+                            onAuthStateChanged(auth, (u) => {
+                                user.value = u;
+                                loading.value = false;
+                                if (unsubscribeSnapshot) unsubscribeSnapshot();
+                                if (u) {
+                                    if (u.isAnonymous) {
+                                        isGuestMode.value = true;
+                                        loadLocalData();
+                                    } else {
+                                        isGuestMode.value = false;
+                                        const docRef = doc(db, 'artifacts', appId, 'users', u.uid, 'data', 'guild');
+                                        unsubscribeSnapshot = onSnapshot(docRef, snap => {
+                                            if (snap.exists()) {
+                                                members.value = snap.data().members || [];
+                                                groups.value = snap.data().groups || [];
+                                            }
+                                        }, () => showToast("讀取雲端數據失敗"));
+                                    }
+                                }
+                            });
+                            return;
+                        } catch (e) { console.error("Firebase Init Error", e); }
+                    }
+
+                    // 4. 全部失敗，進入訪客模式
+                    enableGuestMode();
+                };
+
+                const enableGuestMode = () => {
+                    isGuestMode.value = true;
+                    user.value = { uid: 'guest' };
+                    loading.value = false;
+                    loadLocalData();
                 };
 
                 const loadLocalData = () => {
-                    const saved = localStorage.getItem(`ro_data_${appId}`);
-                    if (saved) {
-                        const data = JSON.parse(saved);
-                        members.value = data.members || [];
-                        groups.value = data.groups || [];
+                    const s = localStorage.getItem(`ro_data_${appId}`);
+                    if (s) {
+                        const d = JSON.parse(s);
+                        members.value = d.members || [];
+                        groups.value = d.groups || [];
                     }
                 };
 
-                // Auth Helpers
-                const handleAuth = async () => {
-                    if (!authForm.value.email || !authForm.value.password) return showToast('請填寫完整資訊');
-                    try {
-                        loading.value = true;
-                        if (ui.value.isSignUp) {
-                            await createUserWithEmailAndPassword(auth, authForm.value.email, authForm.value.password);
-                            showToast('註冊成功！');
-                        } else {
-                            await signInWithEmailAndPassword(auth, authForm.value.email, authForm.value.password);
-                            showToast('歡迎回來！');
-                        }
-                    } catch (err) {
-                        showToast('操作失敗，請檢查網路或帳密');
-                    } finally { loading.value = false; }
-                };
+                // --- UI 方法 ---
+                const showToast = (msg) => { toast.value.msg = msg; setTimeout(() => toast.value.msg = '', 3000); };
+                const getJobLabel = (v) => jobs.find(j => j.val === v)?.label || v;
+                const getJobIcon = (v) => jobs.find(j => j.val === v)?.icon || '👤';
+                const getJobClass = (v) => `job-${v}`;
+                const findMember = (id) => members.value.find(m => m.id === id);
+                const getMemberGroupName = (mid) => groups.value.find(g => g.members.includes(mid))?.name;
 
-                const loginAsGuest = async () => {
-                    if (auth) await signInAnonymously(auth);
-                    else { user.value = { uid: 'guest', isAnonymous: true }; enableGuestMode(); }
-                };
-
-                const handleLogout = async () => { 
-                    if (auth) await signOut(auth); 
-                    user.value = null; 
-                    ui.value.showAuth = false;
-                };
-
-                // Logic Computed
                 const unassignedMembers = computed(() => {
-                    const assignedIds = new Set(groups.value.flatMap(g => g.members));
-                    return members.value.filter(m => !assignedIds.has(m.id));
+                    const assignedIds = groups.value.flatMap(g => g.members);
+                    return members.value.filter(m => !assignedIds.includes(m.id));
                 });
 
                 const sortedMembers = computed(() => {
-                    let res = [...members.value];
+                    let list = [...members.value];
                     const { search, sortKey, sortDir } = listFilters.value;
-                    if (search) res = res.filter(m => m.name.toLowerCase().includes(search.toLowerCase()));
-                    res.sort((a, b) => {
-                        let valA = sortKey === 'name' ? a.name : (sortKey === 'job' ? getJobLabel(a.job) : (getMemberGroupName(a.id) || 'zzz'));
-                        let valB = sortKey === 'name' ? b.name : (sortKey === 'job' ? getJobLabel(b.job) : (getMemberGroupName(b.id) || 'zzz'));
+                    if (search) list = list.filter(m => m.name.toLowerCase().includes(search.toLowerCase()));
+                    list.sort((a, b) => {
+                        let valA, valB;
+                        if (sortKey === 'name') { valA = a.name; valB = b.name; }
+                        else if (sortKey === 'job') { valA = a.job; valB = b.job; }
+                        else { valA = getMemberGroupName(a.id) || 'zzz'; valB = getMemberGroupName(b.id) || 'zzz'; }
                         return valA.toString().localeCompare(valB.toString(), 'zh-TW') * sortDir;
                     });
-                    return res;
+                    return list;
                 });
 
                 const jobStats = computed(() => {
@@ -495,79 +461,70 @@
                     });
                 });
 
-                // Member Operations
+                const setSort = (key) => {
+                    if (listFilters.value.sortKey === key) listFilters.value.sortDir *= -1;
+                    else { listFilters.value.sortKey = key; listFilters.value.sortDir = 1; }
+                };
+
+                const getSortClass = (key) => {
+                    if (listFilters.value.sortKey !== key) return 'sort-icon';
+                    return listFilters.value.sortDir === 1 ? 'sort-asc' : 'sort-desc';
+                };
+
                 const saveMember = () => {
-                    if (!form.value.name.trim()) return;
+                    if (!form.value.name.trim()) return showToast("請輸入暱稱");
                     if (ui.value.editingId) {
-                        const idx = members.value.findIndex(m => m.id === ui.value.editingId);
-                        if (idx !== -1) members.value[idx] = { ...members.value[idx], ...form.value };
+                        const i = members.value.findIndex(m => m.id === ui.value.editingId);
+                        if(i !== -1) members.value[i] = { ...members.value[i], ...form.value };
                     } else {
                         members.value.push({ id: crypto.randomUUID(), ...form.value });
                     }
                     syncData();
-                    if (ui.value.lastModal) { ui.value.modal = ui.value.lastModal; ui.value.lastModal = null; } 
-                    else ui.value.modal = null;
-                    showToast('已儲存冒險者資訊');
+                    ui.value.modal = ui.value.lastModal || null;
+                    showToast("名單已儲存");
                 };
 
-                const editMember = (m) => { 
-                    form.value = { name: m.name, job: m.job }; 
-                    ui.value.editingId = m.id;
-                    ui.value.lastModal = ui.value.modal;
-                    ui.value.modal = 'memberEdit'; 
-                };
-
-                const askDeleteMember = (m) => {
-                    if(confirm(`驅逐「${m.name}」？`)) {
-                        members.value = members.value.filter(x => x.id !== m.id);
-                        groups.value.forEach(g => { g.members = g.members.filter(id => id !== m.id); });
-                        syncData();
-                    }
-                };
-
-                const handleCancelEdit = () => { if(ui.value.lastModal) { ui.value.modal = ui.value.lastModal; ui.value.lastModal = null; } else ui.value.modal = null; };
-                const showToast = (msg) => { toast.value.msg = msg; setTimeout(() => toast.value.msg = '', 3000); };
+                const editMember = (m) => { form.value = { ...m }; ui.value.editingId = m.id; ui.value.lastModal = ui.value.modal; ui.value.modal = 'memberEdit'; };
+                const askDeleteMember = (m) => { if(confirm(`確定刪除 ${m.name}？`)) { members.value = members.value.filter(x => x.id !== m.id); groups.value.forEach(g => g.members = g.members.filter(id => id !== m.id)); syncData(); } };
                 const openAddMember = () => { form.value = { name: '', job: 'priest' }; ui.value.editingId = null; ui.value.modal = 'memberEdit'; };
-                const addNewGroup = () => { groups.value.push({ id: crypto.randomUUID(), name: '新小隊', max: 5, members: [] }); syncData(); };
-                const deleteGroup = (idx) => { if(confirm('解散小組？')) { groups.value.splice(idx, 1); syncData(); } };
-                const removeFromGroup = (g, idx) => { g.members.splice(idx, 1); syncData(); };
-                const moveToGroup = (mId, gId) => {
-                    const g = groups.value.find(x => x.id === gId);
-                    if (g && !g.members.includes(mId)) {
-                        if (g.members.length >= g.max) return showToast('人數已滿');
-                        g.members.push(mId); syncData();
-                    }
+                const handleCancelEdit = () => { ui.value.modal = ui.value.lastModal || null; };
+                const addNewGroup = () => { groups.value.push({ id: crypto.randomUUID(), name: '新小組', max: 5, members: [] }); syncData(); };
+                const deleteGroup = (i) => { if(confirm('解散此組？')) { groups.value.splice(i, 1); syncData(); } };
+                const removeFromGroup = (g, i) => { g.members.splice(i, 1); syncData(); };
+                const moveToGroup = (mid, gid) => {
+                    const g = groups.value.find(x => x.id === gid);
+                    if(g && g.members.length < g.max) { g.members.push(mid); syncData(); }
+                    else showToast("人數已滿");
                 };
-                const downloadCSV = () => {
-                    const csvContent = "\ufeff暱稱,職業,分組\n" + sortedMembers.value.map(m => `${m.name},${getJobLabel(m.job)},${getMemberGroupName(m.id) || '未指派'}`).join("\n");
-                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                    const link = document.createElement("a");
-                    link.href = URL.createObjectURL(blob);
-                    link.download = "公會名單.csv";
-                    link.click();
-                };
-                const getJobLabel = (v) => jobs.find(j => j.val === v)?.label || v;
-                const getJobIcon = (v) => jobs.find(j => j.val === v)?.icon || '👤';
-                const getJobClass = (v) => `job-${v}`;
-                const findMember = (id) => members.value.find(m => m.id === id);
-                const getMemberGroupName = (mid) => groups.value.find(g => g.members.includes(mid))?.name;
 
-                onMounted(() => { initSystem(); setTimeout(() => lucide.createIcons(), 500); });
-                watch([ui, members, groups, listFilters, user], () => setTimeout(() => lucide.createIcons(), 50), { deep: true });
+                const downloadCSV = () => {
+                    const content = "\ufeff暱稱,職業,分組\n" + sortedMembers.value.map(m => `${m.name},${getJobLabel(m.job)},${getMemberGroupName(m.id) || '未指派'}`).join("\n");
+                    const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+                    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "Guild_Members.csv"; a.click();
+                };
+
+                const loginAsGuest = async () => { if(auth) await signInAnonymously(auth); else enableGuestMode(); };
+                const handleLogout = async () => { if(auth) await signOut(auth); else user.value = null; };
+                const handleAuth = async () => {
+                    try {
+                        loading.value = true;
+                        if(ui.value.isSignUp) await createUserWithEmailAndPassword(auth, authForm.value.email, authForm.value.password);
+                        else await signInWithEmailAndPassword(auth, authForm.value.email, authForm.value.password);
+                    } catch(e) { showToast("認證錯誤"); } finally { loading.value = false; }
+                };
+
+                onMounted(() => initSystem());
 
                 return {
-                    user, loading, isGuestMode, members, groups, ui, form, jobs,
-                    toast, listFilters, sortedMembers, unassignedMembers, jobStats, authForm,
+                    user, loading, isGuestMode, members, groups, ui, form, jobs, toast, listFilters,
+                    sortedMembers, unassignedMembers, jobStats, authForm,
                     getJobLabel, getJobIcon, getJobClass, findMember, getMemberGroupName,
-                    saveMember, editMember, askDeleteMember, handleCancelEdit, handleAuth,
-                    openAddMember, addNewGroup, deleteGroup, removeFromGroup, moveToGroup,
-                    loginAsGuest, handleLogout, syncData, setSort: (k) => { if (listFilters.value.sortKey === k) listFilters.value.sortDir *= -1; else { listFilters.value.sortKey = k; listFilters.value.sortDir = 1; } },
-                    downloadCSV
+                    saveMember, editMember, askDeleteMember, handleCancelEdit, openAddMember,
+                    addNewGroup, deleteGroup, removeFromGroup, moveToGroup, setSort, getSortClass,
+                    downloadCSV, loginAsGuest, handleLogout, handleAuth, syncData
                 };
             }
-        });
-
-        app.mount('#app');
+        }).mount('#app');
     </script>
 </body>
 </html>
