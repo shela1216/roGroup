@@ -1,0 +1,21 @@
+{
+    "name": "RO公會分組管理系統",
+    "short_name": "分組管理",
+    "description": "管理您的公會分組與職業配置",
+    "start_url": "index.html",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#0d8de7",
+    "icons": [
+        {
+            "src": "icon.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
