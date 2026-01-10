@@ -250,18 +250,12 @@
                             <div v-for="(mId, mIndex) in group.members" :key="mId"
                                 class="flex justify-between items-center p-2 rounded-lg bg-gray-50 border border-gray-100 group transition-all hover:border-blue-200">
                                 <div class="flex items-center space-x-2 overflow-hidden">
-                                    <!-- <span class="icon-svg text-blue-400 flex-shrink-0">{{
-                                        getJobIcon(findMember(mId)?.job) }}</span> -->
+                                    <span class="icon-svg text-blue-400 flex-shrink-0">{{
+                                        getJobIcon(findMember(mId)?.job) }}</span>
                                     <div class="flex flex-col truncate">
-                                        <span
-                                            class="text-[9px] px-1.5 py-0.5 rounded-full font-bold border gap-1 shadow-sm"
-                                            :class="getJobClass(findMember(mId)?.job)">
-                                            <span>{{ getJobIcon(findMember(mId)?.job) }}</span>
-                                            <span>{{ getJobLabel(findMember(mId)?.job) }}</span>
-                                        </span>
                                         <span class="text-sm font-bold">{{ findMember(mId)?.name }}</span>
-                                        <!-- <span class="text-[9px] text-gray-400 font-bold">{{
-                                            getJobLabel(findMember(mId)?.job) }}</span> -->
+                                        <span class="text-[9px] text-gray-400 font-bold">{{
+                                            getJobLabel(findMember(mId)?.job) }}</span>
                                     </div>
 
                                     <!-- <span class="text-sm font-bold truncate">{{ findMember(mId)?.name }}</span> -->
@@ -274,10 +268,11 @@
                             </div>
                         </div>
                     </div>
-                    <button @click="addNewGroup"
-                        class="ro-card border-dashed border-gray-300 flex flex-col items-center justify-center p-12 text-gray-400 hover:border-[#0d8de7] hover:text-[#0d8de7] hover:bg-blue-50 transition-all group shadow-none">
-                        <span class="text-4xl mb-2 group-hover:scale-110 transition-transform">🚩</span>
-                        <span class="font-bold">新增小組</span>
+                    <button @click="addNewGroup" class="ro-card border-dashed border-gray-300 flex flex-col items-center justify-center p-12 text-gray-400 hover:border-[#0d8de7] hover:text-[#0d8de7] hover:bg-blue-50 transition-all group min-h-[250px]">
+                        <div class="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center mb-3 group-hover:border-blue-400 group-hover:bg-blue-100 transition-all">
+                            <svg class="icon-svg text-2xl group-hover:scale-110 transition-transform"><use xlink:href="#icon-plus"></use></svg>
+                        </div>
+                        <span class="font-black text-sm">建立新的公會小隊</span>
                     </button>
                 </div>
             </template>
