@@ -235,6 +235,9 @@
                     <div>
                         <label class="text-xs font-bold text-gray-400 ml-1">新密碼</label>
                         <input v-model="newPassword" type="password" class="w-full px-4 py-3 rounded-xl border-2 border-blue-50 outline-none font-bold focus:border-blue-400 bg-gray-50" placeholder="請輸入新密碼">
+                        <p class="text-[10px] mt-1 ml-1" :class="newPassword.length >= 6 ? 'text-green-500' : 'text-gray-400'">
+                            {{ newPassword.length >= 6 ? '✅ 長度符合規範' : '⚠️ 長度需至少 6 位' }}
+                        </p>
                     </div>
                     <div>
                         <label class="text-xs font-bold text-gray-400 ml-1">確認新密碼</label>
@@ -242,7 +245,7 @@
                     </div>
                     <div class="flex space-x-3 pt-4">
                         <button @click="ui.modal = null" class="flex-1 py-3 font-bold text-gray-400 bg-gray-100 rounded-xl">取消</button>
-                        <button @click="handleChangePassword" class="flex-1 py-3 font-bold text-white bg-[#0d8de7] rounded-xl ro-btn">確認變更</button>
+                        <button @click="handleChangePassword" class="flex-1 py-3 font-bold text-white bg-[#0d8de7] rounded-xl ro-btn border-b-[#0a6fb8]">確認變更</button>
                     </div>
                 </div>
             </div>
