@@ -255,9 +255,9 @@
                                     <div class="flex flex-col truncate">
                                         <span
                                             class="text-[9px] px-1.5 py-0.5 rounded-full font-bold border gap-1 shadow-sm"
-                                            :class="getJobClass(member.job)">
-                                            <span>{{ getJobIcon(member.job) }}</span>
-                                            <span>{{ getJobLabel(member.job) }}</span>
+                                            :class="getJobClass(findMember(mId)?.job)">
+                                            <span>{{ getJobIcon(findMember(mId)?.job) }}</span>
+                                            <span>{{ getJobLabel(findMember(mId)?.job) }}</span>
                                         </span>
                                         <span class="text-sm font-bold">{{ findMember(mId)?.name }}</span>
                                         <!-- <span class="text-[9px] text-gray-400 font-bold">{{
