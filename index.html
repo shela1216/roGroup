@@ -321,22 +321,34 @@
             </div>
         </div>
 
-        <!-- 帳號設定 Modal -->
+        <!-- 帳號管理/修改密碼 Modal -->
         <div v-if="ui.modal === 'userProfile'" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4" @click.self="ui.modal = null">
-            <div class="ro-card max-w-sm w-full bg-white p-6">
-                <h2 class="text-xl font-black text-blue-700 mb-6 flex items-center gap-2">⚙️ 冒險者公會管理</h2>
+            <div class="ro-card max-w-sm w-full bg-white p-6 overflow-hidden">
+                <h2 class="text-xl font-black text-blue-700 mb-6 flex items-center gap-2"><svg class="icon-svg"><use xlink:href="#icon-settings"></use></svg> 冒險者公會管理</h2>
+                
                 <div class="space-y-4">
                     <div class="p-4 rounded-2xl bg-gray-50 border">
-                        <label class="block text-[10px] font-black text-gray-400 mb-1">當前權限</label>
+                        <label class="block text-[10px] font-black text-gray-400 mb-1">當前登入帳號</label>
                         <div class="font-black text-sm truncate">{{ user.isAnonymous ? '臨時成員 (訪客)' : user.email }}</div>
                     </div>
-                    <div v-if="!user.isAnonymous">
-                        <button @click="handleResetPassword" class="w-full py-3 bg-blue-100 text-blue-600 font-black rounded-xl ro-btn border-b-blue-200 hover:bg-blue-200 transition-colors">發送重設密碼信件</button>
+
+                    <!-- 修改密碼區塊 (僅限郵件登入者) -->
+                    <div v-if="!user.isAnonymous" class="p-4 rounded-2xl bg-blue-50 border border-blue-100">
+                        <h3 class="text-xs font-black text-blue-600 mb-3 flex items-center gap-2"><svg class="icon-svg"><use xlink:href="#icon-lock"></use></svg> 修改管理密碼</h3>
+                        <div class="space-y-3">
+                            <input v-model="passForm.newPass" type="password" placeholder="輸入新密碼" class="w-full p-2 border rounded-xl text-sm font-bold outline-none focus:border-blue-400">
+                            <input v-model="passForm.confirmPass" type="password" placeholder="再次確認密碼" class="w-full p-2 border rounded-xl text-sm font-bold outline-none focus:border-blue-400">
+                            <button @click="handleChangePassword" class="w-full py-2 bg-blue-500 text-white font-black rounded-xl ro-btn border-b-blue-700 text-xs">確認變更密碼</button>
+                        </div>
                     </div>
+
                     <div v-else class="text-[10px] font-bold text-amber-600 bg-amber-50 p-4 rounded-xl border border-amber-100">
-                        提醒：訪客資料儲存於瀏覽器緩存，清除緩存或更換裝置後資料將遺失。
+                        提醒：訪客資料儲存於瀏覽器緩存，清除緩存或更換裝置後資料將遺失。建議註冊正式帳號以跨裝置管理。
                     </div>
-                    <button @click="ui.modal = null" class="w-full py-3 bg-gray-100 text-gray-500 font-black rounded-xl">返回大廳</button>
+
+                    <div class="flex gap-2">
+                        <button @click="ui.modal = null" class="flex-1 py-3 bg-gray-100 text-gray-500 font-black rounded-xl">返回大廳</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -370,6 +382,7 @@
                 const authForm = ref({ email: '', password: '' });
                 const members = ref([]);
                 const groups = ref([]);
+                const passForm = ref({ newPass: '', confirmPass: '' });
                 const jobs = ref([
                     { id: 'j1', name: '騎士', color: '#be123c', icon: '🛡️' },
                     { id: 'j2', name: '牧師', color: '#0369a1', icon: '⛪' },
@@ -426,13 +439,28 @@
                 };
                 const loginAsGuest = async () => { await signInAnonymously(auth); };
                 const handleLogout = () => signOut(auth);
-                const handleResetPassword = async () => {
+                // 直接修改密碼功能
+                const handleChangePassword = async () => {
+                    if (!passForm.value.newPass || passForm.value.newPass.length < 6) {
+                        return alert('密碼長度至少需 6 位元');
+                    }
+                    if (passForm.value.newPass !== passForm.value.confirmPass) {
+                        return alert('兩次輸入的密碼不一致');
+                    }
                     try {
-                        await sendPasswordResetEmail(auth, user.value.email);
-                        alert('重設密碼信件已寄至：' + user.value.email);
-                    } catch (e) { alert(e.message); }
+                        await updatePassword(auth.currentUser, passForm.value.newPass);
+                        alert('密碼修改成功！下次登入請使用新密碼。');
+                        passForm.value = { newPass: '', confirmPass: '' };
+                        ui.value.modal = null;
+                    } catch (e) {
+                        if (e.code === 'auth/requires-recent-login') {
+                            alert('為了安全起見，修改密碼需要您重新登入以驗證身分。');
+                            handleLogout();
+                        } else {
+                            alert('密碼修改失敗：' + e.message);
+                        }
+                    }
                 };
-
                 // Data Persistence
                 const syncData = async () => {
                     if (!user.value) return;
@@ -563,9 +591,9 @@
                 });
 
                 return {
-                    user, authView, authForm, members, groups, jobs, ui, form,
+                    user, authView, authForm,passForm, members, groups, jobs, ui, form,
                     unassignedMembers, jobStats, filteredMembers, findMember, getJob,
-                    handleEmailAuth, loginAsGuest, handleLogout, handleResetPassword,
+                    handleEmailAuth, loginAsGuest, handleLogout, handleChangePassword,
                     saveMember, editMember, deleteMember, exportCSV, addNewGroup, deleteGroup,
                     openAssignMenu, assignToGroup, removeFromGroup, openAddMember, syncData,
                     addNewJob, deleteJob
