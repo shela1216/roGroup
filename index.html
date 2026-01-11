@@ -1,56 +1,128 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>RO公會分組管理系統</title>
-    
+
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-   <link rel="shortcut icon" href="icon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="icon.png" type="image/x-icon">
     <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icon.png">    
+    <link rel="icon" type="image/png" sizes="16x16" href="icon.png">
     <style>
-        :root { --ro-blue: #0d8de7; --ro-bg: #f0f8ff; }
+        :root {
+            --ro-blue: #0d8de7;
+            --ro-bg: #f0f8ff;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
             background-color: var(--ro-bg);
             background-image: radial-gradient(#d0eaff 1px, transparent 1px);
             background-size: 20px 20px;
         }
+
         .ro-card {
             background: white;
             border: 3px solid var(--ro-blue);
             border-radius: 15px;
             box-shadow: 4px 4px 0px rgba(13, 141, 231, 0.15);
         }
-        .ro-btn { transition: all 0.2s; border-bottom-width: 4px; }
-        .ro-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
-        .job-tag {
-            display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
-            border-radius: 6px; font-size: 10px; font-weight: 800; border: 1px solid rgba(0,0,0,0.1);
-            color: white; text-shadow: 0px 1px 1px rgba(0,0,0,0.2);
+
+        .ro-btn {
+            transition: all 0.2s;
+            border-bottom-width: 4px;
         }
-        .poring-float { animation: floating 3s ease-in-out infinite; }
-        @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .icon-svg { width: 1.2em; height: 1.2em; fill: currentColor; display: inline-block; vertical-align: middle; }
-        .progress-bar { transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        .ro-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .job-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: white;
+            text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.2);
+        }
+
+        .poring-float {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .icon-svg {
+            width: 1.2em;
+            height: 1.2em;
+            fill: currentColor;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .progress-bar {
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
     </style>
 </head>
+
 <body>
     <div id="app" class="min-h-screen pb-20">
         <!-- SVG 圖標 -->
         <svg style="display: none;">
-            <symbol id="icon-users" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
-            <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
-            <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></symbol>
-            <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol>
-            <symbol id="icon-chart" viewBox="0 0 24 24"><path d="M10 20h4V4h-4v16zm-6 0h4v-8H4v8zM16 9v11h4V9h-4z"/></symbol>
-            <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6zM19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58z"/></symbol>
-            <symbol id="icon-briefcase" viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-8-2h4v2h-4V4z"/></symbol>
+            <symbol id="icon-users" viewBox="0 0 24 24">
+                <path
+                    d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+            </symbol>
+            <symbol id="icon-plus" viewBox="0 0 24 24">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+            </symbol>
+            <symbol id="icon-trash" viewBox="0 0 24 24">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+            </symbol>
+            <symbol id="icon-edit" viewBox="0 0 24 24">
+                <path
+                    d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+            </symbol>
+            <symbol id="icon-chart" viewBox="0 0 24 24">
+                <path d="M10 20h4V4h-4v16zm-6 0h4v-8H4v8zM16 9v11h4V9h-4z" />
+            </symbol>
+            <symbol id="icon-settings" viewBox="0 0 24 24">
+                <path
+                    d="M12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6zM19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58z" />
+            </symbol>
+            <symbol id="icon-briefcase" viewBox="0 0 24 24">
+                <path
+                    d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-8-2h4v2h-4V4z" />
+            </symbol>
         </svg>
 
         <!-- 導覽列 -->
@@ -61,9 +133,14 @@
                     <span class="text-xl font-black italic tracking-wider">RO 冒險者公會</span>
                 </div>
                 <div class="flex items-center space-x-3" v-if="user">
-                    <span class="hidden md:block text-xs font-bold bg-blue-600 px-2 py-1 rounded">{{ user.isAnonymous ? '訪客模式' : user.email }}</span>
-                    <button @click="ui.modal = 'userProfile'" class="p-2 hover:bg-blue-600 rounded-full transition-colors"><svg class="icon-svg"><use xlink:href="#icon-settings"></use></svg></button>
-                    <button @click="handleLogout" class="bg-red-500 text-white px-4 py-2 rounded-lg font-bold text-sm ro-btn border-b-red-700">登出</button>
+                    <span class="hidden md:block text-xs font-bold bg-blue-600 px-2 py-1 rounded">{{ user.isAnonymous ?
+                        '訪客模式' : user.email }}</span>
+                    <button @click="ui.modal = 'userProfile'"
+                        class="p-2 hover:bg-blue-600 rounded-full transition-colors"><svg class="icon-svg">
+                            <use xlink:href="#icon-settings"></use>
+                        </svg></button>
+                    <button @click="handleLogout"
+                        class="bg-red-500 text-white px-4 py-2 rounded-lg font-bold text-sm ro-btn border-b-red-700">登出</button>
                 </div>
             </div>
         </nav>
@@ -76,23 +153,30 @@
                     <h1 class="text-2xl font-black text-blue-700 mb-6 uppercase tracking-tighter">RO 冒險者公會管理</h1>
                     <div class="space-y-4">
                         <template v-if="authView !== 'guest'">
-                            <input v-model="authForm.email" type="email" placeholder="EMAIL" class="w-full px-4 py-3 rounded-xl border-2 border-blue-50 focus:border-blue-400 outline-none font-bold text-center">
-                            <input v-model="authForm.password" type="password" placeholder="PASSWORD" class="w-full px-4 py-3 rounded-xl border-2 border-blue-50 focus:border-blue-400 outline-none font-bold text-center">
+                            <input v-model="authForm.email" type="email" placeholder="EMAIL"
+                                class="w-full px-4 py-3 rounded-xl border-2 border-blue-50 focus:border-blue-400 outline-none font-bold text-center">
+                            <input v-model="authForm.password" type="password" placeholder="PASSWORD"
+                                class="w-full px-4 py-3 rounded-xl border-2 border-blue-50 focus:border-blue-400 outline-none font-bold text-center">
                         </template>
                         <div v-if="authView === 'login'">
-                            <button @click="handleEmailAuth('login')" class="w-full py-4 bg-blue-500 text-white font-black rounded-xl ro-btn border-b-blue-800 mb-3">立即登入</button>
+                            <button @click="handleEmailAuth('login')"
+                                class="w-full py-4 bg-blue-500 text-white font-black rounded-xl ro-btn border-b-blue-800 mb-3">立即登入</button>
                             <div class="flex justify-between text-xs font-bold text-blue-400 px-2">
                                 <button @click="authView = 'register'">註冊帳號</button>
                                 <button @click="authView = 'guest'">訪客試用</button>
                             </div>
                         </div>
                         <div v-if="authView === 'register'">
-                            <button @click="handleEmailAuth('register')" class="w-full py-4 bg-green-500 text-white font-black rounded-xl ro-btn border-b-green-800 mb-3">完成註冊</button>
-                            <button @click="authView = 'login'" class="w-full text-center text-xs font-bold text-blue-400">返回登入</button>
+                            <button @click="handleEmailAuth('register')"
+                                class="w-full py-4 bg-green-500 text-white font-black rounded-xl ro-btn border-b-green-800 mb-3">完成註冊</button>
+                            <button @click="authView = 'login'"
+                                class="w-full text-center text-xs font-bold text-blue-400">返回登入</button>
                         </div>
                         <div v-if="authView === 'guest'">
-                            <button @click="loginAsGuest" class="w-full py-4 bg-orange-500 text-white font-black rounded-xl ro-btn border-b-orange-800 mb-3">開始試用</button>
-                            <button @click="authView = 'login'" class="w-full text-center text-xs font-bold text-blue-400">返回登入</button>
+                            <button @click="loginAsGuest"
+                                class="w-full py-4 bg-orange-500 text-white font-black rounded-xl ro-btn border-b-orange-800 mb-3">開始試用</button>
+                            <button @click="authView = 'login'"
+                                class="w-full text-center text-xs font-bold text-blue-400">返回登入</button>
                         </div>
                     </div>
                 </div>
@@ -101,83 +185,120 @@
             <!-- 主管理介面 -->
             <template v-else>
                 <div class="flex flex-wrap gap-3 mb-8">
-                    <button @click="ui.modal = 'jobStats'" class="flex items-center gap-2 bg-white px-4 py-3 rounded-2xl ro-card border-blue-500 text-blue-600 font-black text-sm hover:bg-blue-50 transition-colors">
-                        <svg class="icon-svg"><use xlink:href="#icon-chart"></use></svg> 戰力統計
+                    <button @click="ui.modal = 'jobStats'"
+                        class="flex items-center gap-2 bg-white px-4 py-3 rounded-2xl ro-card border-blue-500 text-blue-600 font-black text-sm hover:bg-blue-50 transition-colors">
+                        <svg class="icon-svg">
+                            <use xlink:href="#icon-chart"></use>
+                        </svg> 戰力統計
                     </button>
-                    <button @click="ui.modal = 'memberList'" class="flex items-center gap-2 bg-white px-4 py-3 rounded-2xl ro-card border-blue-500 text-blue-600 font-black text-sm hover:bg-blue-50 transition-colors">
-                        <svg class="icon-svg"><use xlink:href="#icon-users"></use></svg> 成員管理
+                    <button @click="ui.modal = 'memberList'"
+                        class="flex items-center gap-2 bg-white px-4 py-3 rounded-2xl ro-card border-blue-500 text-blue-600 font-black text-sm hover:bg-blue-50 transition-colors">
+                        <svg class="icon-svg">
+                            <use xlink:href="#icon-users"></use>
+                        </svg> 成員管理
                     </button>
-                    <button @click="ui.modal = 'jobSettings'" class="flex items-center gap-2 bg-white px-4 py-3 rounded-2xl ro-card border-blue-500 text-blue-600 font-black text-sm hover:bg-blue-50 transition-colors">
-                        <svg class="icon-svg"><use xlink:href="#icon-briefcase"></use></svg> 職業設定
+                    <button @click="ui.modal = 'jobSettings'"
+                        class="flex items-center gap-2 bg-white px-4 py-3 rounded-2xl ro-card border-blue-500 text-blue-600 font-black text-sm hover:bg-blue-50 transition-colors">
+                        <svg class="icon-svg">
+                            <use xlink:href="#icon-briefcase"></use>
+                        </svg> 職業設定
                     </button>
-                    <button @click="openAddMember" class="flex items-center gap-2 bg-[#0d8de7] px-5 py-3 rounded-2xl border-b-4 border-blue-800 text-white font-black text-sm active:translate-y-0.5 transition-all">
-                        <svg class="icon-svg"><use xlink:href="#icon-plus"></use></svg> 招募成員
+                    <button @click="openAddMember"
+                        class="flex items-center gap-2 bg-[#0d8de7] px-5 py-3 rounded-2xl border-b-4 border-blue-800 text-white font-black text-sm active:translate-y-0.5 transition-all">
+                        <svg class="icon-svg">
+                            <use xlink:href="#icon-plus"></use>
+                        </svg> 招募成員
                     </button>
                 </div>
 
                 <!-- 待分配名單 -->
                 <div class="mb-8 ro-card border-dashed border-blue-300 overflow-hidden">
-                    <button @click="ui.expandUnassigned = !ui.expandUnassigned" class="w-full flex justify-between items-center p-4 bg-blue-50/50">
+                    <button @click="ui.expandUnassigned = !ui.expandUnassigned"
+                        class="w-full flex justify-between items-center p-4 bg-blue-50/50">
                         <div class="flex items-center gap-3">
-                            <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-black">{{ unassignedMembers.length }}</span>
+                            <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-black">{{
+                                unassignedMembers.length }}</span>
                             <span class="font-black text-blue-700">待分配名單 (點擊分配)</span>
                         </div>
                         <span class="text-blue-400 font-bold text-xs">{{ ui.expandUnassigned ? '收合' : '展開' }}</span>
                     </button>
-                    <div v-show="ui.expandUnassigned" class="p-4 bg-white grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                        <div v-for="m in unassignedMembers" @click="openAssignMenu(m)" class="flex items-center gap-2 p-2 border rounded-xl hover:bg-blue-50 cursor-pointer transition-all overflow-hidden">
-                            <span class="job-tag flex-shrink-0" :style="{backgroundColor: getJob(m.jobId)?.color}">{{ getJob(m.jobId)?.icon }} {{ getJob(m.jobId)?.name }}</span>
+                    <div v-show="ui.expandUnassigned"
+                        class="p-4 bg-white grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                        <div v-for="m in unassignedMembers" @click="openAssignMenu(m)"
+                            class="flex items-center gap-2 p-2 border rounded-xl hover:bg-blue-50 cursor-pointer transition-all overflow-hidden">
+                            <span class="job-tag flex-shrink-0" :style="{backgroundColor: getJob(m.jobId)?.color}">{{
+                                getJob(m.jobId)?.icon }} {{ getJob(m.jobId)?.name }}</span>
                             <span class="font-bold text-sm truncate">{{ m.name }}</span>
                         </div>
-                        <div v-if="unassignedMembers.length === 0" class="col-span-full py-8 text-center text-gray-300 font-bold italic">所有冒險者皆已就位</div>
+                        <div v-if="unassignedMembers.length === 0"
+                            class="col-span-full py-8 text-center text-gray-300 font-bold italic">所有冒險者皆已就位</div>
                     </div>
                 </div>
 
                 <!-- 小組展示 -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div v-for="(group, gIndex) in groups" :key="group.id" class="ro-card flex flex-col overflow-hidden">
+                    <div v-for="(group, gIndex) in groups" :key="group.id"
+                        class="ro-card flex flex-col overflow-hidden">
                         <div class="p-4 bg-blue-50/50 border-b flex justify-between items-center">
-                            <input v-model="group.name" @blur="syncData" class="font-black text-blue-700 bg-transparent border-none focus:ring-2 focus:ring-blue-200 rounded px-1 outline-none text-sm w-1/2">
+                            <input v-model="group.name" @blur="syncData"
+                                class="font-black text-blue-700 bg-transparent border-none focus:ring-2 focus:ring-blue-200 rounded px-1 outline-none text-sm w-1/2">
                             <div class="flex items-center gap-2">
-                                <div class="flex items-center bg-white px-2 py-1 rounded-lg border text-[10px] font-black group relative">
+                                <div
+                                    class="flex items-center bg-white px-2 py-1 rounded-lg border text-[10px] font-black group relative">
                                     <span class="text-gray-400">上限:</span>
-                                    <input type="number" v-model.number="group.max" @change="syncData" class="w-8 text-center bg-transparent outline-none text-blue-600">
+                                    <input type="number" v-model.number="group.max" @change="syncData"
+                                        class="w-8 text-center bg-transparent outline-none text-blue-600">
                                 </div>
-                                <button @click="deleteGroup(gIndex)" class="text-gray-300 hover:text-red-400"><svg class="icon-svg"><use xlink:href="#icon-trash"></use></svg></button>
+                                <button @click="deleteGroup(gIndex)" class="text-gray-300 hover:text-red-400"><svg
+                                        class="icon-svg">
+                                        <use xlink:href="#icon-trash"></use>
+                                    </svg></button>
                             </div>
                         </div>
 
                         <div class="h-1.5 w-full bg-gray-100 relative">
-                            <div class="progress-bar h-full absolute top-0 left-0" 
-                                 :class="group.members.length >= group.max ? 'bg-orange-500' : 'bg-blue-500'"
-                                 :style="{width: Math.min((group.members.length / group.max) * 100, 100) + '%'}"></div>
+                            <div class="progress-bar h-full absolute top-0 left-0"
+                                :class="group.members.length >= group.max ? 'bg-orange-500' : 'bg-blue-500'"
+                                :style="{width: Math.min((group.members.length / group.max) * 100, 100) + '%'}"></div>
                         </div>
 
                         <div class="p-4 space-y-2 flex-1">
-                            <div v-for="(mId, mIndex) in group.members" class="flex justify-between items-center bg-gray-50 p-2 rounded-xl text-xs font-bold border border-transparent hover:border-blue-100 transition-all">
+                            <div v-for="(mId, mIndex) in group.members"
+                                class="flex justify-between items-center bg-gray-50 p-2 rounded-xl text-xs font-bold border border-transparent hover:border-blue-100 transition-all">
                                 <div class="flex items-center gap-2 overflow-hidden">
-                                    <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-lg bg-white shadow-sm border text-[10px]">{{ mIndex + 1 }}</span>
-                                    <span class="job-tag scale-90 origin-left flex-shrink-0" :style="{backgroundColor: getJob(findMember(mId)?.jobId)?.color}">
-                                        {{ getJob(findMember(mId)?.jobId)?.icon }} {{ getJob(findMember(mId)?.jobId)?.name }}
+                                    <span
+                                        class="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-lg bg-white shadow-sm border text-[10px]">{{
+                                        mIndex + 1 }}</span>
+                                    <span class="job-tag scale-90 origin-left flex-shrink-0"
+                                        :style="{backgroundColor: getJob(findMember(mId)?.jobId)?.color}">
+                                        {{ getJob(findMember(mId)?.jobId)?.icon }} {{
+                                        getJob(findMember(mId)?.jobId)?.name }}
                                     </span>
                                     <span class="truncate">{{ findMember(mId)?.name }}</span>
                                 </div>
-                                <button @click="removeFromGroup(group, mIndex)" class="w-6 h-6 flex-shrink-0 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full flex items-center justify-center">×</button>
+                                <button @click="removeFromGroup(group, mIndex)"
+                                    class="w-6 h-6 flex-shrink-0 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full flex items-center justify-center">×</button>
                             </div>
-                            <div v-for="i in Math.max(0, group.max - group.members.length)" class="border-2 border-dashed border-gray-100 rounded-xl py-2 text-center text-[9px] text-gray-200 font-black">
+                            <div v-for="i in Math.max(0, group.max - group.members.length)"
+                                class="border-2 border-dashed border-gray-100 rounded-xl py-2 text-center text-[9px] text-gray-200 font-black">
                                 待領取任務
                             </div>
                         </div>
-                        
-                        <div class="p-2 px-4 bg-gray-50 border-t flex justify-between text-[10px] font-black text-gray-400">
+
+                        <div
+                            class="p-2 px-4 bg-gray-50 border-t flex justify-between text-[10px] font-black text-gray-400">
                             <span>集結進度</span>
                             <span>{{ group.members.length }} / {{ group.max }}</span>
                         </div>
                     </div>
-                    
-                    <button @click="addNewGroup" class="ro-card border-dashed border-gray-300 flex flex-col items-center justify-center p-12 text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-all group">
-                        <div class="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center mb-3 group-hover:border-blue-300 group-hover:bg-white">
-                            <svg class="icon-svg text-xl"><use xlink:href="#icon-plus"></use></svg>
+
+                    <button @click="addNewGroup"
+                        class="ro-card border-dashed border-gray-300 flex flex-col items-center justify-center p-12 text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-all group">
+                        <div
+                            class="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center mb-3 group-hover:border-blue-300 group-hover:bg-white">
+                            <svg class="icon-svg text-xl">
+                                <use xlink:href="#icon-plus"></use>
+                            </svg>
                         </div>
                         <span class="font-black text-sm tracking-widest">擴充冒險小隊</span>
                     </button>
@@ -186,28 +307,42 @@
         </main>
 
         <!-- 職業設定 Modal -->
-        <div v-if="ui.modal === 'jobSettings'" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4" @click.self="ui.modal = null">
+        <div v-if="ui.modal === 'jobSettings'"
+            class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4"
+            @click.self="ui.modal = null">
             <div class="ro-card max-w-2xl w-full bg-white flex flex-col max-h-[85vh]">
                 <div class="p-6 border-b flex justify-between items-center bg-blue-50/30">
-                    <h2 class="text-lg font-black text-blue-700 flex items-center gap-2"><svg class="icon-svg"><use xlink:href="#icon-briefcase"></use></svg> 職業百科全書</h2>
-                    <button @click="ui.modal = null" class="text-gray-400 font-black px-2 hover:bg-gray-100 rounded">✕</button>
+                    <h2 class="text-lg font-black text-blue-700 flex items-center gap-2"><svg class="icon-svg">
+                            <use xlink:href="#icon-briefcase"></use>
+                        </svg> 職業百科全書</h2>
+                    <button @click="ui.modal = null"
+                        class="text-gray-400 font-black px-2 hover:bg-gray-100 rounded">✕</button>
                 </div>
                 <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
                     <p class="text-[10px] font-black text-gray-400">定義公會中可用的冒險職業</p>
-                    <button @click="addNewJob" class="bg-blue-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold ro-btn border-b-blue-700">+ 新增職業</button>
+                    <button @click="addNewJob"
+                        class="bg-blue-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold ro-btn border-b-blue-700">+
+                        新增職業</button>
                 </div>
                 <div class="flex-1 overflow-y-auto p-4 space-y-3 custom-scroll">
-                    <div v-for="job in jobs" :key="job.id" class="p-4 bg-white border-2 rounded-2xl flex flex-wrap md:flex-nowrap items-center gap-4">
+                    <div v-for="job in jobs" :key="job.id"
+                        class="p-4 bg-white border-2 rounded-2xl flex flex-wrap md:flex-nowrap items-center gap-4">
                         <div class="flex items-center gap-2 w-full md:w-auto">
-                            <input v-model="job.icon" class="w-12 p-2 border rounded-xl text-center text-xl bg-gray-50" placeholder="圖標">
-                            <input v-model="job.name" @blur="syncData" class="flex-1 md:w-32 p-2 border rounded-xl font-bold" placeholder="職業名稱">
+                            <input v-model="job.icon" class="w-12 p-2 border rounded-xl text-center text-xl bg-gray-50"
+                                placeholder="圖標">
+                            <input v-model="job.name" @blur="syncData"
+                                class="flex-1 md:w-32 p-2 border rounded-xl font-bold" placeholder="職業名稱">
                         </div>
                         <div class="flex items-center gap-2 flex-1">
-                            <input type="color" v-model="job.color" @change="syncData" class="w-10 h-10 border rounded-lg cursor-pointer p-1">
+                            <input type="color" v-model="job.color" @change="syncData"
+                                class="w-10 h-10 border rounded-lg cursor-pointer p-1">
                             <span class="text-xs font-mono font-bold text-gray-400 uppercase">{{ job.color }}</span>
                         </div>
-                        <button @click="deleteJob(job.id)" class="p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg">
-                            <svg class="icon-svg"><use xlink:href="#icon-trash"></use></svg>
+                        <button @click="deleteJob(job.id)"
+                            class="p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg">
+                            <svg class="icon-svg">
+                                <use xlink:href="#icon-trash"></use>
+                            </svg>
                         </button>
                     </div>
                 </div>
@@ -215,33 +350,68 @@
         </div>
 
         <!-- 成員管理 Modal -->
-        <div v-if="ui.modal === 'memberList'" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4" @click.self="ui.modal = null">
+        <div v-if="ui.modal === 'memberList'"
+            class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4"
+            @click.self="ui.modal = null">
             <div class="ro-card max-w-2xl w-full bg-white flex flex-col max-h-[85vh]">
                 <div class="p-6 border-b flex justify-between items-center bg-blue-50/30">
                     <div class="flex items-center gap-3">
-                        <h2 class="text-lg font-black text-blue-700 flex items-center gap-2"><svg class="icon-svg"><use xlink:href="#icon-users"></use></svg> 成員管理帳簿</h2>
-                        <span class="bg-blue-100 text-blue-600 px-3 py-0.5 rounded-full text-xs font-black">總計 {{ members.length }} 人</span>
+                        <h2 class="text-lg font-black text-blue-700 flex items-center gap-2"><svg class="icon-svg">
+                                <use xlink:href="#icon-users"></use>
+                            </svg> 成員名單管理</h2>
+                        <span class="bg-blue-100 text-blue-600 px-3 py-0.5 rounded-full text-xs font-black">總計 {{
+                            members.length }} 人</span>
                     </div>
                     <div class="flex gap-2">
-                        <button @click="exportCSV" class="bg-green-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold ro-btn border-b-green-700">匯出 CSV</button>
-                        <button @click="ui.modal = null" class="text-gray-400 font-black px-2 hover:bg-gray-100 rounded">✕</button>
+                        <button @click="exportCSV"
+                            class="bg-green-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold ro-btn border-b-green-700">匯出
+                            CSV</button>
+                        <button @click="ui.modal = null"
+                            class="text-gray-400 font-black px-2 hover:bg-gray-100 rounded">✕</button>
                     </div>
                 </div>
                 <div class="p-4 flex flex-wrap gap-2 border-b bg-gray-50">
                     <span class="text-xs font-black text-gray-400 pt-2 mr-2">排序:</span>
-                    <button v-for="opt in [{l:'姓名',v:'name'},{l:'職業',v:'job'}]" @click="ui.sortBy = opt.v" :class="ui.sortBy === opt.v ? 'bg-blue-500 text-white border-blue-600' : 'bg-white text-gray-600'" class="px-3 py-1 rounded-lg text-xs font-bold border transition-all">
+                    <button v-for="opt in [{l:'姓名',v:'name'},{l:'職業',v:'job'},{l:'分組',v:'group'}]"
+                        @click="ui.sortBy = opt.v"
+                        :class="ui.sortBy === opt.v ? 'bg-blue-500 text-white border-blue-600' : 'bg-white text-gray-600'"
+                        class="px-3 py-1 rounded-lg text-xs font-bold border transition-all">
                         {{ opt.l }}
                     </button>
                 </div>
                 <div class="flex-1 overflow-y-auto p-4 space-y-2 custom-scroll">
-                    <div v-for="m in filteredMembers" :key="m.id" class="flex justify-between items-center p-3 bg-white border rounded-2xl hover:shadow-sm transition-all">
+                    <div v-for="m in filteredMembers" :key="m.id"
+                        class="flex justify-between items-center p-3 bg-white border rounded-2xl hover:shadow-sm transition-all">
                         <div class="flex items-center gap-3 overflow-hidden">
-                            <span class="job-tag flex-shrink-0" :style="{backgroundColor: getJob(m.jobId)?.color}">{{ getJob(m.jobId)?.icon }} {{ getJob(m.jobId)?.name }}</span>
+                            <span class="job-tag flex-shrink-0" :style="{backgroundColor: getJob(m.jobId)?.color}">{{
+                                getJob(m.jobId)?.icon }} {{ getJob(m.jobId)?.name }}</span>
                             <span class="font-black text-sm truncate">{{ m.name }}</span>
+                            <div class="col-span-1 md:col-span-3">
+                                <template v-if="getMemberGroup(m.id)">
+                                    <span
+                                        class="group-tag block w-full text-center md:inline-block md:w-auto bg-blue-50 text-blue-600 border border-blue-100">
+                                        🛡️ {{ getMemberGroup(m.id).name }}
+                                    </span>
+                                </template>
+                                <template v-else>
+                                    <span
+                                        class="group-tag block w-full text-center md:inline-block md:w-auto bg-gray-50 text-gray-400 border border-gray-100 italic">
+                                        💤 尚未分組
+                                    </span>
+                                </template>
+                            </div>
                         </div>
                         <div class="flex gap-1 flex-shrink-0">
-                            <button @click="editMember(m)" class="w-8 h-8 rounded-lg text-blue-400 hover:bg-blue-50 flex items-center justify-center"><svg class="icon-svg"><use xlink:href="#icon-edit"></use></svg></button>
-                            <button @click="deleteMember(m.id)" class="w-8 h-8 rounded-lg text-red-300 hover:bg-red-50 flex items-center justify-center"><svg class="icon-svg"><use xlink:href="#icon-trash"></use></svg></button>
+                            <button @click="editMember(m)"
+                                class="w-8 h-8 rounded-lg text-blue-400 hover:bg-blue-50 flex items-center justify-center"><svg
+                                    class="icon-svg">
+                                    <use xlink:href="#icon-edit"></use>
+                                </svg></button>
+                            <button @click="deleteMember(m.id)"
+                                class="w-8 h-8 rounded-lg text-red-300 hover:bg-red-50 flex items-center justify-center"><svg
+                                    class="icon-svg">
+                                    <use xlink:href="#icon-trash"></use>
+                                </svg></button>
                         </div>
                     </div>
                 </div>
@@ -249,30 +419,36 @@
         </div>
 
         <!-- 成員編輯/新增 Modal (下拉選單優化版) -->
-        <div v-if="ui.modal === 'memberEdit'" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4" @click.self="ui.modal = null">
+        <div v-if="ui.modal === 'memberEdit'"
+            class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4"
+            @click.self="ui.modal = null">
             <div class="ro-card max-w-sm w-full p-6 bg-white animate-in zoom-in duration-200">
                 <h3 class="font-black text-blue-700 mb-6 text-center text-lg flex items-center justify-center gap-2">
                     <span v-if="!form.id">✨</span><span v-else>📝</span>
                     {{ form.id ? '修正冒險者資訊' : '冒險者入團登記' }}
                 </h3>
-                
+
                 <div class="space-y-5 mb-8">
                     <div>
-                        <label class="block text-[10px] font-black text-blue-400 mb-1.5 uppercase tracking-wider">Adventurer Name / 冒險者名稱</label>
-                        <input v-model="form.name" placeholder="請輸入公會成員名稱" 
-                               class="w-full p-3 bg-gray-50 border-2 border-gray-100 rounded-2xl font-bold outline-none focus:border-blue-400 focus:bg-white transition-all shadow-inner">
+                        <label
+                            class="block text-[10px] font-black text-blue-400 mb-1.5 uppercase tracking-wider">Adventurer
+                            Name / 冒險者名稱</label>
+                        <input v-model="form.name" placeholder="請輸入公會成員名稱"
+                            class="w-full p-3 bg-gray-50 border-2 border-gray-100 rounded-2xl font-bold outline-none focus:border-blue-400 focus:bg-white transition-all shadow-inner">
                     </div>
-                    
+
                     <div>
-                        <label class="block text-[10px] font-black text-blue-400 mb-1.5 uppercase tracking-wider">Assigned Job / 指定職業</label>
+                        <label
+                            class="block text-[10px] font-black text-blue-400 mb-1.5 uppercase tracking-wider">Assigned
+                            Job / 指定職業</label>
                         <div class="relative group">
                             <!-- 職業預覽色塊 -->
                             <div class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg flex items-center justify-center text-sm shadow-sm transition-colors"
-                                 :style="{backgroundColor: getJob(form.jobId)?.color + '22', border: '1px solid ' + getJob(form.jobId)?.color}">
+                                :style="{backgroundColor: getJob(form.jobId)?.color + '22', border: '1px solid ' + getJob(form.jobId)?.color}">
                                 {{ getJob(form.jobId)?.icon }}
                             </div>
-                            <select v-model="form.jobId" 
-                                    class="ro-select w-full pl-11 pr-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-2xl font-bold outline-none focus:border-blue-400 focus:bg-white transition-all cursor-pointer shadow-inner">
+                            <select v-model="form.jobId"
+                                class="ro-select w-full pl-11 pr-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-2xl font-bold outline-none focus:border-blue-400 focus:bg-white transition-all cursor-pointer shadow-inner">
                                 <option v-for="job in jobs" :key="job.id" :value="job.id">
                                     {{ job.icon }} {{ job.name }}
                                 </option>
@@ -280,14 +456,14 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="flex gap-3">
-                    <button @click="ui.modal = (form.id ? 'memberList' : null)" 
-                            class="flex-1 py-3 bg-gray-100 text-gray-500 font-black rounded-2xl hover:bg-gray-200 transition-colors text-sm">
+                    <button @click="ui.modal = (form.id ? 'memberList' : null)"
+                        class="flex-1 py-3 bg-gray-100 text-gray-500 font-black rounded-2xl hover:bg-gray-200 transition-colors text-sm">
                         取消
                     </button>
-                    <button @click="saveMember" 
-                            class="flex-1 py-3 bg-[#0d8de7] text-white font-black rounded-2xl ro-btn border-b-blue-800 text-sm">
+                    <button @click="saveMember"
+                        class="flex-1 py-3 bg-[#0d8de7] text-white font-black rounded-2xl ro-btn border-b-blue-800 text-sm">
                         {{ form.id ? '確認更新' : '確認入團' }}
                     </button>
                 </div>
@@ -295,41 +471,54 @@
         </div>
 
         <!-- 快速分配彈窗 -->
-        <div v-if="ui.assigningMember" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4" @click.self="ui.assigningMember = null">
+        <div v-if="ui.assigningMember"
+            class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4"
+            @click.self="ui.assigningMember = null">
             <div class="ro-card max-w-xs w-full bg-white p-6 shadow-2xl">
                 <div class="text-center mb-6">
-                    <div class="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black mb-2 italic">Assignment Order</div>
-                    <h4 class="font-black text-gray-700">派遣 <span class="text-blue-600">「{{ ui.assigningMember.name }}」</span> 至哪支小隊？</h4>
+                    <div
+                        class="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black mb-2 italic">
+                        Assignment Order</div>
+                    <h4 class="font-black text-gray-700">派遣 <span class="text-blue-600">「{{ ui.assigningMember.name
+                            }}」</span> 至哪支小隊？</h4>
                 </div>
                 <div class="space-y-2 max-h-60 overflow-y-auto custom-scroll pr-1">
-                    <button v-for="group in groups" :key="group.id" @click="assignToGroup(group)" :disabled="group.members.length >= group.max" 
-                            :class="group.members.length >= group.max ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'hover:bg-blue-50 border-blue-100'"
-                            class="w-full p-3 border-2 rounded-2xl font-black text-sm flex justify-between items-center transition-all">
+                    <button v-for="group in groups" :key="group.id" @click="assignToGroup(group)"
+                        :disabled="group.members.length >= group.max"
+                        :class="group.members.length >= group.max ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'hover:bg-blue-50 border-blue-100'"
+                        class="w-full p-3 border-2 rounded-2xl font-black text-sm flex justify-between items-center transition-all">
                         <span>{{ group.name }}</span>
                         <div class="flex items-center gap-2">
                             <span class="text-[10px] text-gray-400">{{ group.members.length }}/{{ group.max }}</span>
                             <div class="w-8 h-1 bg-gray-100 rounded-full overflow-hidden">
-                                <div class="bg-blue-400 h-full" :style="{width: (group.members.length/group.max)*100 + '%'}"></div>
+                                <div class="bg-blue-400 h-full"
+                                    :style="{width: (group.members.length/group.max)*100 + '%'}"></div>
                             </div>
                         </div>
                     </button>
                 </div>
-                <button @click="ui.assigningMember = null" class="w-full mt-4 text-xs font-bold text-gray-400 py-2">稍後再說</button>
+                <button @click="ui.assigningMember = null"
+                    class="w-full mt-4 text-xs font-bold text-gray-400 py-2">稍後再說</button>
             </div>
         </div>
-        
+
         <!-- 職業統計 Modal -->
-        <div v-if="ui.modal === 'jobStats'" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4" @click.self="ui.modal = null">
+        <div v-if="ui.modal === 'jobStats'"
+            class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4"
+            @click.self="ui.modal = null">
             <div class="ro-card max-w-2xl w-full bg-white p-6 max-h-[85vh] flex flex-col">
                 <div class="flex justify-between items-center mb-6">
                     <div class="flex items-center gap-3">
                         <h2 class="text-xl font-black text-blue-700">戰力職業分佈</h2>
-                        <span class="bg-orange-100 text-orange-600 px-3 py-0.5 rounded-full text-xs font-black">公會成員 {{ members.length }} 人</span>
+                        <span class="bg-orange-100 text-orange-600 px-3 py-0.5 rounded-full text-xs font-black">公會成員 {{
+                            members.length }} 人</span>
                     </div>
                     <button @click="ui.modal = null" class="text-gray-400 hover:bg-gray-100 rounded px-2">✕</button>
                 </div>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 overflow-y-auto p-2 custom-scroll">
-                    <div v-for="stat in jobStats" :key="stat.id" class="p-4 bg-gray-50 rounded-2xl text-center border-b-4 transition-all hover:scale-105" :style="{borderColor: stat.color}">
+                    <div v-for="stat in jobStats" :key="stat.id"
+                        class="p-4 bg-gray-50 rounded-2xl text-center border-b-4 transition-all hover:scale-105"
+                        :style="{borderColor: stat.color}">
                         <div class="text-3xl mb-1">{{ stat.icon }}</div>
                         <div class="text-[10px] font-black text-gray-400 truncate">{{ stat.name }}</div>
                         <div class="text-xl font-black" :style="{color: stat.color}">
@@ -344,10 +533,14 @@
         </div>
 
         <!-- 帳號管理/修改密碼 Modal -->
-        <div v-if="ui.modal === 'userProfile'" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4" @click.self="ui.modal = null">
+        <div v-if="ui.modal === 'userProfile'"
+            class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4"
+            @click.self="ui.modal = null">
             <div class="ro-card max-w-sm w-full bg-white p-6 overflow-hidden">
-                <h2 class="text-xl font-black text-blue-700 mb-6 flex items-center gap-2"><svg class="icon-svg"><use xlink:href="#icon-settings"></use></svg> 冒險者公會管理</h2>
-                
+                <h2 class="text-xl font-black text-blue-700 mb-6 flex items-center gap-2"><svg class="icon-svg">
+                        <use xlink:href="#icon-settings"></use>
+                    </svg> 冒險者公會管理</h2>
+
                 <div class="space-y-4">
                     <div class="p-4 rounded-2xl bg-gray-50 border">
                         <label class="block text-[10px] font-black text-gray-400 mb-1">當前登入帳號</label>
@@ -356,20 +549,27 @@
 
                     <!-- 修改密碼區塊 (僅限郵件登入者) -->
                     <div v-if="!user.isAnonymous" class="p-4 rounded-2xl bg-blue-50 border border-blue-100">
-                        <h3 class="text-xs font-black text-blue-600 mb-3 flex items-center gap-2"><svg class="icon-svg"><use xlink:href="#icon-lock"></use></svg> 修改管理密碼</h3>
+                        <h3 class="text-xs font-black text-blue-600 mb-3 flex items-center gap-2"><svg class="icon-svg">
+                                <use xlink:href="#icon-lock"></use>
+                            </svg> 修改管理密碼</h3>
                         <div class="space-y-3">
-                            <input v-model="passForm.newPass" type="password" placeholder="輸入新密碼" class="w-full p-2 border rounded-xl text-sm font-bold outline-none focus:border-blue-400">
-                            <input v-model="passForm.confirmPass" type="password" placeholder="再次確認密碼" class="w-full p-2 border rounded-xl text-sm font-bold outline-none focus:border-blue-400">
-                            <button @click="handleChangePassword" class="w-full py-2 bg-blue-500 text-white font-black rounded-xl ro-btn border-b-blue-700 text-xs">確認變更密碼</button>
+                            <input v-model="passForm.newPass" type="password" placeholder="輸入新密碼"
+                                class="w-full p-2 border rounded-xl text-sm font-bold outline-none focus:border-blue-400">
+                            <input v-model="passForm.confirmPass" type="password" placeholder="再次確認密碼"
+                                class="w-full p-2 border rounded-xl text-sm font-bold outline-none focus:border-blue-400">
+                            <button @click="handleChangePassword"
+                                class="w-full py-2 bg-blue-500 text-white font-black rounded-xl ro-btn border-b-blue-700 text-xs">確認變更密碼</button>
                         </div>
                     </div>
 
-                    <div v-else class="text-[10px] font-bold text-amber-600 bg-amber-50 p-4 rounded-xl border border-amber-100">
+                    <div v-else
+                        class="text-[10px] font-bold text-amber-600 bg-amber-50 p-4 rounded-xl border border-amber-100">
                         提醒：訪客資料儲存於瀏覽器緩存，清除緩存或更換裝置後資料將遺失。建議註冊正式帳號以跨裝置管理。
                     </div>
 
                     <div class="flex gap-2">
-                        <button @click="ui.modal = null" class="flex-1 py-3 bg-gray-100 text-gray-500 font-black rounded-xl">返回大廳</button>
+                        <button @click="ui.modal = null"
+                            class="flex-1 py-3 bg-gray-100 text-gray-500 font-black rounded-xl">返回大廳</button>
                     </div>
                 </div>
             </div>
@@ -423,7 +623,9 @@
                 // Helpers
                 const findMember = (id) => members.value.find(m => m.id === id);
                 const getJob = (id) => jobs.value.find(j => j.id === id) || { name: '未知職業', icon: '❓', color: '#ccc' };
-                
+                const getMemberGroup = (mid) => {
+                    return groups.value.find(g => g.members.includes(mid));
+                };
                 const unassignedMembers = computed(() => {
                     const assigned = new Set();
                     groups.value.forEach(g => g.members.forEach(id => assigned.add(id)));
@@ -441,11 +643,17 @@
                     let res = [...members.value];
                     if (ui.value.sortBy === 'name') {
                         res.sort((a,b) => a.name.localeCompare(b.name, 'zh-TW'));
-                    } else {
+                    } else if (ui.value.sortBy === 'job') {
                         res.sort((a,b) => {
-                            const ja = getJob(a.jobId)?.name || '';
-                            const jb = getJob(b.jobId)?.name || '';
+                            const ja = getJob(a.jobId).name;
+                            const jb = getJob(b.jobId).name;
                             return ja.localeCompare(jb, 'zh-TW');
+                        });
+                    } else if (ui.value.sortBy === 'group') {
+                        res.sort((a,b) => {
+                            const ga = getMemberGroup(a.id)?.name || 'zzz';
+                            const gb = getMemberGroup(b.id)?.name || 'zzz';
+                            return ga.localeCompare(gb, 'zh-TW');
                         });
                     }
                     return res;
@@ -486,10 +694,10 @@
                 // Data Persistence
                 const syncData = async () => {
                     if (!user.value) return;
-                    const payload = JSON.parse(JSON.stringify({ 
-                        members: members.value, 
+                    const payload = JSON.parse(JSON.stringify({
+                        members: members.value,
                         groups: groups.value,
-                        jobs: jobs.value 
+                        jobs: jobs.value
                     }));
                     if (user.value.isAnonymous) {
                         localStorage.setItem(`ro_data_${appId}`, JSON.stringify(payload));
@@ -525,7 +733,7 @@
                 };
                 const editMember = (m) => { form.value = { ...m }; ui.value.modal = 'memberEdit'; };
                 const deleteMember = (id) => {
-                    if(!confirm('確定要從公會名冊中刪除此冒險者？')) return;
+                    if (!confirm('確定要從公會名冊中刪除此冒險者？')) return;
                     members.value = members.value.filter(m => m.id !== id);
                     groups.value.forEach(g => g.members = g.members.filter(mid => mid !== id));
                     syncData();
@@ -537,7 +745,7 @@
                     groups.value.push({ id: crypto.randomUUID(), name: `冒險分隊 ${groups.value.length + 1}`, max: 5, members: [] });
                     syncData();
                 };
-                const deleteGroup = (i) => { if(confirm('解散此隊伍？')) { groups.value.splice(i, 1); syncData(); } };
+                const deleteGroup = (i) => { if (confirm('解散此隊伍？')) { groups.value.splice(i, 1); syncData(); } };
                 const openAssignMenu = (m) => ui.value.assigningMember = m;
                 const assignToGroup = (g) => {
                     if (g.members.length < g.max) {
@@ -577,7 +785,7 @@
 
                 onMounted(async () => {
                     const config = await loadConfig();
-                    
+
                     if (config && config.apiKey) {
                         const app = initializeApp(config);
                         auth = getAuth(app);
@@ -587,7 +795,7 @@
                             if (u) {
                                 if (u.isAnonymous) {
                                     const local = localStorage.getItem(`ro_data_${appId}`);
-                                    if(local) {
+                                    if (local) {
                                         const d = JSON.parse(local);
                                         members.value = d.members || [];
                                         groups.value = d.groups || [];
@@ -607,13 +815,13 @@
                         });
                     } else {
                         console.log("No valid Firebase config. Initializing in Guest Mode.");
-                        auth = { currentUser: null }; 
+                        auth = { currentUser: null };
                         // User needs to click guest login
                     }
                 });
 
                 return {
-                    user, authView, authForm,passForm, members, groups, jobs, ui, form,
+                    user, authView, authForm, passForm, members, groups, jobs, ui, form,
                     unassignedMembers, jobStats, filteredMembers, findMember, getJob,
                     handleEmailAuth, loginAsGuest, handleLogout, handleChangePassword,
                     saveMember, editMember, deleteMember, exportCSV, addNewGroup, deleteGroup,
@@ -624,4 +832,5 @@
         }).mount('#app');
     </script>
 </body>
+
 </html>
