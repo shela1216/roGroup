@@ -248,26 +248,48 @@
             </div>
         </div>
 
-        <!-- 成員編輯/新增 Modal -->
+        <!-- 成員編輯/新增 Modal (下拉選單優化版) -->
         <div v-if="ui.modal === 'memberEdit'" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4" @click.self="ui.modal = null">
-            <div class="ro-card max-sm w-full p-6 bg-white animate-in zoom-in duration-200">
-                <h3 class="font-black text-blue-700 mb-4 text-center">{{ form.id ? '修正冒險者資訊' : '冒險者入團登記' }}</h3>
-                <label class="block text-[10px] font-black text-gray-400 mb-1 uppercase tracking-tighter">Adventurer Name</label>
-                <input v-model="form.name" placeholder="請輸入名稱" class="w-full p-3 border-2 border-gray-50 rounded-xl mb-4 font-bold outline-none focus:border-blue-400 transition-all">
+            <div class="ro-card max-w-sm w-full p-6 bg-white animate-in zoom-in duration-200">
+                <h3 class="font-black text-blue-700 mb-6 text-center text-lg flex items-center justify-center gap-2">
+                    <span v-if="!form.id">✨</span><span v-else>📝</span>
+                    {{ form.id ? '修正冒險者資訊' : '冒險者入團登記' }}
+                </h3>
                 
-                <label class="block text-[10px] font-black text-gray-400 mb-1 uppercase tracking-tighter">Select Job</label>
-                <div class="grid grid-cols-3 gap-2 mb-6 max-h-48 overflow-y-auto p-1 custom-scroll">
-                    <button v-for="job in jobs" :key="job.id" @click="form.jobId = job.id" 
-                            :class="form.jobId === job.id ? 'border-blue-500 bg-blue-50 text-blue-600 ring-2 ring-blue-100' : 'border-gray-50 text-gray-400'" 
-                            class="p-2 border-2 rounded-xl text-center transition-all group">
-                        <div class="text-xl group-hover:scale-110 transition-transform">{{ job.icon }}</div>
-                        <div class="text-[9px] font-black truncate">{{ job.name }}</div>
-                    </button>
+                <div class="space-y-5 mb-8">
+                    <div>
+                        <label class="block text-[10px] font-black text-blue-400 mb-1.5 uppercase tracking-wider">Adventurer Name / 冒險者名稱</label>
+                        <input v-model="form.name" placeholder="請輸入公會成員名稱" 
+                               class="w-full p-3 bg-gray-50 border-2 border-gray-100 rounded-2xl font-bold outline-none focus:border-blue-400 focus:bg-white transition-all shadow-inner">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-[10px] font-black text-blue-400 mb-1.5 uppercase tracking-wider">Assigned Job / 指定職業</label>
+                        <div class="relative group">
+                            <!-- 職業預覽色塊 -->
+                            <div class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg flex items-center justify-center text-sm shadow-sm transition-colors"
+                                 :style="{backgroundColor: getJob(form.jobId)?.color + '22', border: '1px solid ' + getJob(form.jobId)?.color}">
+                                {{ getJob(form.jobId)?.icon }}
+                            </div>
+                            <select v-model="form.jobId" 
+                                    class="ro-select w-full pl-11 pr-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-2xl font-bold outline-none focus:border-blue-400 focus:bg-white transition-all cursor-pointer shadow-inner">
+                                <option v-for="job in jobs" :key="job.id" :value="job.id">
+                                    {{ job.icon }} {{ job.name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="flex gap-2">
-                    <button @click="ui.modal = (form.id ? 'memberList' : null)" class="flex-1 py-3 bg-gray-50 text-gray-400 font-black rounded-xl hover:bg-gray-100 transition-colors">取消</button>
-                    <button @click="saveMember" class="flex-1 py-3 bg-blue-500 text-white font-black rounded-xl ro-btn border-b-blue-800">保存變更</button>
+                <div class="flex gap-3">
+                    <button @click="ui.modal = (form.id ? 'memberList' : null)" 
+                            class="flex-1 py-3 bg-gray-100 text-gray-500 font-black rounded-2xl hover:bg-gray-200 transition-colors text-sm">
+                        取消
+                    </button>
+                    <button @click="saveMember" 
+                            class="flex-1 py-3 bg-[#0d8de7] text-white font-black rounded-2xl ro-btn border-b-blue-800 text-sm">
+                        {{ form.id ? '確認更新' : '確認入團' }}
+                    </button>
                 </div>
             </div>
         </div>
