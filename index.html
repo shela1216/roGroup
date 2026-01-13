@@ -366,43 +366,40 @@
                 </div>
             </div>
         </div>
-        <!-- 職業設定 Modal -->
-        <div v-if="ui.modal === 'jobSettings'"
-            class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4"
-            @click.self="ui.modal = null">
+        <!-- 職業設定 Modal (置中) -->
+        <div v-if="ui.modal === 'jobSettings'" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4" @click.self="ui.modal = null">
             <div class="ro-card max-w-2xl w-full bg-white flex flex-col max-h-[85vh]">
+                <!-- 全螢幕遮罩：僅在圖標選擇器打開時顯示，用於點擊外部關閉 -->
+                <div v-if="ui.openIconPickerId" class="fixed inset-0 z-[500] cursor-default" @click.stop="ui.openIconPickerId = null"></div>
+
                 <div class="p-6 border-b flex justify-between items-center bg-blue-50/30">
-                    <h2 class="text-lg font-black text-blue-700 flex items-center gap-2"><svg class="icon-svg">
-                            <use xlink:href="#icon-briefcase"></use>
-                        </svg> 職業百科全書</h2>
-                    <button @click="ui.modal = null"
-                        class="text-gray-400 font-black px-2 hover:bg-gray-100 rounded">✕</button>
+                    <h2 class="text-lg font-black text-blue-700 flex items-center gap-2"><svg class="icon-svg"><use xlink:href="#icon-briefcase"></use></svg> 職業百科全書</h2>
+                    <button @click="ui.modal = null" class="text-gray-400 font-black px-2 hover:bg-gray-100 rounded">✕</button>
                 </div>
                 <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
                     <p class="text-[10px] font-black text-gray-400">定義公會中可用的冒險職業</p>
-                    <button @click="addNewJob"
-                        class="bg-blue-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold ro-btn border-b-blue-700">+
-                        新增職業</button>
+                    <button @click="addNewJob" class="bg-blue-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold ro-btn border-b-blue-700">+ 新增職業</button>
                 </div>
-                <div class="flex-1 overflow-y-auto p-4 space-y-3 custom-scroll">
-                    <div v-for="job in jobs" :key="job.id"
-                        class="p-4 bg-white border-2 rounded-2xl flex flex-wrap md:flex-nowrap items-center gap-4">
-                        <div class="flex items-center gap-2 w-full md:w-auto">
-                            <input v-model="job.icon" class="w-12 p-2 border rounded-xl text-center text-xl bg-gray-50"
-                                placeholder="圖標">
-                            <input v-model="job.name" @blur="syncData"
-                                class="flex-1 md:w-32 p-2 border rounded-xl font-bold" placeholder="職業名稱">
+                <div class="flex-1 overflow-y-auto p-4 space-y-3 custom-scroll relative">
+                    <div v-for="job in jobs" :key="job.id" 
+                         class="p-4 bg-white border-2 rounded-2xl flex flex-wrap md:flex-nowrap items-center gap-4 transition-all"
+                         :class="ui.openIconPickerId === job.id ? 'z-[600] border-blue-300 shadow-lg' : 'relative z-0 border-gray-100'">
+                        
+                        <div class="flex items-center gap-2 w-full md:w-auto relative">
+                            <!-- 圖標按鈕 -->
+                            <button @click.stop="ui.openIconPickerId = (ui.openIconPickerId === job.id ? null : job.id)" 
+                                    class="w-12 h-10 border-2 rounded-xl text-center text-xl bg-gray-50 hover:bg-white hover:border-blue-300 transition-colors flex items-center justify-center">
+                                {{ job.icon }}
+                            </button>
+                            
+                            <input v-model="job.name" @blur="syncData" class="flex-1 md:w-32 p-2 border-b-2 border-gray-100 focus:border-blue-400 outline-none font-bold transition-colors bg-transparent focus:bg-gray-50 rounded" placeholder="職業名稱">
                         </div>
                         <div class="flex items-center gap-2 flex-1">
-                            <input type="color" v-model="job.color" @change="syncData"
-                                class="w-10 h-10 border rounded-lg cursor-pointer p-1">
+                            <input type="color" v-model="job.color" @change="syncData" class="w-10 h-10 border rounded-lg cursor-pointer p-1">
                             <span class="text-xs font-mono font-bold text-gray-400 uppercase">{{ job.color }}</span>
                         </div>
-                        <button @click="deleteJob(job.id)"
-                            class="p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg">
-                            <svg class="icon-svg">
-                                <use xlink:href="#icon-trash"></use>
-                            </svg>
+                        <button @click="deleteJob(job.id)" class="p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg">
+                            <svg class="icon-svg"><use xlink:href="#icon-trash"></use></svg>
                         </button>
                     </div>
                 </div>
@@ -674,11 +671,21 @@
                     { id: 'j6', name: '鐵匠', color: '#a16207', icon: '🔨' },
                     { id: 'j7', name: '槍手', color: '#c2410c', icon: '🔫' }
                 ]);
-                const ui = ref({ modal: null, expandUnassigned: true, assigningMember: null, sortBy: 'name' });
+                const ui = ref({ modal: null, expandUnassigned: true, assigningMember: null, sortBy: 'name', openIconPickerId: null });
                 const form = ref({ id: null, name: '', jobId: 'j1' });
                 const importText = ref('');
                 let db, auth;
                 const appId = 'ro-guild-v5-pro';
+                // 內建 Emoji 清單
+                const emojiList = [
+                    '⚔️', '🛡️', '🏹', '✨', '🔥', '❄️', '⚡', '🌪️', 
+                    '💧', '🌿', '💀', '⚰️', '💊', '🔨', '🪓', '💰', 
+                    '🛒', '🎸', '🎭', '🥊', '🥋', '🔫', '💣', '🐱', 
+                    '🦅', '⛪', '📖', '👑', '💎', '🆕', '👼', '🧛',
+                    '🩸', '🗡️', '🧿', '🧬', '🧪', '🔭', '📜', '🎵',
+                    '🎪', '🦄', '🐲', '🐾', '🕸️', '🦂', '🐍', '🦋',
+                    '👹', '👺', '👻', '👽', '🤖', '👾', '🎃', '🦴'
+                ];
 
                 // Helpers
                 const findMember = (id) => members.value.find(m => m.id === id);
@@ -936,7 +943,7 @@
                     handleEmailAuth, loginAsGuest, handleLogout, handleChangePassword,
                     saveMember, editMember, deleteMember, exportCSV, addNewGroup, deleteGroup,
                     openAssignMenu, assignToGroup, removeFromGroup, openAddMember, syncData, getMemberGroup,
-                    addNewJob, deleteJob, confirmImport
+                    addNewJob, deleteJob, confirmImport,emojiList
                 };
             }
         }).mount('#app');
