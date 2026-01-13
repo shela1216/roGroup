@@ -587,43 +587,52 @@
             </div>
         </div>
 
-        <!-- 職業統計 Modal (改用條列式+進度條) -->
+        <!-- 職業統計 Modal (條列式 + 百分比進度條) -->
         <div v-if="ui.modal === 'jobStats'" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4" @click.self="ui.modal = null">
-            <div class="ro-card max-w-lg w-full bg-white p-6 max-h-[85vh] flex flex-col">
+            <div class="ro-card max-w-lg w-full bg-white p-6 max-h-[85vh] flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center mb-6 border-b pb-4">
                     <div class="flex items-center gap-3">
-                        <div class="bg-blue-100 p-2 rounded-lg text-blue-600">
+                        <div class="bg-blue-100 p-2 rounded-xl text-blue-600">
                              <svg class="icon-svg text-xl"><use xlink:href="#icon-chart"></use></svg>
                         </div>
                         <div>
-                            <h2 class="text-lg font-black text-blue-700">戰力職業分佈</h2>
-                            <p class="text-[10px] text-gray-400 font-bold">總計成員 {{ members.length }} 人</p>
+                            <h2 class="text-lg font-black text-blue-700">戰力職業分布</h2>
+                            <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">Job Class Distribution ({{ members.length }} Total)</p>
                         </div>
                     </div>
                     <button @click="ui.modal = null" class="text-gray-400 hover:bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center font-bold">✕</button>
                 </div>
                 
-                <div class="flex-1 overflow-y-auto custom-scroll pr-1 space-y-3">
-                    <div v-for="stat in jobStats" :key="stat.id" class="p-3 bg-gray-50 border border-gray-100 rounded-2xl hover:border-blue-200 transition-all">
-                        <div class="flex justify-between items-center mb-2">
+                <div class="flex-1 overflow-y-auto custom-scroll pr-1 space-y-4">
+                    <div v-for="stat in jobStats" :key="stat.id" class="p-3 bg-gray-50/50 border border-gray-100 rounded-2xl transition-all hover:bg-white hover:border-blue-200">
+                        <div class="flex justify-between items-end mb-2">
                             <div class="flex items-center gap-3">
                                 <div class="text-2xl w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-100">
                                     {{ stat.icon }}
                                 </div>
                                 <div>
-                                    <div class="font-black text-sm text-gray-700">{{ stat.name }}</div>
-                                    <div class="text-[10px] font-bold text-gray-400">{{ stat.count }} 人</div>
+                                    <div class="font-black text-sm text-gray-800">{{ stat.name }}</div>
+                                    <div class="text-[10px] font-bold text-gray-400">{{ stat.count }} 冒險者</div>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <div class="text-lg font-black" :style="{color: stat.color}">{{ stat.percent }}%</div>
+                                <div class="text-lg font-black leading-none" :style="{color: stat.color}">{{ stat.percent }}%</div>
                             </div>
                         </div>
-                        <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <!-- 進度條 -->
+                        <div class="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden shadow-inner">
                             <div class="h-full rounded-full transition-all duration-1000 ease-out" 
                                  :style="{ width: stat.percent + '%', backgroundColor: stat.color }"></div>
                         </div>
                     </div>
+                    
+                    <div v-if="members.length === 0" class="py-12 text-center text-gray-400 italic font-bold">
+                        尚未有成員登錄資料
+                    </div>
+                </div>
+                
+                <div class="mt-4 pt-4 border-t text-center">
+                    <span class="text-[10px] font-black text-gray-300 tracking-tighter uppercase">Ragnarok Online Guild Management System</span>
                 </div>
             </div>
         </div>
@@ -739,10 +748,15 @@
                 });
 
                 const jobStats = computed(() => {
-                    return jobs.value.map(j => ({
-                        ...j,
-                        count: members.value.filter(m => m.jobId === j.id).length
-                    }));
+                    const total = members.value.length || 1;
+                    return jobs.value.map(j => {
+                        const count = members.value.filter(m => m.jobId === j.id).length;
+                        return {
+                            ...j,
+                            count,
+                            percent: Math.round((count / total) * 100)
+                        };
+                    });
                 });
 
                 const filteredMembers = computed(() => {
