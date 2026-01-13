@@ -406,6 +406,26 @@
             </div>
         </div>
 
+        <!-- 獨立置中 Emoji Picker Modal -->
+        <div v-if="ui.openIconPickerId" 
+             class="fixed inset-0 z-[999] flex items-center justify-center bg-black/20 backdrop-blur-sm p-4"
+             @click.stop="ui.openIconPickerId = null">
+             
+             <div class="bg-white rounded-3xl shadow-2xl border-4 border-blue-100 w-full max-w-sm max-h-[60vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200" @click.stop>
+                <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
+                    <span class="font-black text-gray-400 text-xs tracking-widest uppercase">Select Icon / 選擇圖標</span>
+                    <button @click="ui.openIconPickerId = null" class="text-gray-400 hover:text-red-500"><svg class="icon-svg"><use xlink:href="#icon-x"></use></svg></button>
+                </div>
+                <div class="p-4 grid grid-cols-6 sm:grid-cols-8 gap-2 overflow-y-auto custom-scroll">
+                     <button v-for="emoji in emojiList" :key="emoji" 
+                             @click.stop="updateJobIcon(emoji)"
+                             class="aspect-square flex items-center justify-center text-xl hover:bg-blue-100 hover:scale-110 rounded-xl transition-all cursor-pointer border border-transparent hover:border-blue-300">
+                         {{ emoji }}
+                     </button>
+                </div>
+             </div>
+        </div>
+
         <!-- 成員管理 Modal -->
         <div v-if="ui.modal === 'memberList'"
             class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4"
@@ -776,6 +796,14 @@
                 };
 
 
+                const updateJobIcon = (emoji) => {
+                    const job = jobs.value.find(j => j.id === ui.value.openIconPickerId);
+                    if (job) {
+                        job.icon = emoji;
+                        ui.value.openIconPickerId = null;
+                        syncData();
+                    }
+                };
                 // Firebase Auth
                 const handleEmailAuth = async (type) => {
                     if (!authForm.value.email || !authForm.value.password) return alert('請完整填寫冒險者憑證');
@@ -943,7 +971,7 @@
                     handleEmailAuth, loginAsGuest, handleLogout, handleChangePassword,
                     saveMember, editMember, deleteMember, exportCSV, addNewGroup, deleteGroup,
                     openAssignMenu, assignToGroup, removeFromGroup, openAddMember, syncData, getMemberGroup,
-                    addNewJob, deleteJob, confirmImport,emojiList
+                    addNewJob, deleteJob, confirmImport,emojiList,updateJobIcon
                 };
             }
         }).mount('#app');
