@@ -94,7 +94,10 @@
         }
 
         .group-tag {
-            padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
         }
     </style>
 </head>
@@ -127,6 +130,9 @@
             <symbol id="icon-briefcase" viewBox="0 0 24 24">
                 <path
                     d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-8-2h4v2h-4V4z" />
+            </symbol>
+            <symbol id="icon-import" viewBox="0 0 24 24">
+                <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" />
             </symbol>
         </svg>
 
@@ -191,13 +197,13 @@
             <template v-else>
                 <div class="grid grid-cols-2 md:flex md:flex-wrap gap-2 md:gap-3 mb-6 md:mb-8">
                     <button @click="ui.modal = 'jobStats'"
-                         class="flex items-center justify-center gap-2 bg-white px-3 py-3 rounded-xl ro-card border-blue-500 text-blue-600 font-black text-xs md:text-sm hover:bg-blue-50 transition-colors">
+                        class="flex items-center justify-center gap-2 bg-white px-3 py-3 rounded-xl ro-card border-blue-500 text-blue-600 font-black text-xs md:text-sm hover:bg-blue-50 transition-colors">
                         <svg class="icon-svg">
                             <use xlink:href="#icon-chart"></use>
                         </svg> 戰力統計
                     </button>
                     <button @click="ui.modal = 'memberList'"
-                         class="flex items-center justify-center gap-2 bg-white px-3 py-3 rounded-xl ro-card border-blue-500 text-blue-600 font-black text-xs md:text-sm hover:bg-blue-50 transition-colors">
+                        class="flex items-center justify-center gap-2 bg-white px-3 py-3 rounded-xl ro-card border-blue-500 text-blue-600 font-black text-xs md:text-sm hover:bg-blue-50 transition-colors">
                         <svg class="icon-svg">
                             <use xlink:href="#icon-users"></use>
                         </svg> 成員管理
@@ -207,6 +213,12 @@
                         <svg class="icon-svg">
                             <use xlink:href="#icon-briefcase"></use>
                         </svg> 職業設定
+                    </button>
+                    <button @click="ui.modal = 'importMembers'"
+                        class="col-span-2 md:col-auto flex items-center justify-center gap-2 bg-orange-400 px-5 py-3 rounded-xl border-b-4 border-orange-600 text-white font-black text-xs md:text-sm active:translate-y-0.5 transition-all">
+                        <svg class="icon-svg">
+                            <use xlink:href="#icon-import"></use>
+                        </svg> 匯入名單
                     </button>
                     <button @click="openAddMember"
                         class="flex items-center justify-center gap-2  bg-[#0d8de7] px-5 py-3 rounded-xl border-b-4 border-blue-800 text-white font-black text-sm active:translate-y-0.5 transition-all">
@@ -310,7 +322,50 @@
                 </div>
             </template>
         </main>
+        <!-- 匯入成員 Modal (新增) -->
+        <div v-if="ui.modal === 'importMembers'"
+            class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4"
+            @click.self="ui.modal = null">
+            <div
+                class="ro-card max-w-lg w-full p-6 bg-white animate-in zoom-in duration-200 flex flex-col max-h-[85vh]">
+                <h3 class="font-black text-blue-700 mb-2 text-center text-lg flex items-center justify-center gap-2">
+                    <svg class="icon-svg">
+                        <use xlink:href="#icon-chart"></use>
+                    </svg> 批量匯入成員
+                </h3>
+                <p class="text-xs text-gray-400 mb-4 text-center">請貼上 Excel 複製的內容或 CSV 格式 (每行: 名字, 職業)</p>
 
+                <textarea v-model="importText" placeholder="範例：&#10;勇者A, 騎士&#10;勇者B 牧師&#10;勇者C (若未填寫職業則預設)"
+                    class="w-full p-3 bg-gray-50 border-2 border-gray-200 rounded-xl mb-4 font-mono text-xs focus:border-blue-400 outline-none flex-1 resize-none h-48"></textarea>
+
+                <div v-if="previewImport.length > 0"
+                    class="mb-4 bg-blue-50 p-3 rounded-xl border border-blue-100 max-h-32 overflow-y-auto custom-scroll">
+                    <h4 class="text-[10px] font-black text-blue-500 mb-2">解析預覽 ({{ previewImport.length }} 人)</h4>
+                    <div v-for="(item, idx) in previewImport" :key="idx" class="flex items-center gap-2 text-xs mb-1">
+                        <!-- 新增狀態標籤 -->
+                        <span v-if="members.some(m => m.name === item.name)"
+                            class="text-[9px] text-orange-500 bg-orange-100 px-1 rounded font-bold">覆蓋</span>
+                        <span v-else class="text-[9px] text-green-500 bg-green-100 px-1 rounded font-bold">新增</span>
+
+                        <span class="font-bold text-gray-700">{{ item.name }}</span>
+                        <span class="text-gray-400">→</span>
+                        <span class="job-tag scale-90 origin-left"
+                            :style="{backgroundColor: getJob(item.jobId)?.color}">{{ getJob(item.jobId)?.icon }} {{
+                            getJob(item.jobId)?.name }}</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button @click="ui.modal = null"
+                        class="flex-1 py-3 bg-gray-100 text-gray-500 font-black rounded-xl hover:bg-gray-200 transition-colors">取消</button>
+                    <button @click="confirmImport"
+                        class="flex-1 py-3 bg-blue-500 text-white font-black rounded-xl ro-btn border-b-blue-800"
+                        :disabled="previewImport.length === 0" :class="{'opacity-50': previewImport.length === 0}">
+                        確認匯入
+                    </button>
+                </div>
+            </div>
+        </div>
         <!-- 職業設定 Modal -->
         <div v-if="ui.modal === 'jobSettings'"
             class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4"
@@ -647,15 +702,15 @@
                 const filteredMembers = computed(() => {
                     let res = [...members.value];
                     if (ui.value.sortBy === 'name') {
-                        res.sort((a,b) => a.name.localeCompare(b.name, 'zh-TW'));
+                        res.sort((a, b) => a.name.localeCompare(b.name, 'zh-TW'));
                     } else if (ui.value.sortBy === 'job') {
-                        res.sort((a,b) => {
+                        res.sort((a, b) => {
                             const ja = getJob(a.jobId).name;
                             const jb = getJob(b.jobId).name;
                             return ja.localeCompare(jb, 'zh-TW');
                         });
                     } else if (ui.value.sortBy === 'group') {
-                        res.sort((a,b) => {
+                        res.sort((a, b) => {
                             const ga = getMemberGroup(a.id)?.name || 'zzz';
                             const gb = getMemberGroup(b.id)?.name || 'zzz';
                             return ga.localeCompare(gb, 'zh-TW');
@@ -663,6 +718,56 @@
                     }
                     return res;
                 });
+
+                const previewImport = computed(() => {
+                    if (!importText.value) return [];
+                    const lines = importText.value.split(/\r?\n/);
+                    const result = [];
+                    lines.forEach(line => {
+                        const parts = line.split(/,|\t/).map(s => s.trim()).filter(s => s);
+                        if (parts.length > 0) {
+                            const name = parts[0];
+                            const jobName = parts[1] || '';
+                            let jobId = jobs.value[0].id; // default
+                            if (jobName) {
+                                const found = jobs.value.find(j => j.name.includes(jobName) || jobName.includes(j.name));
+                                if (found) jobId = found.id;
+                            }
+                            result.push({ name, jobId });
+                        }
+                    });
+                    return result;
+                });
+
+                const confirmImport = () => {
+                    let newCount = 0;
+                    let updateCount = 0;
+
+                    previewImport.value.forEach(m => {
+                        // 尋找是否已存在相同暱稱的成員
+                        const existingIdx = members.value.findIndex(existing => existing.name === m.name);
+
+                        if (existingIdx !== -1) {
+                            // 覆蓋現有資料 (更新職業)
+                            members.value[existingIdx].jobId = m.jobId;
+                            updateCount++;
+                        } else {
+                            // 新增成員
+                            members.value.push({
+                                id: crypto.randomUUID(),
+                                name: m.name,
+                                jobId: m.jobId
+                            });
+                            newCount++;
+                        }
+                    });
+
+                    syncData();
+                    ui.value.modal = null;
+                    importText.value = '';
+                    alert(`匯入完成！新增 ${newCount} 人，更新 ${updateCount} 人`);
+                };
+
 
                 // Firebase Auth
                 const handleEmailAuth = async (type) => {
@@ -827,11 +932,11 @@
 
                 return {
                     user, authView, authForm, passForm, members, groups, jobs, ui, form,
-                    unassignedMembers, jobStats, filteredMembers, findMember, getJob,
+                    unassignedMembers, jobStats, filteredMembers, findMember, getJob, previewImport,
                     handleEmailAuth, loginAsGuest, handleLogout, handleChangePassword,
                     saveMember, editMember, deleteMember, exportCSV, addNewGroup, deleteGroup,
-                    openAssignMenu, assignToGroup, removeFromGroup, openAddMember, syncData,getMemberGroup,
-                    addNewJob, deleteJob
+                    openAssignMenu, assignToGroup, removeFromGroup, openAddMember, syncData, getMemberGroup,
+                    addNewJob, deleteJob, confirmImport
                 };
             }
         }).mount('#app');
