@@ -230,92 +230,69 @@
 
                 <!-- 待分配名單 -->
                 <div class="mb-8 ro-card border-dashed border-blue-300 overflow-hidden">
-                    <button @click="ui.expandUnassigned = !ui.expandUnassigned"
-                        class="w-full flex justify-between items-center p-4 bg-blue-50/50">
+                    <button @click="ui.expandUnassigned = !ui.expandUnassigned" class="w-full flex justify-between items-center p-4 bg-blue-50/50">
                         <div class="flex items-center gap-3">
-                            <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-black">{{
-                                unassignedMembers.length }}</span>
+                            <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-black">{{ unassignedMembers.length }}</span>
                             <span class="font-black text-blue-700">待分配名單 (點擊分配)</span>
                         </div>
                         <span class="text-blue-400 font-bold text-xs">{{ ui.expandUnassigned ? '收合' : '展開' }}</span>
                     </button>
-                    <div v-show="ui.expandUnassigned"
-                        class="p-4 bg-white grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                        <div v-for="m in unassignedMembers" @click="openAssignMenu(m)"
-                            class="flex items-center gap-2 p-2 border rounded-xl hover:bg-blue-50 cursor-pointer transition-all overflow-hidden">
-                            <span class="job-tag flex-shrink-0" :style="{backgroundColor: getJob(m.jobId)?.color}">{{
-                                getJob(m.jobId)?.icon }} {{ getJob(m.jobId)?.name }}</span>
+                    <div v-show="ui.expandUnassigned" class="p-4 bg-white grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                        <div v-for="m in unassignedMembers" @click="openAssignMenu(m)" class="flex items-center gap-2 p-2 border rounded-xl hover:bg-blue-50 cursor-pointer transition-all overflow-hidden">
+                            <span class="job-tag flex-shrink-0" :style="{backgroundColor: getJob(m.jobId)?.color}">{{ getJob(m.jobId)?.icon }} {{ getJob(m.jobId)?.name }}</span>
                             <span class="font-bold text-sm truncate">{{ m.name }}</span>
                         </div>
-                        <div v-if="unassignedMembers.length === 0"
-                            class="col-span-full py-8 text-center text-gray-300 font-bold italic">所有冒險者皆已就位</div>
+                        <div v-if="unassignedMembers.length === 0" class="col-span-full py-8 text-center text-gray-300 font-bold italic">所有冒險者皆已就位</div>
                     </div>
                 </div>
 
                 <!-- 小組展示 -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div v-for="(group, gIndex) in groups" :key="group.id"
-                        class="ro-card flex flex-col overflow-hidden">
+                    <div v-for="(group, gIndex) in groups" :key="group.id" class="ro-card flex flex-col overflow-hidden">
                         <div class="p-4 bg-blue-50/50 border-b flex justify-between items-center">
-                            <input v-model="group.name" @blur="syncData"
-                                class="font-black text-blue-700 bg-transparent border-none focus:ring-2 focus:ring-blue-200 rounded px-1 outline-none text-sm w-1/2">
+                            <input v-model="group.name" @blur="syncData" class="font-black text-blue-700 bg-transparent border-none focus:ring-2 focus:ring-blue-200 rounded px-1 outline-none text-sm w-1/2">
                             <div class="flex items-center gap-2">
-                                <div
-                                    class="flex items-center bg-white px-2 py-1 rounded-lg border text-[10px] font-black group relative">
+                                <div class="flex items-center bg-white px-2 py-1 rounded-lg border text-[10px] font-black group relative">
                                     <span class="text-gray-400">上限:</span>
-                                    <input type="number" v-model.number="group.max" @change="syncData"
-                                        class="w-8 text-center bg-transparent outline-none text-blue-600">
+                                    <input type="number" v-model.number="group.max" @change="syncData" class="w-8 text-center bg-transparent outline-none text-blue-600">
                                 </div>
-                                <button @click="deleteGroup(gIndex)" class="text-gray-300 hover:text-red-400"><svg
-                                        class="icon-svg">
-                                        <use xlink:href="#icon-trash"></use>
-                                    </svg></button>
+                                <button @click="deleteGroup(gIndex)" class="text-gray-300 hover:text-red-400"><svg class="icon-svg"><use xlink:href="#icon-trash"></use></svg></button>
                             </div>
                         </div>
 
                         <div class="h-1.5 w-full bg-gray-100 relative">
-                            <div class="progress-bar h-full absolute top-0 left-0"
-                                :class="group.members.length >= group.max ? 'bg-orange-500' : 'bg-blue-500'"
-                                :style="{width: Math.min((group.members.length / group.max) * 100, 100) + '%'}"></div>
+                            <div class="progress-bar h-full absolute top-0 left-0" 
+                                 :class="group.members.length >= group.max ? 'bg-orange-500' : 'bg-blue-500'"
+                                 :style="{width: Math.min((group.members.length / group.max) * 100, 100) + '%'}"></div>
                         </div>
 
                         <div class="p-4 space-y-2 flex-1">
-                            <div v-for="(mId, mIndex) in group.members"
-                                class="flex justify-between items-center bg-gray-50 p-2 rounded-xl text-xs font-bold border border-transparent hover:border-blue-100 transition-all">
+                            <div v-for="(mId, mIndex) in group.members" 
+                                 @click="openAssignMenu(findMember(mId))"
+                                 class="flex justify-between items-center bg-gray-50 p-2 rounded-xl text-xs font-bold border border-transparent hover:border-blue-100 transition-all cursor-pointer hover:shadow-sm">
                                 <div class="flex items-center gap-2 overflow-hidden">
-                                    <span
-                                        class="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-lg bg-white shadow-sm border text-[10px]">{{
-                                        mIndex + 1 }}</span>
-                                    <span class="job-tag scale-90 origin-left flex-shrink-0"
-                                        :style="{backgroundColor: getJob(findMember(mId)?.jobId)?.color}">
-                                        {{ getJob(findMember(mId)?.jobId)?.icon }} {{
-                                        getJob(findMember(mId)?.jobId)?.name }}
+                                    <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-lg bg-white shadow-sm border text-[10px]">{{ mIndex + 1 }}</span>
+                                    <span class="job-tag scale-90 origin-left flex-shrink-0" :style="{backgroundColor: getJob(findMember(mId)?.jobId)?.color}">
+                                        {{ getJob(findMember(mId)?.jobId)?.icon }} {{ getJob(findMember(mId)?.jobId)?.name }}
                                     </span>
                                     <span class="truncate">{{ findMember(mId)?.name }}</span>
                                 </div>
-                                <button @click="removeFromGroup(group, mIndex)"
-                                    class="w-6 h-6 flex-shrink-0 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full flex items-center justify-center">×</button>
+                                <button @click.stop="removeFromGroup(group, mIndex)" class="w-6 h-6 flex-shrink-0 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full flex items-center justify-center">×</button>
                             </div>
-                            <div v-for="i in Math.max(0, group.max - group.members.length)"
-                                class="border-2 border-dashed border-gray-100 rounded-xl py-2 text-center text-[9px] text-gray-200 font-black">
+                            <div v-for="i in Math.max(0, group.max - group.members.length)" class="border-2 border-dashed border-gray-100 rounded-xl py-2 text-center text-[9px] text-gray-200 font-black">
                                 待領取任務
                             </div>
                         </div>
-
-                        <div
-                            class="p-2 px-4 bg-gray-50 border-t flex justify-between text-[10px] font-black text-gray-400">
+                        
+                        <div class="p-2 px-4 bg-gray-50 border-t flex justify-between text-[10px] font-black text-gray-400">
                             <span>集結進度</span>
                             <span>{{ group.members.length }} / {{ group.max }}</span>
                         </div>
                     </div>
-
-                    <button @click="addNewGroup"
-                        class="ro-card border-dashed border-gray-300 flex flex-col items-center justify-center p-12 text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-all group">
-                        <div
-                            class="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center mb-3 group-hover:border-blue-300 group-hover:bg-white">
-                            <svg class="icon-svg text-xl">
-                                <use xlink:href="#icon-plus"></use>
-                            </svg>
+                    
+                    <button @click="addNewGroup" class="ro-card border-dashed border-gray-300 flex flex-col items-center justify-center p-12 text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-all group">
+                        <div class="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center mb-3 group-hover:border-blue-300 group-hover:bg-white">
+                            <svg class="icon-svg text-xl"><use xlink:href="#icon-plus"></use></svg>
                         </div>
                         <span class="font-black text-sm tracking-widest">擴充冒險小隊</span>
                     </button>
@@ -555,35 +532,27 @@
             </div>
         </div>
 
-        <!-- 快速分配彈窗 -->
-        <div v-if="ui.assigningMember"
-            class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4"
-            @click.self="ui.assigningMember = null">
+        <!-- 快速分配彈窗 (智慧版) -->
+        <div v-if="ui.assigningMember" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4" @click.self="ui.assigningMember = null">
             <div class="ro-card max-w-xs w-full bg-white p-6 shadow-2xl">
                 <div class="text-center mb-6">
-                    <div
-                        class="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black mb-2 italic">
-                        Assignment Order</div>
-                    <h4 class="font-black text-gray-700">派遣 <span class="text-blue-600">「{{ ui.assigningMember.name
-                            }}」</span> 至哪支小隊？</h4>
+                    <div class="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black mb-2 italic">Assignment Order</div>
+                    <h4 class="font-black text-gray-700">派遣 <span class="text-blue-600">「{{ ui.assigningMember.name }}」</span> 至...</h4>
                 </div>
                 <div class="space-y-2 max-h-60 overflow-y-auto custom-scroll pr-1">
-                    <button v-for="group in groups" :key="group.id" @click="assignToGroup(group)"
-                        :disabled="group.members.length >= group.max"
-                        :class="group.members.length >= group.max ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'hover:bg-blue-50 border-blue-100'"
-                        class="w-full p-3 border-2 rounded-2xl font-black text-sm flex justify-between items-center transition-all">
+                    <button v-for="group in groups" :key="group.id" 
+                            @click="assignToGroup(group)"
+                            :disabled="group.members.length >= group.max && !group.members.includes(ui.assigningMember.id)" 
+                            :class="group.members.includes(ui.assigningMember.id) ? 'bg-blue-50 border-blue-200 cursor-default' : (group.members.length >= group.max ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'hover:bg-blue-50 border-blue-100')"
+                            class="w-full p-3 border-2 rounded-2xl font-black text-sm flex justify-between items-center transition-all">
                         <span>{{ group.name }}</span>
                         <div class="flex items-center gap-2">
-                            <span class="text-[10px] text-gray-400">{{ group.members.length }}/{{ group.max }}</span>
-                            <div class="w-8 h-1 bg-gray-100 rounded-full overflow-hidden">
-                                <div class="bg-blue-400 h-full"
-                                    :style="{width: (group.members.length/group.max)*100 + '%'}"></div>
-                            </div>
+                            <span v-if="group.members.includes(ui.assigningMember.id)" class="text-[9px] text-blue-500 font-bold bg-white px-2 rounded-full border border-blue-200">目前所在</span>
+                            <span class="text-[10px] text-gray-400" v-else>{{ group.members.length }}/{{ group.max }}</span>
                         </div>
                     </button>
                 </div>
-                <button @click="ui.assigningMember = null"
-                    class="w-full mt-4 text-xs font-bold text-gray-400 py-2">稍後再說</button>
+                <button @click="ui.assigningMember = null" class="w-full mt-4 text-xs font-bold text-gray-400 py-2">稍後再說</button>
             </div>
         </div>
 
