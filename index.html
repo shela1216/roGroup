@@ -676,7 +676,7 @@
                 ]);
                 const ui = ref({ modal: null, expandUnassigned: true, assigningMember: null, sortBy: 'name' });
                 const form = ref({ id: null, name: '', jobId: 'j1' });
-
+                const importText = ref('');
                 let db, auth;
                 const appId = 'ro-guild-v5-pro';
 
@@ -931,7 +931,7 @@
                 });
 
                 return {
-                    user, authView, authForm, passForm, members, groups, jobs, ui, form,
+                    user, authView, authForm, passForm, members, groups, jobs, ui, form, importText,
                     unassignedMembers, jobStats, filteredMembers, findMember, getJob, previewImport,
                     handleEmailAuth, loginAsGuest, handleLogout, handleChangePassword,
                     saveMember, editMember, deleteMember, exportCSV, addNewGroup, deleteGroup,
