@@ -173,27 +173,32 @@
                     為了不錯過任何一場 GVG 或 MVP 時間，<br>請點擊下方按鈕加入我們的公會行事曆！
                 </p>
                 
-                <!-- 訂閱按鈕 (Google) - 統一為唯一入口 -->
+                <!-- 訂閱按鈕 (統一入口) -->
                 <button id="btn-google" onclick="subscribeCalendar()" class="ro-btn w-full py-4 text-xl font-bold rounded-lg shadow-lg flex items-center justify-center gap-3 group mb-2">
                     <i class="fa-brands fa-google text-2xl group-hover:animate-pulse"></i>
                     一鍵加入 Google 行事曆
                 </button>
-                <p class="text-[10px] text-gray-400 text-center mb-3">
+
+                <!-- iOS 下載 APP 按鈕 (預設隱藏，偵測到 iOS 才顯示) -->
+                <!-- 直接顯示 App Store 下載連結 -->
+                <a id="btn-ios-download" href="https://apps.apple.com/tw/app/google-calendar/id909319292" target="_blank" 
+                   class="hidden w-full py-3 bg-white border-2 border-gray-300 text-gray-600 font-bold rounded-lg shadow-sm items-center justify-center gap-2 mb-2 hover:bg-gray-50 transition-colors">
+                    <i class="fa-brands fa-app-store-ios text-xl"></i>
+                    尚未安裝？下載 Google 日曆 APP
+                </a>
+
+                <p id="btn-subtext" class="text-[10px] text-gray-400 text-center mb-3">
                     * 點擊後請選擇「新增 / Add」
                 </p>
 
-                <!-- iOS 專用提示區塊 (預設隱藏，偵測到 iOS 才顯示) -->
+                <!-- iOS 提示文字區塊 -->
                 <div id="ios-hint-box" class="hidden text-left bg-yellow-50 border border-yellow-200 rounded p-3 mt-2 shadow-sm">
-                    <p class="text-xs font-bold text-yellow-800 mb-2">
-                        <i class="fa-brands fa-apple text-lg mr-1"></i> iOS 用戶重要提醒：
+                    <p class="text-xs font-bold text-yellow-800 mb-1">
+                        <i class="fa-brands fa-apple text-lg mr-1"></i> iOS 用戶小撇步：
                     </p>
-                    <p class="text-xs text-gray-700 leading-relaxed mb-3">
-                        為了確保通知正常運作，強烈建議您安裝官方 <span class="font-bold text-roBlue">Google 行事曆 APP</span>，不要使用內建行事曆。
+                    <p class="text-xs text-gray-700 leading-relaxed">
+                        建議先安裝 APP，再回來點擊藍色按鈕，這樣通知最穩定！
                     </p>
-                    <a href="https://apps.apple.com/tw/app/google-calendar/id909319292" target="_blank" 
-                       class="block w-full text-center bg-white border border-gray-300 text-gray-600 text-xs font-bold py-2 rounded hover:bg-gray-50 transition-colors">
-                        <i class="fa-brands fa-app-store-ios text-base align-middle mr-1"></i> 下載 Google 行事曆 APP
-                    </a>
                 </div>
                 
                 <!-- 裝置提示訊息 -->
@@ -307,31 +312,56 @@
         // ==========================================
         // 裝置偵測與顯示邏輯
         // ==========================================
+        function getMobileOperatingSystem() {
+            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            if (/android/i.test(userAgent)) return "Android";
+            // iOS detection (including iPadOS 13+)
+            if (/iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+                return "iOS";
+            }
+            return "unknown";
+        }
+
         function detectDevice() {
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            const isIOS = /iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            
+            const os = getMobileOperatingSystem();
             const hintText = document.getElementById('hint-text');
             const iosHintBox = document.getElementById('ios-hint-box');
+            const btnIosDownload = document.getElementById('btn-ios-download');
+            const subText = document.getElementById('btn-subtext');
 
-            if (isIOS) {
-                // 如果是 iOS：顯示 APP 下載提示區塊
+            if (os === "iOS") {
+                // 如果是 iOS：
+                // 1. 顯示下載按鈕
+                btnIosDownload.classList.remove('hidden');
+                btnIosDownload.classList.add('flex');
+                
+                // 2. 顯示小提示框
                 iosHintBox.classList.remove('hidden');
                 iosHintBox.classList.add('block');
                 
-                hintText.innerHTML = '<i class="fa-brands fa-apple"></i> 偵測到 iOS 裝置，請務必安裝 Google 行事曆 APP';
+                hintText.innerHTML = '<i class="fa-brands fa-apple"></i> 偵測到 iOS 裝置';
                 hintText.classList.add('text-roBlue');
-            } else {
-                // 如果是 Android 或 PC：隱藏提示
+                
+                // 修改說明文字
+                subText.innerHTML = '* 若已安裝 APP，請直接點擊藍色按鈕';
+            } else if (os === "Android") {
+                // 如果是 Android：隱藏下載按鈕 (Android 會自動轉)
+                btnIosDownload.classList.remove('flex');
+                btnIosDownload.classList.add('hidden');
+                
                 iosHintBox.classList.remove('block');
                 iosHintBox.classList.add('hidden');
                 
-                if (/android/i.test(userAgent)) {
-                    hintText.innerHTML = '<i class="fa-brands fa-android"></i> 偵測到 Android 裝置，直接點擊加入即可';
-                    hintText.classList.add('text-green-600');
-                } else {
-                    hintText.innerHTML = '<i class="fa-solid fa-desktop"></i> 請使用 Google 帳號加入';
-                }
+                hintText.innerHTML = '<i class="fa-brands fa-android"></i> 偵測到 Android 裝置 (自動偵測 APP)';
+                hintText.classList.add('text-green-600');
+                subText.innerHTML = '* 若未安裝 APP 將自動跳轉至 Play 商店';
+            } else {
+                // 電腦版
+                btnIosDownload.classList.remove('flex');
+                btnIosDownload.classList.add('hidden');
+                iosHintBox.classList.remove('block');
+                iosHintBox.classList.add('hidden');
+                hintText.innerHTML = '<i class="fa-solid fa-desktop"></i> 電腦版請使用 Google 帳號加入';
             }
         }
 
@@ -340,10 +370,18 @@
         };
 
         function subscribeCalendar() {
-            // 所有裝置都統一使用 Google Calendar 連結
-            // 手機有裝 Google Calendar APP 的話，通常會喚起 APP
-            const calendarUrl = `https://calendar.google.com/calendar/u/0/r?cid=${encodeURIComponent(calendarId)}`;
-            window.open(calendarUrl, '_blank');
+            const os = getMobileOperatingSystem();
+            const cid = encodeURIComponent(calendarId);
+            
+            if (os === "Android") {
+                // Android 魔法：Intent Scheme
+                const intentUrl = `intent://calendar.google.com/calendar/u/0/r?cid=${cid}#Intent;scheme=https;package=com.google.android.calendar;S.browser_fallback_url=https://play.google.com/store/apps/details?id=com.google.android.calendar;end`;
+                window.location.href = intentUrl;
+            } else {
+                // iOS & Desktop: 使用標準網頁連結
+                const calendarUrl = `https://calendar.google.com/calendar/u/0/r?cid=${cid}`;
+                window.open(calendarUrl, '_blank');
+            }
         }
 
         function copyId() {
