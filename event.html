@@ -173,28 +173,33 @@
                     為了不錯過任何一場 GVG 或 MVP 時間，<br>請點擊下方按鈕加入我們的公會行事曆！
                 </p>
                 
-                <!-- 訂閱按鈕 (Google) - 預設顯示 -->
-                <button id="btn-google" onclick="subscribeCalendar()" class="ro-btn w-full py-4 text-xl font-bold rounded-lg shadow-lg flex items-center justify-center gap-3 group mb-3">
+                <!-- 訂閱按鈕 (Google) - 統一為唯一入口 -->
+                <button id="btn-google" onclick="subscribeCalendar()" class="ro-btn w-full py-4 text-xl font-bold rounded-lg shadow-lg flex items-center justify-center gap-3 group mb-2">
                     <i class="fa-brands fa-google text-2xl group-hover:animate-pulse"></i>
                     一鍵加入 Google 行事曆
                 </button>
-
-                <!-- 訂閱按鈕 (iOS/Apple) - 預設隱藏，由 JS 控制顯示 -->
-                <!-- 修改：樣式改為 ro-btn (藍色風格)，與上方一致 -->
-                <button id="btn-ios" onclick="subscribeIos()" class="hidden ro-btn w-full py-4 text-xl font-bold rounded-lg shadow-lg items-center justify-center gap-3 group mb-3">
-                    <i class="fa-brands fa-apple text-2xl group-hover:animate-pulse"></i>
-                    加入 Apple 內建行事曆
-                </button>
-                
-                <!-- 裝置提示訊息 -->
-                <p id="hint-text" class="text-xs text-gray-500 mt-2 font-bold">
-                    <i class="fa-solid fa-spinner fa-spin"></i> 偵測裝置中...
+                <p class="text-[10px] text-gray-400 text-center mb-3">
+                    * 點擊後請選擇「新增 / Add」
                 </p>
 
-                <!-- 手動切換選項 -->
-                <div id="show-all-options" onclick="showAllButtons()" class="text-[10px] text-roBlue mt-3 cursor-pointer underline hover:text-blue-700">
-                    顯示其他系統選項
+                <!-- iOS 專用提示區塊 (預設隱藏，偵測到 iOS 才顯示) -->
+                <div id="ios-hint-box" class="hidden text-left bg-yellow-50 border border-yellow-200 rounded p-3 mt-2 shadow-sm">
+                    <p class="text-xs font-bold text-yellow-800 mb-2">
+                        <i class="fa-brands fa-apple text-lg mr-1"></i> iOS 用戶重要提醒：
+                    </p>
+                    <p class="text-xs text-gray-700 leading-relaxed mb-3">
+                        為了確保通知正常運作，強烈建議您安裝官方 <span class="font-bold text-roBlue">Google 行事曆 APP</span>，不要使用內建行事曆。
+                    </p>
+                    <a href="https://apps.apple.com/tw/app/google-calendar/id909319292" target="_blank" 
+                       class="block w-full text-center bg-white border border-gray-300 text-gray-600 text-xs font-bold py-2 rounded hover:bg-gray-50 transition-colors">
+                        <i class="fa-brands fa-app-store-ios text-base align-middle mr-1"></i> 下載 Google 行事曆 APP
+                    </a>
                 </div>
+                
+                <!-- 裝置提示訊息 -->
+                <p id="hint-text" class="text-xs text-gray-500 mt-3 font-bold">
+                    <i class="fa-solid fa-spinner fa-spin"></i> 偵測裝置中...
+                </p>
             </div>
 
             <!-- 新增：行事曆預覽區塊 -->
@@ -238,33 +243,29 @@
                 </div>
 
                 <div class="space-y-4">
-                    <!-- Google 教學 -->
+                    <!-- 通用教學 -->
                     <div class="flex gap-3 items-start">
-                        <div class="flex-shrink-0 w-6 h-6 bg-roBlue text-white rounded-full flex items-center justify-center font-bold text-xs mt-0.5">G</div>
+                        <div class="flex-shrink-0 w-6 h-6 bg-roBlue text-white rounded-full flex items-center justify-center font-bold text-xs mt-0.5">1</div>
                         <div class="text-sm text-gray-600">
-                            <p class="font-bold text-gray-800">Google / Android 用戶</p>
-                            點擊<span class="text-roBlue font-bold">藍色按鈕</span>，跳轉後點選「新增」即可。
+                            <p class="font-bold text-gray-800">加入日曆</p>
+                            點擊上方藍色按鈕，登入您的 Google 帳號並點選「新增」。
                         </div>
                     </div>
 
-                    <!-- iOS 教學 -->
                     <div class="flex gap-3 items-start">
-                        <div class="flex-shrink-0 w-6 h-6 bg-gray-600 text-white rounded-full flex items-center justify-center font-bold text-xs mt-0.5">A</div>
+                        <div class="flex-shrink-0 w-6 h-6 bg-roBlue text-white rounded-full flex items-center justify-center font-bold text-xs mt-0.5">2</div>
                         <div class="text-sm text-gray-600">
-                            <p class="font-bold text-gray-800">Apple / iOS 用戶</p>
-                            <!-- 修改：更新文字描述為藍色按鈕 -->
-                            <p>1. 點擊<span class="text-roBlue font-bold">藍色按鈕</span>。</p>
-                            <p>2. 系統會跳出「要訂閱行事曆嗎？」，請點選<span class="text-blue-600 font-bold">「訂閱」</span>。</p>
-                            <p>3. 最後點選右上角的「加入」即可在內建行事曆看到行程。</p>
+                            <p class="font-bold text-gray-800">檢查 APP</p>
+                            開啟您的 <span class="font-bold text-roBlue">Google 日曆 APP</span>，在側邊選單確認「萬玖娛樂」已勾選。
                         </div>
                     </div>
-                    
-                    <!-- 檢查同步 -->
-                    <div class="flex gap-3 items-start border-t border-dashed border-gray-300 pt-3">
+
+                    <!-- iOS 特別提醒 -->
+                    <div class="flex gap-3 items-start">
                         <div class="flex-shrink-0 w-6 h-6 bg-roYellow text-white rounded-full flex items-center justify-center font-bold text-xs mt-0.5">!</div>
                         <div class="text-sm text-gray-600">
-                            <p class="font-bold text-gray-800">行程沒出現？</p>
-                            <p>請開啟您的行事曆 APP，點選下方的「行事曆」或側邊選單，確認<span class="font-bold">「萬玖娛樂」</span>的選項是否有被勾選。</p>
+                            <p class="font-bold text-gray-800">iOS 用戶注意</p>
+                            <p>請務必下載並使用 <span class="font-bold">Google 日曆 APP</span> 來接收通知。內建行事曆容易漏接訊息！</p>
                         </div>
                     </div>
                 </div>
@@ -304,77 +305,45 @@
         document.getElementById('calendarPreview').src = embedUrl;
 
         // ==========================================
-        // 裝置偵測與按鈕控制邏輯
+        // 裝置偵測與顯示邏輯
         // ==========================================
-        function detectDeviceAndSwitchButton() {
+        function detectDevice() {
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            
-            // 判斷是否為 iOS (iPhone, iPad, iPod)
-            // 注意：新版 iPadOS 可能會顯示為 MacIntel，需透過 touch points 輔助判斷
             const isIOS = /iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
             
-            const googleBtn = document.getElementById('btn-google');
-            const iosBtn = document.getElementById('btn-ios');
             const hintText = document.getElementById('hint-text');
+            const iosHintBox = document.getElementById('ios-hint-box');
 
             if (isIOS) {
-                // 如果是 iOS：隱藏 Google 按鈕，顯示 iOS 按鈕
-                googleBtn.classList.remove('flex');
-                googleBtn.classList.add('hidden');
+                // 如果是 iOS：顯示 APP 下載提示區塊
+                iosHintBox.classList.remove('hidden');
+                iosHintBox.classList.add('block');
                 
-                iosBtn.classList.remove('hidden');
-                iosBtn.classList.add('flex');
-                
-                hintText.innerHTML = '<i class="fa-brands fa-apple"></i> 已偵測到 iOS 裝置';
+                hintText.innerHTML = '<i class="fa-brands fa-apple"></i> 偵測到 iOS 裝置，請務必安裝 Google 行事曆 APP';
                 hintText.classList.add('text-roBlue');
             } else {
-                // 如果是 Android 或 PC：顯示 Google 按鈕 (預設)，確保 iOS 按鈕隱藏
-                googleBtn.classList.remove('hidden');
-                googleBtn.classList.add('flex');
-                
-                iosBtn.classList.remove('flex');
-                iosBtn.classList.add('hidden');
+                // 如果是 Android 或 PC：隱藏提示
+                iosHintBox.classList.remove('block');
+                iosHintBox.classList.add('hidden');
                 
                 if (/android/i.test(userAgent)) {
-                    hintText.innerHTML = '<i class="fa-brands fa-android"></i> 已偵測到 Android 裝置';
+                    hintText.innerHTML = '<i class="fa-brands fa-android"></i> 偵測到 Android 裝置，直接點擊加入即可';
                     hintText.classList.add('text-green-600');
                 } else {
-                    hintText.innerHTML = '<i class="fa-solid fa-desktop"></i> 建議使用 Google 行事曆';
+                    hintText.innerHTML = '<i class="fa-solid fa-desktop"></i> 請使用 Google 帳號加入';
                 }
             }
         }
 
-        // 顯示所有按鈕 (給使用者手動選擇)
-        function showAllButtons() {
-            const googleBtn = document.getElementById('btn-google');
-            const iosBtn = document.getElementById('btn-ios');
-            const hintText = document.getElementById('hint-text');
-            const showAllLink = document.getElementById('show-all-options');
-
-            googleBtn.classList.remove('hidden');
-            googleBtn.classList.add('flex');
-            
-            iosBtn.classList.remove('hidden');
-            iosBtn.classList.add('flex');
-
-            hintText.innerHTML = '已顯示所有系統選項';
-            hintText.className = 'text-xs text-gray-400 mt-2';
-            showAllLink.style.display = 'none'; // 隱藏「顯示所有」連結
-        }
-
-        // 頁面載入時執行偵測
         window.onload = function() {
-            detectDeviceAndSwitchButton();
+            detectDevice();
         };
 
         function subscribeCalendar() {
+            // 所有裝置都統一使用 Google Calendar 連結
+            // 手機有裝 Google Calendar APP 的話，通常會喚起 APP
             const calendarUrl = `https://calendar.google.com/calendar/u/0/r?cid=${encodeURIComponent(calendarId)}`;
             window.open(calendarUrl, '_blank');
-        }
-
-        function subscribeIos() {
-            const icalUrl = `webcal://calendar.google.com/calendar/ical/${encodeURIComponent(calendarId)}/public/basic.ics`;
-            window.location.href = icalUrl;
         }
 
         function copyId() {
