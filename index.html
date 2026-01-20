@@ -903,10 +903,18 @@
                 const deleteGroup = (i) => { if (confirm('解散此隊伍？')) { groups.value.splice(i, 1); syncData(); } };
                 const openAssignMenu = (m) => ui.value.assigningMember = m;
                 const assignToGroup = (g) => {
+                    // 如果成員已在其他組，先移除
+                    groups.value.forEach(grp => {
+                        const idx = grp.members.indexOf(ui.value.assigningMember.id);
+                        if (idx !== -1) grp.members.splice(idx, 1);
+                    });
+
                     if (g.members.length < g.max) {
                         g.members.push(ui.value.assigningMember.id);
                         ui.value.assigningMember = null;
                         syncData();
+                    } else {
+                        alert('隊伍已滿，無法加入');
                     }
                 };
                 const removeFromGroup = (g, i) => { g.members.splice(i, 1); syncData(); };
