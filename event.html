@@ -109,6 +109,12 @@
             opacity: 1;
             bottom: 50px;
         }
+
+        /* 隱藏行事曆 iframe 的捲軸 (選用) */
+        iframe::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center py-10 px-4">
@@ -167,7 +173,7 @@
                     為了不錯過任何一場 GVG 或 MVP 時間，<br>請點擊下方按鈕加入我們的公會行事曆！
                 </p>
                 
-                <!-- 訂閱按鈕 (預設連結為範例，需自行更換) -->
+                <!-- 訂閱按鈕 -->
                 <button onclick="subscribeCalendar()" class="ro-btn w-full py-4 text-xl font-bold rounded-lg shadow-lg flex items-center justify-center gap-3 group">
                     <i class="fa-brands fa-google text-2xl group-hover:animate-pulse"></i>
                     一鍵加入 Google 行事曆
@@ -178,8 +184,29 @@
                 </p>
             </div>
 
-            <!-- 手動複製 ID 區塊 (備用方案) -->
+            <!-- 新增：行事曆預覽區塊 -->
             <div class="mb-8">
+                <div class="flex items-center gap-2 mb-2 justify-center">
+                    <i class="fa-regular fa-calendar-check text-roBlue"></i>
+                    <h3 class="font-bold text-gray-700 text-sm">即將到來的活動 Event List</h3>
+                </div>
+                <!-- 預覽容器 -->
+                <div class="bg-white p-1 border border-gray-300 rounded shadow-inner">
+                    <iframe id="calendarPreview" 
+                            style="border: 0" 
+                            width="100%" 
+                            height="300" 
+                            frameborder="0" 
+                            scrolling="no">
+                    </iframe>
+                </div>
+                 <p class="text-[10px] text-gray-400 mt-2 text-center">
+                    * 若預覽無法顯示，請確認日曆權限已設為「公開」
+                </p>
+            </div>
+
+            <!-- 手動複製 ID 區塊 (備用方案) -->
+            <div class="mb-8 border-t border-dashed border-gray-300 pt-6">
                 <p class="text-xs text-gray-500 mb-2">如果按鈕沒反應，請手動複製 ID：</p>
                 <div class="flex items-center justify-center gap-2">
                     <input type="text" id="calendarIdInput" value="example@group.calendar.google.com" 
@@ -255,11 +282,24 @@
         // 2. 點擊「設定和共用」
         // 3. 往下滑找到「整合日曆」部分的「日曆 ID」
         // 4. 複製那個 ID 貼在下面引號內
-        const calendarId = "c_b68d9e...example...group.calendar.google.com"; // <-- 替換這裡
+        // 注意：為了讓預覽功能正常運作，這個日曆必須設為「公開」
+        
+        // 範例 ID (請換成您的):
+        const calendarId = "3942ceaaa2bafb3a4e83ee69891bcf2fbe22d8cb7b2f5290679f4ba7b11b3915@group.calendar.google.com"; // <-- 替換這裡
         // ==========================================
 
-        // 更新畫面上的 ID 顯示 (開發者用，實際使用可隱藏 input)
+        // 更新畫面上的 ID 顯示
         document.getElementById('calendarIdInput').value = calendarId;
+
+        // 初始化行事曆預覽
+        // 參數說明：
+        // showTitle=0 (不顯示標題), showNav=1 (顯示月份切換), showDate=1 (顯示日期)
+        // showPrint=0 (不顯示列印), showTabs=0 (不顯示週/月切換), showCalendars=0 (不顯示日曆清單)
+        // mode=AGENDA (日程表模式，比較適合手機寬度嵌入，顯示未來活動清單)
+        // ctz=Asia/Taipei (時區鎖定台北)
+        const embedUrl = `https://calendar.google.com/calendar/embed?src=${encodeURIComponent(calendarId)}&ctz=Asia%2FTaipei&mode=AGENDA&showTitle=0&showPrint=0&showTabs=0&showCalendars=0&showTz=0&bgcolor=%23FFFFFF`;
+        
+        document.getElementById('calendarPreview').src = embedUrl;
 
         function subscribeCalendar() {
             // 建構 Google Calendar 加入連結
