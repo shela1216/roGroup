@@ -7,6 +7,10 @@
     
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 html2canvas 用於生成圖片 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- 引入 jsPDF 用於生成 PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
         :root { --ro-blue: #0d8de7; --ro-bg: #f0f8ff; }
@@ -63,12 +67,20 @@
         
         .animate-fade-in { animation: fadeIn 0.2s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        #report-content { font-family: Arial, Helvetica, sans-serif !important; }
+        
+        /* 列表動畫 */
+        .list-move, .list-enter-active, .list-leave-active { transition: all 0.3s ease; }
+        .list-enter-from, .list-leave-to { opacity: 0; transform: translateX(30px); }
+        .list-leave-active { position: absolute; }
     </style>
 </head>
 <body>
     <div id="app" class="min-h-screen pb-20">
         <!-- SVG 圖標 -->
         <svg style="display: none;">
+            <symbol id="icon-crown" viewBox="0 0 24 24"><path d="M12 8.2l2.36 4.97 5.16.57-3.86 3.51 1.08 5.09L12 19.64 7.26 22.34l1.08-5.09-3.86-3.51 5.16-.57L12 8.2m0-3.66L9.08 10.5l-6.38.7 4.77 4.34-1.34 6.28L12 18.75l5.87 3.07-1.34-6.28 4.77-4.34-6.38-.7L12 4.54z" fill="currentColor"/></symbol>
             <symbol id="icon-users" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
             <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
             <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></symbol>
@@ -88,14 +100,14 @@
         </svg>
 
         <!-- 唯讀模式提示 -->
-        <div v-if="isReadOnly" class="bg-amber-100 text-amber-700 text-center py-2 text-xs font-black border-b border-amber-200 sticky top-0 z-[60]">
-            👀 目前為訪客檢視模式 - 僅供查看，無法編輯
+        <div v-if="isReadOnly" class="bg-amber-100 text-amber-700 text-center py-2 text-xs font-black border-b border-amber-200">
+            👀 目前為訪客檢視模式 - 僅供查看分組，無法進行編輯
             <button v-if="isOwner" @click="exitReadOnly" class="ml-2 underline text-blue-600 hover:text-blue-800">我是管理員，回到編輯模式</button>
             <a v-else href="?" class="underline ml-2 text-amber-900">建立我的公會</a>
         </div>
 
         <!-- 導覽列 -->
-        <nav class="bg-[#0d8de7] text-white p-4 shadow-md sticky top-0 z-50 no-print" :class="isReadOnly ? 'top-[33px]' : 'top-0'">
+        <nav class="bg-[#0d8de7] text-white p-4 shadow-md sticky top-0 z-50 no-print">
             <div class="max-w-6xl mx-auto flex justify-between items-center">
                 <div class="flex items-center space-x-3">
                     <span class="text-xl md:text-2xl poring-float flex items-center justify-center w-10 h-10 rounded-xl bg-white/20 text-[#ffe4e1]">
@@ -103,31 +115,22 @@
                     </span>
                     <span class="text-xl font-black italic tracking-wider">RO GUILD ADMIN</span>
                 </div>
-                <div class="flex items-center space-x-3" v-if="user">
-                    <span class="hidden md:block text-xs font-bold bg-blue-600 px-2 py-1 rounded">{{ user.isAnonymous ? '訪客' : user.email }}</span>
-                    
-                    <!-- 在唯讀模式下顯示「回到首頁」或「解除鎖定」 -->
-                    <button v-if="isReadOnly && isOwner" @click="exitReadOnly" class="bg-white text-blue-500 px-3 py-1.5 rounded-lg font-bold text-xs ro-btn border-b-blue-200">
-                        <svg class="icon-svg mr-1"><use xlink:href="#icon-home"></use></svg> 回到編輯
-                    </button>
-                    
-                    <template v-if="!isReadOnly">
-                        <button @click="ui.modal = 'userProfile'" class="p-2 hover:bg-blue-600 rounded-full transition-colors"><svg class="icon-svg"><use xlink:href="#icon-settings"></use></svg></button>
-                        <button @click="handleLogout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm ro-btn border-b-red-700">登出</button>
-                    </template>
+                <div class="flex items-center space-x-3" v-if="user && !isReadOnly">
+                    <span class="hidden md:block text-xs font-bold bg-blue-600 px-2 py-1 rounded">{{ user.isAnonymous ? '訪客模式' : user.email }}</span>
+                    <button @click="ui.modal = 'userProfile'" class="p-2 hover:bg-blue-600 rounded-full transition-colors"><svg class="icon-svg"><use xlink:href="#icon-settings"></use></svg></button>
+                    <button @click="handleLogout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm ro-btn border-b-red-700">登出</button>
                 </div>
             </div>
         </nav>
 
         <main class="max-w-6xl mx-auto p-4 md:p-6">
-            
-            <!-- 1. 載入中 (最優先) -->
+            <!-- 1. 載入中 -->
             <div v-if="loading" class="flex flex-col items-center justify-center py-20">
                 <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin mb-4"></div>
                 <p class="text-blue-500 font-bold animate-pulse">正在讀取公會資料...</p>
             </div>
 
-            <!-- 2. 密碼鎖定畫面 (讀取完畢且有密碼鎖且未解鎖時顯示) -->
+            <!-- 2. 密碼鎖定畫面 -->
             <div v-else-if="isShareLocked" class="max-w-md mx-auto mt-20 px-4 animate-fade-in">
                 <div class="ro-card p-8 bg-white/90 backdrop-blur-md text-center">
                     <div class="text-5xl mb-4 text-gray-400 flex justify-center"><svg class="icon-svg"><use xlink:href="#icon-lock"></use></svg></div>
@@ -138,8 +141,39 @@
                 </div>
             </div>
 
-            <!-- 3. 主管理介面/唯讀介面 (已登入 OR 已解鎖分享) -->
-            <template v-else-if="user">
+            <!-- 3. 登入介面 -->
+            <div v-else-if="!user" class="max-w-md mx-auto mt-12 px-4 no-print">
+                <div class="ro-card p-8 bg-white/90 backdrop-blur-md text-center">
+                    <div class="text-6xl mb-4 poring-float flex justify-center text-[#ffb6c1]">
+                        <svg class="icon-svg" style="font-size: 4rem;"><use xlink:href="#icon-poring"></use></svg>
+                    </div>
+                    <h1 class="text-2xl font-black text-blue-700 mb-6 uppercase tracking-tighter">Adventurer Hall</h1>
+                    <div class="space-y-4">
+                        <template v-if="authView !== 'guest'">
+                            <input v-model="authForm.email" type="email" placeholder="EMAIL" class="w-full px-4 py-3 rounded-xl border-2 border-blue-50 focus:border-blue-400 outline-none font-bold text-center">
+                            <input v-model="authForm.password" type="password" placeholder="PASSWORD" class="w-full px-4 py-3 rounded-xl border-2 border-blue-50 focus:border-blue-400 outline-none font-bold text-center">
+                        </template>
+                        <div v-if="authView === 'login'">
+                            <button @click="handleEmailAuth('login')" class="w-full py-4 bg-blue-500 text-white font-black rounded-xl ro-btn border-b-blue-800 mb-3">立即登入</button>
+                            <div class="flex justify-between text-xs font-bold text-blue-400 px-2">
+                                <button @click="authView = 'register'">註冊帳號</button>
+                                <button @click="authView = 'guest'">訪客試用</button>
+                            </div>
+                        </div>
+                        <div v-if="authView === 'register'">
+                            <button @click="handleEmailAuth('register')" class="w-full py-4 bg-green-500 text-white font-black rounded-xl ro-btn border-b-green-800 mb-3">完成註冊</button>
+                            <button @click="authView = 'login'" class="w-full text-center text-xs font-bold text-blue-400">返回登入</button>
+                        </div>
+                        <div v-if="authView === 'guest'">
+                            <button @click="loginAsGuest" class="w-full py-4 bg-orange-500 text-white font-black rounded-xl ro-btn border-b-orange-800 mb-3">開始試用</button>
+                            <button @click="authView = 'login'" class="w-full text-center text-xs font-bold text-blue-400">返回登入</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. 主管理介面 -->
+            <template v-else>
                 <div class="grid grid-cols-2 md:flex md:flex-wrap gap-2 md:gap-3 mb-6 md:mb-8 no-print">
                     <button @click="ui.modal = 'jobStats'" class="flex items-center justify-center gap-2 bg-white px-3 py-3 rounded-xl ro-card border-blue-500 text-blue-600 font-black text-xs md:text-sm hover:bg-blue-50 transition-colors">
                         <svg class="icon-svg"><use xlink:href="#icon-chart"></use></svg> 戰力統計
@@ -185,91 +219,97 @@
                     </div>
                 </div>
 
-                <!-- 小組展示 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 no-print">
-                    <div v-for="(group, gIndex) in groups" :key="group.id" class="ro-card flex flex-col overflow-hidden">
-                        <div class="p-4 bg-blue-50/50 border-b flex justify-between items-center">
+                <!-- 小組展示 (螢幕版 - 垂直條列 + 網格成員) -->
+                <!-- 修正重點：小隊網格 (Grid) 恢復為高密度排列，但成員顯示改為雙行資訊 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-2 no-print w-full">
+                    <div v-for="(group, gIndex) in groups" :key="group.id" class="ro-card flex flex-col overflow-hidden min-h-[300px]">
+                        <div class="p-2 bg-blue-50/50 border-b flex justify-between items-center">
                             <input v-model="group.name" @blur="!isReadOnly && syncData()" :disabled="isReadOnly"
-                                   class="font-black text-blue-700 bg-transparent border-none focus:ring-2 focus:ring-blue-200 rounded px-1 outline-none text-sm w-1/2">
-                            <div class="flex items-center gap-2">
-                                <div class="flex items-center bg-white px-2 py-1 rounded-lg border text-[10px] font-black group relative">
-                                    <svg class="icon-svg text-gray-400 mr-1"><use xlink:href="#icon-limit"></use></svg>
-                                    <input type="number" v-model.number="group.max" @change="!isReadOnly && syncData()" :disabled="isReadOnly" class="w-8 text-center bg-transparent outline-none text-blue-600">
+                                   class="font-black text-blue-700 bg-transparent border-none focus:ring-2 focus:ring-blue-200 rounded px-1 outline-none text-xs w-1/2">
+                            <div class="flex items-center gap-1">
+                                <!-- 快速選人按鈕 -->
+                                <button v-if="!isReadOnly" @click="openSelectMemberForGroup(group)" class="text-blue-400 hover:text-blue-600 p-1" title="選擇成員加入"><svg class="icon-svg text-xs"><use xlink:href="#icon-add-user"></use></svg></button>
+                                <div class="flex items-center bg-white px-1 py-0.5 rounded-lg border text-[9px] font-black group relative">
+                                    <svg class="icon-svg text-gray-400 mr-0.5" style="width:0.8em;height:0.8em;"><use xlink:href="#icon-limit"></use></svg>
+                                    <input type="number" v-model.number="group.max" @change="!isReadOnly && syncData()" :disabled="isReadOnly" class="w-6 text-center bg-transparent outline-none text-blue-600">
                                 </div>
-                                <button v-if="!isReadOnly" @click="deleteGroup(gIndex)" class="text-gray-300 hover:text-red-400"><svg class="icon-svg"><use xlink:href="#icon-trash"></use></svg></button>
+                                <button v-if="!isReadOnly" @click="deleteGroup(gIndex)" class="text-gray-300 hover:text-red-400"><svg class="icon-svg text-xs"><use xlink:href="#icon-trash"></use></svg></button>
                             </div>
                         </div>
 
-                        <div class="h-1.5 w-full bg-gray-100 relative">
+                        <div class="h-1 w-full bg-gray-100 relative">
                             <div class="progress-bar h-full absolute top-0 left-0" 
                                  :class="group.members.length >= group.max ? 'bg-orange-500' : 'bg-blue-500'"
                                  :style="{width: Math.min((group.members.length / group.max) * 100, 100) + '%'}"></div>
                         </div>
 
-                        <div class="p-4 space-y-2 flex-1">
-                            <div v-for="(mId, mIndex) in group.members" 
-                                 @click="!isReadOnly && openAssignMenu(findMember(mId))"
-                                 class="flex justify-between items-center bg-gray-50 p-2 rounded-xl text-xs font-bold border border-transparent transition-all"
-                                 :class="!isReadOnly ? 'hover:border-blue-100 cursor-pointer hover:shadow-sm' : 'cursor-default'">
-                                <div class="flex items-center gap-2 overflow-hidden">
-                                    <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-lg bg-white shadow-sm border text-[10px]">{{ mIndex + 1 }}</span>
-                                    <span class="job-tag scale-90 origin-left flex-shrink-0" :style="{backgroundColor: getJob(findMember(mId)?.jobId)?.color}">
-                                        {{ getJob(findMember(mId)?.jobId)?.icon }} {{ getJob(findMember(mId)?.jobId)?.name }}
-                                    </span>
-                                    <span class="truncate">{{ findMember(mId)?.name }}</span>
+                        <!-- 成員列表 (條列式) -->
+                        <div class="p-2 flex-1 space-y-1 overflow-y-auto custom-scroll content-start">
+                             <transition-group name="list" tag="div" class="space-y-1">
+                                <div v-for="(mId, mIndex) in getSortedGroupMembers(group)" :key="mId" 
+                                     @click="!isReadOnly && openAssignMenu(findMember(mId))"
+                                     class="relative group/item flex justify-between items-center bg-gray-50 hover:bg-white p-1 rounded-lg border border-transparent hover:border-blue-100 hover:shadow-sm transition-all"
+                                     :class="[
+                                        !isReadOnly ? 'cursor-pointer' : 'cursor-default',
+                                        group.leaderId === mId ? 'bg-yellow-50 border-yellow-200 shadow-sm' : 'bg-gray-50'
+                                     ]">
+                                    
+                                    <div class="flex items-center gap-1.5 overflow-hidden flex-1">
+                                        <!-- Leader/Index Badge -->
+                                        <div class="flex-shrink-0">
+                                             <button v-if="!isReadOnly" @click.stop="toggleLeader(group, mId)" 
+                                                    class="w-5 h-5 flex items-center justify-center rounded border transition-colors"
+                                                    :class="group.leaderId === mId ? 'bg-yellow-400 text-white border-yellow-500' : 'bg-white text-gray-300 border-gray-200 hover:border-yellow-300 hover:text-yellow-300'">
+                                                <svg class="icon-svg" style="width: 0.8em; height: 0.8em;"><use xlink:href="#icon-crown"></use></svg>
+                                            </button>
+                                            <span v-else-if="group.leaderId === mId" class="w-5 h-5 flex items-center justify-center rounded bg-yellow-400 text-white border border-yellow-500">
+                                                <svg class="icon-svg" style="width: 0.8em; height: 0.8em;"><use xlink:href="#icon-crown"></use></svg>
+                                            </span>
+                                            <span v-else class="w-5 h-5 flex items-center justify-center rounded bg-white shadow-sm border text-gray-400 text-[10px] font-bold">{{ getOriginalIndex(group, mId) + 1 }}</span>
+                                        </div>
+
+                                        <!-- Member Info (Icon + Name/Job in 2 lines) -->
+                                        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-sm border border-gray-100 flex-shrink-0"
+                                            :style="{backgroundColor: getJob(findMember(mId)?.jobId)?.color + '33'}">
+                                            {{ getJob(findMember(mId)?.jobId)?.icon }}
+                                        </div>
+                                        
+                                        <div class="flex flex-col overflow-hidden leading-tight">
+                                            <span class="truncate text-[11px] font-bold text-gray-700" :class="{'text-yellow-700': group.leaderId === mId}">
+                                                {{ findMember(mId)?.name }}
+                                            </span>
+                                            <span class="truncate text-[9px] font-bold opacity-80" :style="{color: getJob(findMember(mId)?.jobId)?.color}">
+                                                {{ getJob(findMember(mId)?.jobId)?.name }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Remove Button -->
+                                    <button v-if="!isReadOnly" @click.stop="removeFromGroup(group, mId)" class="w-5 h-5 flex-shrink-0 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full flex items-center justify-center ml-1 font-bold text-xs">×</button>
                                 </div>
-                                <button v-if="!isReadOnly" @click.stop="removeFromGroup(group, mIndex)" class="w-6 h-6 flex-shrink-0 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full flex items-center justify-center">×</button>
-                            </div>
-                            <div v-if="!isReadOnly" v-for="i in Math.max(0, group.max - group.members.length)" class="border-2 border-dashed border-gray-100 rounded-xl py-2 text-center text-[9px] text-gray-200 font-black">
-                                待領取任務
+                            </transition-group>
+                            
+                            <!-- Empty Slots -->
+                            <div v-if="!isReadOnly" v-for="i in Math.max(0, group.max - group.members.length)" 
+                                 class="border border-dashed border-gray-100 rounded-lg py-1.5 flex items-center justify-center text-center text-[9px] text-gray-300 font-bold">
+                                待領取
                             </div>
                         </div>
                         
-                        <div class="p-2 px-4 bg-gray-50 border-t flex justify-between text-[10px] font-black text-gray-400">
+                        <div class="p-1 px-3 bg-gray-50 border-t flex justify-between text-[9px] font-black text-gray-400">
                             <span>集結進度</span>
                             <span>{{ group.members.length }} / {{ group.max }}</span>
                         </div>
                     </div>
                     
-                    <button v-if="!isReadOnly" @click="addNewGroup" class="ro-card border-dashed border-gray-300 flex flex-col items-center justify-center p-12 text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-all group">
-                        <div class="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center mb-3 group-hover:border-blue-300 group-hover:bg-white">
-                            <svg class="icon-svg text-xl"><use xlink:href="#icon-plus"></use></svg>
+                    <button v-if="!isReadOnly" @click="addNewGroup" class="ro-card border-dashed border-gray-300 flex flex-col items-center justify-center p-8 text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-all group min-h-[300px]">
+                        <div class="w-10 h-10 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center mb-2 group-hover:border-blue-300 group-hover:bg-white">
+                            <svg class="icon-svg text-lg"><use xlink:href="#icon-plus"></use></svg>
                         </div>
-                        <span class="font-black text-sm tracking-widest">擴充冒險小隊</span>
+                        <span class="font-black text-xs tracking-widest">擴充小隊</span>
                     </button>
                 </div>
             </template>
-
-            <!-- 4. 登入介面 (最後檢查：未登入且非分享模式) -->
-            <div v-else class="max-w-md mx-auto mt-12 px-4 no-print">
-                <div class="ro-card p-8 bg-white/90 backdrop-blur-md text-center">
-                    <div class="text-6xl mb-4 poring-float flex justify-center text-[#ffb6c1]">
-                        <svg class="icon-svg" style="font-size: 4rem;"><use xlink:href="#icon-poring"></use></svg>
-                    </div>
-                    <h1 class="text-2xl font-black text-blue-700 mb-6 uppercase tracking-tighter">Adventurer Hall</h1>
-                    <div class="space-y-4">
-                        <template v-if="authView !== 'guest'">
-                            <input v-model="authForm.email" type="email" placeholder="EMAIL" class="w-full px-4 py-3 rounded-xl border-2 border-blue-50 focus:border-blue-400 outline-none font-bold text-center">
-                            <input v-model="authForm.password" type="password" placeholder="PASSWORD" class="w-full px-4 py-3 rounded-xl border-2 border-blue-50 focus:border-blue-400 outline-none font-bold text-center">
-                        </template>
-                        <div v-if="authView === 'login'">
-                            <button @click="handleEmailAuth('login')" class="w-full py-4 bg-blue-500 text-white font-black rounded-xl ro-btn border-b-blue-800 mb-3">立即登入</button>
-                            <div class="flex justify-between text-xs font-bold text-blue-400 px-2">
-                                <button @click="authView = 'register'">註冊帳號</button>
-                                <button @click="authView = 'guest'">訪客試用</button>
-                            </div>
-                        </div>
-                        <div v-if="authView === 'register'">
-                            <button @click="handleEmailAuth('register')" class="w-full py-4 bg-green-500 text-white font-black rounded-xl ro-btn border-b-green-800 mb-3">完成註冊</button>
-                            <button @click="authView = 'login'" class="w-full text-center text-xs font-bold text-blue-400">返回登入</button>
-                        </div>
-                        <div v-if="authView === 'guest'">
-                            <button @click="loginAsGuest" class="w-full py-4 bg-orange-500 text-white font-black rounded-xl ro-btn border-b-orange-800 mb-3">開始試用</button>
-                            <button @click="authView = 'login'" class="w-full text-center text-xs font-bold text-blue-400">返回登入</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </main>
 
         <!-- 分享名單 Modal -->
@@ -294,6 +334,28 @@
                     </button>
                     <button v-if="sharedLink" @click="copyLink" class="px-4 py-3 bg-blue-100 text-blue-600 font-black rounded-xl hover:bg-blue-200">複製</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- 選擇成員加入小組 Modal -->
+        <div v-if="ui.modal === 'selectMemberForGroup'" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4" @click.self="ui.modal = null">
+            <div class="ro-card w-full max-w-md bg-white p-6 shadow-2xl animate-in zoom-in duration-200 flex flex-col max-h-[80vh]">
+                <h3 class="font-black text-blue-700 mb-4 text-center">加入成員至 {{ ui.targetGroup?.name }}</h3>
+                <div class="flex-1 overflow-y-auto custom-scroll pr-1 space-y-2">
+                    <div v-for="m in unassignedMembers" :key="m.id" 
+                         @click="addMemberToGroup(m)"
+                         class="flex justify-between items-center p-3 border rounded-xl hover:bg-blue-50 cursor-pointer transition-all">
+                        <div class="flex items-center gap-2">
+                            <span class="job-tag flex-shrink-0" :style="{backgroundColor: getJob(m.jobId)?.color}">{{ getJob(m.jobId)?.icon }}</span>
+                            <span class="font-bold text-gray-700">{{ m.name }}</span>
+                        </div>
+                        <svg class="icon-svg text-blue-400"><use xlink:href="#icon-plus"></use></svg>
+                    </div>
+                    <div v-if="unassignedMembers.length === 0" class="text-center py-8 text-gray-300 font-bold italic">
+                        沒有待分配的成員
+                    </div>
+                </div>
+                <button @click="ui.modal = null" class="w-full mt-4 py-3 bg-gray-100 text-gray-500 font-black rounded-xl">取消</button>
             </div>
         </div>
 
@@ -400,6 +462,7 @@
                         </div>
                         <div class="flex gap-2 w-full md:w-auto">
                             <!-- 移除原本的「匯出 CSV」按鈕 -->
+                            <button @click="exportCSV" class="flex-1 md:flex-none flex items-center justify-center gap-2 bg-green-500 text-white px-3 py-2 md:py-1.5 rounded-lg text-xs font-bold ro-btn border-b-green-700 transition-all active:scale-95"><svg class="icon-svg"><use xlink:href="#icon-download"></use></svg> 匯出 CSV</button>
                             <button @click="ui.modal = null" class="hidden md:block text-gray-400 font-black px-2 hover:bg-gray-100 rounded">✕</button>
                         </div>
                     </div>
@@ -542,8 +605,7 @@
                     { id: 'j6', name: '鐵匠', color: '#a16207', icon: '🔨' },
                     { id: 'j7', name: '槍手', color: '#c2410c', icon: '🔫' }
                 ]);
-
-                const ui = ref({ modal: null, expandUnassigned: true, assigningMember: null, sortBy: 'name', openIconPickerId: null });
+                const ui = ref({ modal: null, expandUnassigned: true, assigningMember: null, sortBy: 'name', openIconPickerId: null, targetGroup: null });
                 const form = ref({ id: null, name: '', jobId: 'j1' });
                 const importText = ref('');
                 const sharedLink = ref('');
@@ -553,6 +615,7 @@
                 const linkCopied = ref(false);
                 let tempSharedData = null; // Store data until unlocked
                 const isOwner = ref(false); // Is owner of shared link
+
                 // 內建 Emoji 清單
                 const emojiList = [
                     '⚔️', '🛡️', '🏹', '✨', '🔥', '❄️', '⚡', '🌪️', 
@@ -576,6 +639,23 @@
                     groups.value.forEach(g => g.members.forEach(id => assigned.add(id)));
                     return members.value.filter(m => !assigned.has(m.id));
                 });
+
+                const getSortedGroupMembers = (group) => {
+                    if (!group.members) return [];
+                    const membersList = [...group.members]; 
+                    if (group.leaderId) {
+                        const leaderIdx = membersList.indexOf(group.leaderId);
+                        if (leaderIdx !== -1) {
+                            membersList.splice(leaderIdx, 1);
+                            membersList.unshift(group.leaderId);
+                        }
+                    }
+                    return membersList;
+                };
+
+                const getOriginalIndex = (group, mId) => {
+                    return group.members.indexOf(mId);
+                };
 
                 const jobStats = computed(() => {
                     const total = members.value.length || 1;
@@ -674,7 +754,7 @@
                     if (isReadOnly.value || !user.value) return;
                     const payload = JSON.parse(JSON.stringify({ 
                         members: members.value, 
-                        groups: groups.value,
+                        groups: groups.value, 
                         jobs: jobs.value,
                         updatedAt: new Date().toISOString() 
                     }));
@@ -725,23 +805,70 @@
                     syncData();
                 };
                 const deleteGroup = (i) => { if(confirm('解散此隊伍？')) { groups.value.splice(i, 1); syncData(); } };
+                
                 const openAssignMenu = (m) => ui.value.assigningMember = m;
-                const assignToGroup = (g) => {
-                    if(g.members.includes(ui.value.assigningMember.id)) {
-                        ui.value.assigningMember = null;
-                        return; // already in this group
-                    }
-                    groups.value.forEach(grp => {
-                        const idx = grp.members.indexOf(ui.value.assigningMember.id);
+                const openSelectMemberForGroup = (group) => { ui.value.targetGroup = group; ui.value.modal = 'selectMemberForGroup'; };
+                
+                const addMemberToGroup = (member) => {
+                    // 1. Remove from old group
+                     groups.value.forEach(grp => {
+                        const idx = grp.members.indexOf(member.id);
                         if(idx !== -1) grp.members.splice(idx, 1);
                     });
+                    
+                    // 2. Add to new group
+                    ui.value.targetGroup.members.push(member.id);
+                    // Default leader logic
+                    if (!ui.value.targetGroup.leaderId) {
+                        ui.value.targetGroup.leaderId = member.id;
+                    }
+
+                    ui.value.modal = null;
+                    syncData();
+                };
+
+                const assignToGroup = (g) => {
                     if (g.members.length < g.max) {
+                        // Check if already in another group
+                         groups.value.forEach(grp => {
+                            const idx = grp.members.indexOf(ui.value.assigningMember.id);
+                            if(idx !== -1) grp.members.splice(idx, 1);
+                        });
+                        
                         g.members.push(ui.value.assigningMember.id);
+                        // Default leader logic
+                        if (!g.leaderId) {
+                            g.leaderId = ui.value.assigningMember.id;
+                        }
+
                         ui.value.assigningMember = null;
                         syncData();
-                    } else { alert('隊伍已滿'); }
+                    } else {
+                        alert('隊伍已滿');
+                    }
                 };
-                const removeFromGroup = (g, i) => { g.members.splice(i, 1); syncData(); };
+                const removeFromGroup = (g, memberId) => { 
+                    const idx = g.members.indexOf(memberId);
+                    if (idx === -1) return;
+                    
+                    g.members.splice(idx, 1);
+                    
+                    // If leader was removed
+                    if (g.leaderId === memberId) {
+                        g.leaderId = null;
+                        if (g.members.length > 0) {
+                            g.leaderId = g.members[0];
+                        }
+                    }
+                    syncData(); 
+                };
+                
+                const toggleLeader = (group, memberId) => {
+                    if (group.leaderId === memberId) group.leaderId = null;
+                    else group.leaderId = memberId;
+                    syncData();
+                };
+
                 const exportCSV = () => {
                     let csv = "姓名,職業,目前分隊\n";
                     members.value.forEach(m => {
@@ -754,6 +881,18 @@
                 };
 
                 // Share Logic
+                const publishGuild = async () => {
+                    if (!user.value || user.value.isAnonymous) return alert("訪客模式無法分享，請先註冊/登入");
+                    const shareId = user.value.uid;
+                    try {
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_guilds', shareId), {
+                            members: members.value, groups: groups.value, jobs: jobs.value, updatedAt: new Date().toISOString(),
+                            password: sharePassword.value // Save password
+                        });
+                        if(ui.value.modal === 'shareModal') alert("發佈成功！");
+                    } catch(e) { console.error(e); alert("發佈失敗"); }
+                };
+
                 const openShareModal = async () => {
                     if (!user.value || user.value.isAnonymous) return alert("訪客模式無法分享，請先註冊/登入");
                     
@@ -767,17 +906,6 @@
                     } catch(e) {
                         console.error(e);
                     }
-                };
-
-                const publishGuild = async () => {
-                    const shareId = user.value.uid;
-                    try {
-                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_guilds', shareId), {
-                            members: members.value, groups: groups.value, jobs: jobs.value, updatedAt: new Date().toISOString(),
-                            password: sharePassword.value // Save password
-                        });
-                        if(ui.value.modal === 'shareModal') alert("發佈成功！");
-                    } catch(e) { console.error(e); alert("發佈失敗"); }
                 };
 
                 const copyLink = () => {
@@ -868,15 +996,12 @@
                         auth = getAuth(app);
                         db = getFirestore(app);
 
-                        // 統一在 Auth State Change 後處理
-                        onAuthStateChanged(auth, u => {
-                            user.value = u;
-
-                            if (shareId) {
-                                loadSharedData(shareId, u); // 傳入 u 以判斷是否為 owner
-                            } else {
-                                // 正常非分享模式
-                                if (u) {
+                        if (shareId) {
+                            loadSharedData(shareId);
+                        } else {
+                            onAuthStateChanged(auth, u => {
+                                user.value = u;
+                                if (u && !isReadOnly.value) {
                                     if (u.isAnonymous) {
                                         const local = localStorage.getItem(`ro_data_${appId}`);
                                         if(local) {
@@ -896,9 +1021,9 @@
                                         }, (err) => { console.error("Firestore Error:", err); });
                                     }
                                 }
-                                loading.value = false;
-                            }
-                        });
+                                if(!shareId) loading.value = false;
+                            });
+                        }
                     } else {
                         console.log("No valid Firebase config. Initializing in Guest Mode.");
                         auth = { currentUser: null }; 
@@ -925,7 +1050,8 @@
                     openAssignMenu, assignToGroup, removeFromGroup, openAddMember, syncData,
                     addNewJob, deleteJob, confirmImport, emojiList, updateJobIcon,
                     publishGuild, copyLink, sharedLink, linkCopied, openShareModal,
-                    sharePassword, visitorPassword, isShareLocked, unlockShare, isOwner, exitReadOnly
+                    sharePassword, visitorPassword, isShareLocked, unlockShare, isOwner, exitReadOnly,
+                    openSelectMemberForGroup, addMemberToGroup, toggleLeader, getSortedGroupMembers, getOriginalIndex
                 };
             }
         }).mount('#app');
