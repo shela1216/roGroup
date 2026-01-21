@@ -221,7 +221,7 @@
 
                 <!-- 小組展示 (螢幕版 - 垂直條列 + 網格成員) -->
                 <!-- 修正重點：小隊網格 (Grid) 恢復為高密度排列，但成員顯示改為雙行資訊 -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-2 no-print w-full">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-2 no-print w-full">
                     <div v-for="(group, gIndex) in groups" :key="group.id" class="ro-card flex flex-col overflow-hidden min-h-[300px]">
                         <div class="p-2 bg-blue-50/50 border-b flex justify-between items-center">
                             <input v-model="group.name" @blur="!isReadOnly && syncData()" :disabled="isReadOnly"
