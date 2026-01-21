@@ -83,21 +83,27 @@
             <symbol id="icon-x" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
             <symbol id="icon-chevron-down" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></symbol>
             <symbol id="icon-limit" viewBox="0 0 24 24"><path d="M8 11h3v10h2V11h3l-4-4-4 4zM4 3v2h16V3H4z"/></symbol>
+            <symbol id="icon-add-user" viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
         </svg>
 
+        <!-- 唯讀模式提示 -->
+        <div v-if="isReadOnly" class="bg-amber-100 text-amber-700 text-center py-2 text-xs font-black border-b border-amber-200">
+            👀 目前為訪客檢視模式 - 僅供查看分組，無法進行編輯
+            <a href="?" class="underline ml-2 text-amber-900">建立我的公會</a>
+        </div>
+
         <!-- 導覽列 -->
-        <nav class="bg-[#0d8de7] text-white p-4 shadow-md sticky top-0 z-50">
+        <nav class="bg-[#0d8de7] text-white p-4 shadow-md sticky top-0 z-50 no-print">
             <div class="max-w-6xl mx-auto flex justify-between items-center">
                 <div class="flex items-center space-x-3">
-                    <span class="text-xl md:text-2xl poring-float flex items-center justify-center w-10 h-10 rounded-xl bg-white/20 text-[#eaa5af]">
+                    <span class="text-xl md:text-2xl poring-float flex items-center justify-center w-10 h-10 rounded-xl bg-white/20 text-[#ffe4e1]">
                         <svg class="icon-svg"><use xlink:href="#icon-poring"></use></svg>
                     </span>
-                    <span class="text-xl font-black italic tracking-wider">RO公會分組管理</span>
+                    <span class="text-xl font-black italic tracking-wider">RO GUILD ADMIN</span>
                 </div>
                 <div class="flex items-center space-x-3" v-if="user && !isReadOnly">
                     <span class="hidden md:block text-xs font-bold bg-blue-600 px-2 py-1 rounded">{{ user.isAnonymous ? '訪客模式' : user.email }}</span>
                     <button @click="ui.modal = 'userProfile'" class="p-2 hover:bg-blue-600 rounded-full transition-colors"><svg class="icon-svg"><use xlink:href="#icon-settings"></use></svg></button>
-                    <!-- 修正登出按鈕顏色 -->
                     <button @click="handleLogout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm ro-btn border-b-red-700">登出</button>
                 </div>
             </div>
@@ -110,7 +116,7 @@
                     <div class="text-6xl mb-4 poring-float flex justify-center text-[#ffb6c1]">
                         <svg class="icon-svg" style="font-size: 4rem;"><use xlink:href="#icon-poring"></use></svg>
                     </div>
-                    <h1 class="text-2xl font-black text-blue-700 mb-6 uppercase tracking-tighter">冒險者登入</h1>
+                    <h1 class="text-2xl font-black text-blue-700 mb-6 uppercase tracking-tighter">Adventurer Hall</h1>
                     <div class="space-y-4">
                         <template v-if="authView !== 'guest'">
                             <input v-model="authForm.email" type="email" placeholder="EMAIL" class="w-full px-4 py-3 rounded-xl border-2 border-blue-50 focus:border-blue-400 outline-none font-bold text-center">
@@ -135,9 +141,19 @@
                 </div>
             </div>
 
+            <!-- 密碼鎖定畫面 -->
+            <div v-else-if="isShareLocked" class="max-w-md mx-auto mt-20 px-4 animate-fade-in">
+                <div class="ro-card p-8 bg-white/90 backdrop-blur-md text-center">
+                    <div class="text-5xl mb-4 text-gray-400"><svg class="icon-svg"><use xlink:href="#icon-lock"></use></svg></div>
+                    <h2 class="text-xl font-black text-gray-700 mb-2">此名單受密碼保護</h2>
+                    <p class="text-xs text-gray-400 mb-6">請輸入密碼以查看公會部署內容</p>
+                    <input v-model="visitorPassword" type="password" placeholder="請輸入密碼" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-400 outline-none font-bold text-center mb-4">
+                    <button @click="unlockShare" class="w-full py-3 bg-blue-500 text-white font-black rounded-xl ro-btn border-b-blue-800">解鎖查看</button>
+                </div>
+            </div>
+
             <!-- 主管理介面 -->
             <template v-else-if="user">
-                <!-- 按鈕優化：手機版並列顯示 -->
                 <div class="grid grid-cols-2 md:flex md:flex-wrap gap-2 md:gap-3 mb-6 md:mb-8 no-print">
                     <button @click="ui.modal = 'jobStats'" class="flex items-center justify-center gap-2 bg-white px-3 py-3 rounded-xl ro-card border-blue-500 text-blue-600 font-black text-xs md:text-sm hover:bg-blue-50 transition-colors">
                         <svg class="icon-svg"><use xlink:href="#icon-chart"></use></svg> 戰力統計
@@ -147,13 +163,13 @@
                         <button @click="ui.modal = 'memberList'" class="flex items-center justify-center gap-2 bg-white px-3 py-3 rounded-xl ro-card border-blue-500 text-blue-600 font-black text-xs md:text-sm hover:bg-blue-50 transition-colors">
                             <svg class="icon-svg"><use xlink:href="#icon-users"></use></svg> 成員管理
                         </button>
-                        <button @click="ui.modal = 'jobSettings'" class="flex items-center justify-center gap-2 bg-white px-3 py-3 rounded-xl ro-card border-blue-500 text-blue-600 font-black text-xs md:text-sm hover:bg-blue-50 transition-colors">
+                        <button @click="ui.modal = 'jobSettings'" class="col-span-2 md:col-auto flex items-center justify-center gap-2 bg-white px-3 py-3 rounded-xl ro-card border-blue-500 text-blue-600 font-black text-xs md:text-sm hover:bg-blue-50 transition-colors">
                             <svg class="icon-svg"><use xlink:href="#icon-briefcase"></use></svg> 職業設定
                         </button>
-                        <button @click="ui.modal = 'importMembers'" class="flex items-center justify-center gap-2 bg-orange-400 px-3 py-3 rounded-xl border-b-4 border-orange-600 text-white font-black text-xs md:text-sm active:translate-y-0.5 transition-all">
+                        <button @click="ui.modal = 'importMembers'" class="col-span-2 md:col-auto flex items-center justify-center gap-2 bg-orange-400 px-5 py-3 rounded-xl border-b-4 border-orange-600 text-white font-black text-xs md:text-sm active:translate-y-0.5 transition-all">
                             <svg class="icon-svg"><use xlink:href="#icon-import"></use></svg> 匯入名單
                         </button>
-                        <button @click="openShareModal" class="flex items-center justify-center gap-2 bg-pink-500 px-3 py-3 rounded-xl border-b-4 border-pink-700 text-white font-black text-xs md:text-sm active:translate-y-0.5 transition-all">
+                        <button @click="openShareModal" class="col-span-2 md:col-auto flex items-center justify-center gap-2 bg-pink-500 px-5 py-3 rounded-xl border-b-4 border-pink-700 text-white font-black text-xs md:text-sm active:translate-y-0.5 transition-all">
                             <svg class="icon-svg"><use xlink:href="#icon-share"></use></svg> 分享連結
                         </button>
                         <button @click="openAddMember" class="col-span-2 md:col-auto flex items-center justify-center gap-2 bg-[#0d8de7] px-5 py-3 rounded-xl border-b-4 border-blue-800 text-white font-black text-xs md:text-sm active:translate-y-0.5 transition-all">
@@ -250,10 +266,18 @@
                 <h3 class="font-black text-blue-700 mb-2 text-center text-lg flex items-center justify-center gap-2">
                     <svg class="icon-svg"><use xlink:href="#icon-share"></use></svg> 分享公會名單
                 </h3>
-                <p class="text-xs text-gray-400 mb-6 text-center">產生的連結可供其他成員查看分組，但無法編輯。</p>
+                <p class="text-xs text-gray-400 mb-4 text-center">產生的連結可供其他成員查看分組，但無法編輯。</p>
+                
                 <div class="bg-gray-50 p-4 rounded-xl border border-blue-100 mb-4 break-all text-xs font-mono text-gray-600 select-all cursor-text" @click="copyLink">
-                    {{ sharedLink || '點擊發佈以產生連結...' }}
+                    {{ sharedLink || '點擊「發佈/更新」以產生連結...' }}
                 </div>
+
+                <div class="mb-4 border-t border-gray-100 pt-4">
+                     <label class="text-xs font-black text-gray-500 block mb-1">設定存取密碼 (選填)</label>
+                     <input v-model="sharePassword" type="text" placeholder="留空則不設密碼" class="w-full p-2 bg-gray-50 border rounded-lg text-sm outline-none focus:border-blue-300">
+                     <p class="text-[10px] text-gray-400 mt-1">若設定密碼，訪客進入連結時需輸入正確密碼才可查看。</p>
+                </div>
+
                 <div class="flex gap-2">
                     <button @click="ui.modal = null" class="flex-1 py-3 bg-gray-100 text-gray-500 font-black rounded-xl hover:bg-gray-200">關閉</button>
                     <button @click="publishGuild" class="flex-1 py-3 bg-purple-500 text-white font-black rounded-xl ro-btn border-b-purple-700">
@@ -366,7 +390,6 @@
                             <button @click="ui.modal = null" class="md:hidden text-gray-400 font-black px-2 hover:bg-gray-100 rounded text-lg">✕</button>
                         </div>
                         <div class="flex gap-2 w-full md:w-auto">
-                            <!-- 移除原本的「匯出 CSV」 -->
                             <button @click="ui.modal = null" class="hidden md:block text-gray-400 font-black px-2 hover:bg-gray-100 rounded">✕</button>
                         </div>
                     </div>
@@ -381,9 +404,9 @@
                             <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-black shrink-0">{{ m.name.charAt(0).toUpperCase() }}</div>
                             <span class="font-black text-sm text-gray-800 truncate">{{ m.name }}</span>
                         </div>
-                        <div v-if="!isReadOnly" class="member-actions col-span-1 md:col-span-2 md:order-last flex md:justify-end gap-2">
-                            <button @click="editMember(m)" class="flex-1 md:flex-none h-10 w-full md:w-10 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-100 flex items-center justify-center transition-colors"><svg class="icon-svg"><use xlink:href="#icon-edit"></use></svg></button>
-                            <button @click="deleteMember(m.id)" class="flex-1 md:flex-none h-10 w-full md:w-10 rounded-lg bg-red-50 text-red-400 hover:bg-red-100 flex items-center justify-center transition-colors"><svg class="icon-svg"><use xlink:href="#icon-trash"></use></svg></button>
+                        <div class="member-actions col-span-1 md:col-span-2 md:order-last flex md:justify-end gap-2">
+                            <button v-if="!isReadOnly" @click="editMember(m)" class="flex-1 md:flex-none h-10 w-full md:w-10 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-100 flex items-center justify-center transition-colors"><svg class="icon-svg"><use xlink:href="#icon-edit"></use></svg></button>
+                            <button v-if="!isReadOnly" @click="deleteMember(m.id)" class="flex-1 md:flex-none h-10 w-full md:w-10 rounded-lg bg-red-50 text-red-400 hover:bg-red-100 flex items-center justify-center transition-colors"><svg class="icon-svg"><use xlink:href="#icon-trash"></use></svg></button>
                         </div>
                         <div class="col-span-1 md:col-span-3"><span class="job-tag w-full md:w-auto justify-center" :style="{backgroundColor: getJob(m.jobId)?.color}">{{ getJob(m.jobId)?.icon }} {{ getJob(m.jobId)?.name }}</span></div>
                         <div class="col-span-1 md:col-span-3">
@@ -513,7 +536,11 @@
                 const form = ref({ id: null, name: '', jobId: 'j1' });
                 const importText = ref('');
                 const sharedLink = ref('');
+                const sharePassword = ref(''); // Share password
+                const visitorPassword = ref(''); // Input for visitor
+                const isShareLocked = ref(false); // Locked state
                 const linkCopied = ref(false);
+                let tempSharedData = null; // Store data until unlocked
 
                 // 內建 Emoji 清單
                 const emojiList = [
@@ -524,7 +551,7 @@
                     '🩸', '🗡️', '🧿', '🧬', '🧪', '🔭', '📜', '🎵',
                     '🎪', '🦄', '🐲', '🐾', '🕸️', '🦂', '🐍', '🦋',
                     '👹', '👺', '👻', '👽', '🤖', '👾', '🎃', '🦴'
-                ];         
+                ];  
                 let db, auth;
                 const appId = 'ro-guild-v5-pro';
 
@@ -611,34 +638,15 @@
                    const newPass = prompt("請輸入新密碼 (至少6位數):");
                    if (!newPass) return;
                    if (newPass.length < 6) return alert("密碼長度不足");
-                   
-                   try {
-                       await updatePassword(auth.currentUser, newPass);
-                       alert("密碼修改成功！");
-                   } catch(e) {
-                       alert("修改失敗 (可能需要重新登入): " + e.message);
-                   }
+                   try { await updatePassword(auth.currentUser, newPass); alert("密碼修改成功！"); } 
+                   catch(e) { alert("修改失敗 (需重新登入): " + e.message); }
                 };
 
-                // Data Persistence
                 const syncData = async () => {
                     if (isReadOnly.value || !user.value) return;
                     const payload = { members: members.value, groups: groups.value, jobs: jobs.value, updatedAt: new Date().toISOString() };
                     if (user.value.isAnonymous) localStorage.setItem(`ro_data_${appId}`, JSON.stringify(payload));
                     else await setDoc(doc(db, 'artifacts', appId, 'users', user.value.uid, 'data', 'guild'), payload);
-                };
-
-                // Job Operations
-                const addNewJob = () => {
-                    jobs.value.push({ id: 'j' + Date.now(), name: '新職人', color: '#3b82f6', icon: '🆕' });
-                    syncData();
-                };
-                const deleteJob = (id) => {
-                    if (jobs.value.length <= 1) return alert('公會至少需要保留一個職業。');
-                    const hasMembers = members.value.some(m => m.jobId === id);
-                    if (hasMembers && !confirm('尚有冒險者擔任此職業，刪除後他們將失去職業關聯，確定嗎？')) return;
-                    jobs.value = jobs.value.filter(j => j.id !== id);
-                    syncData();
                 };
 
                 // Member Operations
@@ -670,28 +678,13 @@
                 const deleteGroup = (i) => { if(confirm('解散此隊伍？')) { groups.value.splice(i, 1); syncData(); } };
                 const openAssignMenu = (m) => ui.value.assigningMember = m;
                 const assignToGroup = (g) => {
-                    // Check if member is already in a group (move logic)
-                    if(g.members.includes(ui.value.assigningMember.id)) {
-                        ui.value.assigningMember = null;
-                        return; // already in this group
-                    }
-
-                    // Remove from any previous group
-                    groups.value.forEach(grp => {
-                        const idx = grp.members.indexOf(ui.value.assigningMember.id);
-                        if(idx !== -1) grp.members.splice(idx, 1);
-                    });
-
                     if (g.members.length < g.max) {
                         g.members.push(ui.value.assigningMember.id);
                         ui.value.assigningMember = null;
                         syncData();
-                    } else {
-                        alert('隊伍已滿');
                     }
                 };
                 const removeFromGroup = (g, i) => { g.members.splice(i, 1); syncData(); };
-
                 const exportCSV = () => {
                     let csv = "姓名,職業,目前分隊\n";
                     members.value.forEach(m => {
@@ -700,59 +693,81 @@
                     });
                     const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
                     const url = URL.createObjectURL(blob);
-                    const link = document.createElement("a");
-                    link.href = url;
-                    link.download = `RO_公會編組_${new Date().toLocaleDateString()}.csv`;
-                    link.click();
+                    const link = document.createElement("a"); link.href = url; link.download = `RO_Guild_${new Date().toLocaleDateString()}.csv`; link.click();
+                };
+                
+                const addNewJob = () => { jobs.value.push({ id: 'j'+Date.now(), name: '新職人', color: '#3b82f6', icon: '🆕' }); syncData(); };
+                const deleteJob = (id) => {
+                    if (jobs.value.length <= 1) return alert('需保留一個職業');
+                    if (members.value.some(m => m.jobId === id) && !confirm('尚有成員使用此職業，確定刪除？')) return;
+                    jobs.value = jobs.value.filter(j => j.id !== id); syncData();
                 };
 
                 // Share Logic
-                const publishGuild = async () => {
-                    if (!user.value || user.value.isAnonymous) return alert("訪客模式無法分享，請先註冊/登入");
-                    const shareId = user.value.uid;
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_guilds', shareId), {
-                        members: members.value, groups: groups.value, jobs: jobs.value, updatedAt: new Date().toISOString()
-                    });
-                    sharedLink.value = `${window.location.origin}${window.location.pathname}?share=${shareId}`;
-                };
-
                 const openShareModal = async () => {
                     if (!user.value || user.value.isAnonymous) return alert("訪客模式無法分享，請先註冊/登入");
-                    
                     const shareId = user.value.uid;
                     sharedLink.value = `${window.location.origin}${window.location.pathname}?share=${shareId}`;
                     ui.value.modal = 'shareModal';
-                    
-                    // Auto publish data
+                };
+
+                const publishGuild = async () => {
+                    const shareId = user.value.uid;
                     try {
-                        await publishGuild();
-                    } catch(e) {
-                        console.error(e);
-                    }
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_guilds', shareId), {
+                            members: members.value, groups: groups.value, jobs: jobs.value, updatedAt: new Date().toISOString(),
+                            password: sharePassword.value // Save password
+                        });
+                        alert("發佈成功！");
+                    } catch(e) { console.error(e); alert("發佈失敗"); }
                 };
 
                 const copyLink = () => {
                     navigator.clipboard.writeText(sharedLink.value);
                     linkCopied.value = true; setTimeout(() => linkCopied.value = false, 2000);
                 };
+                
+                // Unlock share function
+                const unlockShare = () => {
+                    if (visitorPassword.value === tempSharedData.password) {
+                        members.value = tempSharedData.members || [];
+                        groups.value = tempSharedData.groups || [];
+                        if (tempSharedData.jobs) jobs.value = tempSharedData.jobs;
+                        user.value = { email: 'Guest Viewer', isAnonymous: true }; // Fake auth
+                        isShareLocked.value = false;
+                        loading.value = false;
+                    } else {
+                        alert("密碼錯誤，請重試");
+                    }
+                };
 
                 const loadSharedData = async (shareId) => {
                     loading.value = true;
                     isReadOnly.value = true;
-                    // For public data, we don't strictly need auth if rules allow, but safety first
                     if (!auth.currentUser) await signInAnonymously(auth); 
                     
                     onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'shared_guilds', shareId), snap => {
                         if (snap.exists()) {
                             const d = snap.data();
-                            members.value = d.members || []; groups.value = d.groups || []; if(d.jobs) jobs.value = d.jobs;
-                            // Fake user for UI to render
-                            user.value = { email: 'Guest Viewer', isAnonymous: true };
+                            
+                            // Check for password protection
+                            if (d.password && d.password.trim() !== '') {
+                                tempSharedData = d;
+                                isShareLocked.value = true;
+                                loading.value = false; // Stop main loading, show lock screen
+                            } else {
+                                // No password, load directly
+                                members.value = d.members || []; 
+                                groups.value = d.groups || []; 
+                                if(d.jobs) jobs.value = d.jobs;
+                                user.value = { email: 'Guest Viewer', isAnonymous: true };
+                                loading.value = false;
+                            }
                         } else {
                             alert("找不到分享資料");
-                            window.location.search = ''; // reset
+                            window.location.search = ''; 
+                            loading.value = false;
                         }
-                        loading.value = false;
                     });
                 };
 
@@ -821,7 +836,8 @@
                     saveMember, editMember, deleteMember, exportCSV, addNewGroup, deleteGroup,
                     openAssignMenu, assignToGroup, removeFromGroup, openAddMember, syncData,
                     addNewJob, deleteJob, confirmImport, emojiList, updateJobIcon,
-                    publishGuild, copyLink, sharedLink, linkCopied, openShareModal
+                    publishGuild, copyLink, sharedLink, linkCopied, openShareModal,
+                    sharePassword, visitorPassword, isShareLocked, unlockShare
                 };
             }
         }).mount('#app');
