@@ -226,6 +226,9 @@
                             <use xlink:href="#icon-import"></use>
                         </svg> 匯入名單
                     </button>
+                    <button @click="ui.modal = 'shareModal'" class="col-span-2 md:col-auto flex items-center justify-center gap-2 bg-purple-500 px-5 py-3 rounded-xl border-b-4 border-purple-700 text-white font-black text-xs md:text-sm active:translate-y-0.5 transition-all">
+                            <svg class="icon-svg"><use xlink:href="#icon-share"></use></svg> 分享名單
+                    </button>
                 </div>
 
                 <!-- 待分配名單 -->
@@ -556,6 +559,28 @@
             </div>
         </div>
 
+        <!-- 分享名單 Modal (New) -->
+        <div v-if="ui.modal === 'shareModal'" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[500] p-4" @click.self="ui.modal = null">
+            <div class="ro-card max-w-md w-full p-6 bg-white shadow-2xl">
+                <h3 class="font-black text-blue-700 mb-2 text-center text-lg flex items-center justify-center gap-2">
+                    <svg class="icon-svg"><use xlink:href="#icon-import"></use></svg> 分享公會名單
+                </h3>
+                <p class="text-xs text-gray-400 mb-6 text-center">產生的連結可供其他成員查看分組，但無法編輯。</p>
+                
+                <div class="bg-gray-50 p-4 rounded-xl border border-blue-100 mb-4 break-all text-xs font-mono text-gray-600">
+                    {{ sharedLink || '點擊發佈以產生連結...' }}
+                </div>
+
+                <div class="flex gap-2">
+                    <button @click="ui.modal = null" class="flex-1 py-3 bg-gray-100 text-gray-500 font-black rounded-xl hover:bg-gray-200">關閉</button>
+                    <button @click="publishGuild" class="flex-1 py-3 bg-purple-500 text-white font-black rounded-xl ro-btn border-b-purple-700">
+                        {{ sharedLink ? '更新發佈內容' : '發佈並產生連結' }}
+                    </button>
+                    <button v-if="sharedLink" @click="copyLink" class="px-4 py-3 bg-blue-100 text-blue-600 font-black rounded-xl hover:bg-blue-200">複製</button>
+                </div>
+            </div>
+        </div>
+
         <!-- 職業統計 Modal (條列式 + 百分比進度條) -->
         <div v-if="ui.modal === 'jobStats'" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4" @click.self="ui.modal = null">
             <div class="ro-card max-w-lg w-full bg-white p-6 max-h-[85vh] flex flex-col overflow-hidden">
@@ -699,6 +724,8 @@
                 const ui = ref({ modal: null, expandUnassigned: true, assigningMember: null, sortBy: 'name', openIconPickerId: null });
                 const form = ref({ id: null, name: '', jobId: 'j1' });
                 const importText = ref('');
+                const sharedLink = ref('');
+                const linkCopied = ref(false);
                 let db, auth;
                 const appId = 'ro-guild-v5-pro';
                 // 內建 Emoji 清單
@@ -933,6 +960,36 @@
                     link.click();
                 };
 
+                // --- Share Logic ---
+                const publishGuild = async () => {
+                    if (!user.value || user.value.isAnonymous) return alert("訪客模式無法分享，請先註冊/登入");
+                    const shareId = user.value.uid;
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_guilds', shareId), {
+                        members: members.value, groups: groups.value, jobs: jobs.value, updatedAt: new Date().toISOString()
+                    });
+                    sharedLink.value = `${window.location.origin}${window.location.pathname}?share=${shareId}`;
+                };
+
+                const copyLink = () => {
+                    navigator.clipboard.writeText(sharedLink.value);
+                    linkCopied.value = true; setTimeout(() => linkCopied.value = false, 2000);
+                };
+
+                const loadSharedData = async (shareId) => {
+                    loading.value = true;
+                    isReadOnly.value = true;
+                    if (!auth.currentUser) await signInAnonymously(auth);
+                    
+                    onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'shared_guilds', shareId), snap => {
+                        if (snap.exists()) {
+                            const d = snap.data();
+                            members.value = d.members || []; groups.value = d.groups || []; if(d.jobs) jobs.value = d.jobs;
+                            user.value = { email: 'Guest Viewer', isAnonymous: true };
+                        } else { alert("找不到分享資料"); window.location.search = ''; }
+                        loading.value = false;
+                    });
+                };
+
                 // Modified Config Loading
                 const loadConfig = async () => {
                     try {
@@ -989,7 +1046,8 @@
                     handleEmailAuth, loginAsGuest, handleLogout, handleChangePassword,
                     saveMember, editMember, deleteMember, exportCSV, addNewGroup, deleteGroup,
                     openAssignMenu, assignToGroup, removeFromGroup, openAddMember, syncData, getMemberGroup,
-                    addNewJob, deleteJob, confirmImport,emojiList,updateJobIcon
+                    addNewJob, deleteJob, confirmImport,emojiList,updateJobIcon,
+                    publishGuild, copyLink, sharedLink, linkCopied
                 };
             }
         }).mount('#app');
