@@ -503,7 +503,7 @@
                 const jobs = ref([
                     { id: 'j1', name: '騎士', color: '#be123c', icon: '🛡️' },
                     { id: 'j2', name: '牧師', color: '#0369a1', icon: '⛪' },
-                    { id: 'j3', name: '巫師', color: '#7e22ce', icon: '🔮' },
+                    { id: 'j3', name: '法師', color: '#7e22ce', icon: '🔮' },
                     { id: 'j4', name: '獵人', color: '#15803d', icon: '🏹' },
                     { id: 'j5', name: '刺客', color: '#4b5563', icon: '🗡️' },
                     { id: 'j6', name: '鐵匠', color: '#a16207', icon: '🔨' },
@@ -670,10 +670,24 @@
                 const deleteGroup = (i) => { if(confirm('解散此隊伍？')) { groups.value.splice(i, 1); syncData(); } };
                 const openAssignMenu = (m) => ui.value.assigningMember = m;
                 const assignToGroup = (g) => {
+                    // Check if member is already in a group (move logic)
+                    if(g.members.includes(ui.value.assigningMember.id)) {
+                        ui.value.assigningMember = null;
+                        return; // already in this group
+                    }
+
+                    // Remove from any previous group
+                    groups.value.forEach(grp => {
+                        const idx = grp.members.indexOf(ui.value.assigningMember.id);
+                        if(idx !== -1) grp.members.splice(idx, 1);
+                    });
+
                     if (g.members.length < g.max) {
                         g.members.push(ui.value.assigningMember.id);
                         ui.value.assigningMember = null;
                         syncData();
+                    } else {
+                        alert('隊伍已滿');
                     }
                 };
                 const removeFromGroup = (g, i) => { g.members.splice(i, 1); syncData(); };
