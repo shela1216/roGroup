@@ -216,7 +216,7 @@
                 </div>
 
                 <!-- 小組展示 (螢幕版 - 垂直條列 + 網格成員) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-8 gap-3 no-print w-full">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 no-print w-full">
                     <div v-for="(group, gIndex) in groups" :key="group.id" class="ro-card flex flex-col overflow-hidden min-h-[300px]">
                         <div class="p-2 bg-blue-50/50 border-b flex justify-between items-center">
                             <input v-model="group.name" @blur="!isReadOnly && syncData()" :disabled="isReadOnly"
