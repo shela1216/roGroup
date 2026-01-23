@@ -294,7 +294,7 @@
         </main>
 
         <!-- 浮動待分配名單 (置底) -->
-        <div v-if="unassignedMembers.length > 0 || (!isReadOnly && user)" 
+        <div v-if="unassignedMembers.length > 0 || (isReadOnly && user)" 
              class="fixed bottom-0 left-0 right-0 z-50 bg-white shadow-[0_-5px_20px_rgba(0,0,0,0.15)] rounded-t-2xl border-t-4 border-blue-500 transition-transform duration-300 ease-in-out flex flex-col no-print max-w-6xl mx-auto"
              :style="{ transform: ui.expandUnassigned ? 'translateY(0)' : 'translateY(calc(100% - 3.5rem))', height: ui.expandUnassigned ? '40vh' : 'auto' }">
             
