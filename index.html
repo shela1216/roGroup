@@ -7,18 +7,7 @@
     
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入 html2canvas 用於生成圖片 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- 引入 jsPDF 用於生成 PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link rel="shortcut icon" href="icon.png" type="image/x-icon">
-    <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icon.png"> 
-    <meta name="apple-mobile-web-app-title" content="RO公會分組管理系統">
-    <meta name="application-name" content="RO公會分組管理系統">
-    <meta name="theme-color" content="#0d8de7">   
-    <link rel="manifest" href='manifest.json'>    
+    
     <style>
         :root { --ro-blue: #0d8de7; --ro-bg: #f0f8ff; }
         body {
@@ -215,6 +204,8 @@
                     </template>
                 </div>
 
+                <!-- 待分配名單 (已移除，改為下方浮動置底) -->
+
                 <!-- 小組展示 (螢幕版 - 垂直條列 + 網格成員) -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 no-print w-full">
                     <div v-for="(group, gIndex) in groups" :key="group.id" class="ro-card flex flex-col overflow-hidden min-h-[300px]">
@@ -242,12 +233,8 @@
                         <div class="p-2 flex-1 space-y-1 overflow-y-auto custom-scroll content-start">
                              <transition-group name="list" tag="div" class="space-y-1">
                                 <div v-for="(mId, mIndex) in getSortedGroupMembers(group)" :key="mId" 
-                                     @click="!isReadOnly && openAssignMenu(findMember(mId))"
-                                     class="relative group/item flex justify-between items-center bg-gray-50 hover:bg-white p-1 rounded-lg text-[10px] font-bold border border-transparent hover:border-blue-100 hover:shadow-sm transition-all"
-                                     :class="[
-                                        !isReadOnly ? 'cursor-pointer' : 'cursor-default',
-                                        group.leaderId === mId ? 'bg-yellow-50 border-yellow-200 shadow-sm' : 'bg-gray-50'
-                                     ]">
+                                     @click="openAssignMenu(findMember(mId))"
+                                     class="relative group/item flex justify-between items-center bg-gray-50 hover:bg-white p-1 rounded-lg text-[10px] font-bold border border-transparent hover:border-blue-100 hover:shadow-sm transition-all cursor-pointer">
                                     
                                     <div class="flex items-center gap-1.5 overflow-hidden flex-1">
                                         <!-- Leader/Index Badge -->
@@ -307,7 +294,7 @@
         </main>
 
         <!-- 浮動待分配名單 (置底) -->
-        <div v-if="user && !isReadOnly" 
+        <div v-if="unassignedMembers.length > 0 || (!isReadOnly && user)" 
              class="fixed bottom-0 left-0 right-0 z-50 bg-white shadow-[0_-5px_20px_rgba(0,0,0,0.15)] rounded-t-2xl border-t-4 border-blue-500 transition-transform duration-300 ease-in-out flex flex-col no-print max-w-6xl mx-auto"
              :style="{ transform: ui.expandUnassigned ? 'translateY(0)' : 'translateY(calc(100% - 3.5rem))', height: ui.expandUnassigned ? '40vh' : 'auto' }">
             
@@ -315,7 +302,7 @@
             <div @click="ui.expandUnassigned = !ui.expandUnassigned" class="flex justify-between items-center p-3 px-4 bg-blue-50/50 cursor-pointer hover:bg-blue-100/50 transition-colors rounded-t-xl h-14 flex-shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full font-black">{{ unassignedMembers.length }}</div>
-                    <span class="font-black text-blue-700 text-sm">待分配名單 (點擊分配)</span>
+                    <span class="font-black text-blue-700 text-sm">待分配名單 {{ isReadOnly ? '' : '(點擊分配)' }}</span>
                 </div>
                 <div class="text-blue-400 font-bold flex items-center gap-1 text-xs">
                     {{ ui.expandUnassigned ? '收合' : '展開' }}
@@ -533,6 +520,28 @@
                 </div>
             </div>
         </div>
+
+        <!-- 快速分配彈窗 (略) -->
+        <div v-if="ui.assigningMember" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4" @click.self="ui.assigningMember = null">
+            <div class="ro-card max-w-xs w-full bg-white p-6 shadow-2xl">
+                <div class="text-center mb-6">
+                    <div class="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black mb-2 italic">Assignment Order</div>
+                    <h4 class="font-black text-gray-700">派遣 <span class="text-blue-600">「{{ ui.assigningMember.name }}」</span> 至哪支小隊？</h4>
+                </div>
+                <div class="space-y-2 max-h-60 overflow-y-auto custom-scroll pr-1">
+                    <button v-for="group in groups" :key="group.id" @click="assignToGroup(group)" :disabled="group.members.length >= group.max && !group.members.includes(ui.assigningMember.id)" 
+                            :class="group.members.includes(ui.assigningMember.id) ? 'bg-blue-50 border-blue-200 cursor-default' : (group.members.length >= group.max ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'hover:bg-blue-50 border-blue-100')"
+                            class="w-full p-3 border-2 rounded-2xl font-black text-sm flex justify-between items-center transition-all">
+                        <span>{{ group.name }}</span>
+                        <div class="flex items-center gap-2">
+                            <span v-if="group.members.includes(ui.assigningMember.id)" class="text-[9px] text-blue-500 font-bold bg-white px-2 rounded-full border border-blue-200">目前所在</span>
+                            <span class="text-[10px] text-gray-400" v-else>{{ group.members.length }}/{{ group.max }}</span>
+                        </div>
+                    </button>
+                </div>
+                <button @click="ui.assigningMember = null" class="w-full mt-4 text-xs font-bold text-gray-400 py-2">稍後再說</button>
+            </div>
+        </div>
         
         <!-- 職業統計 Modal (略) -->
         <div v-if="ui.modal === 'jobStats'" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4" @click.self="ui.modal = null">
@@ -598,15 +607,13 @@
                 const members = ref([]);
                 const groups = ref([]);
                 const jobs = ref([
-                    { id: 'j1', name: '騎士', color: '#be123c', icon: '🛡️' },
-                    { id: 'j2', name: '牧師', color: '#0369a1', icon: '⛪' },
-                    { id: 'j3', name: '巫師', color: '#7e22ce', icon: '🔮' },
+                    { id: 'j1', name: '騎士', color: '#be123c', icon: '⚔️' },
+                    { id: 'j2', name: '牧師', color: '#0369a1', icon: '✨' },
+                    { id: 'j3', name: '巫師', color: '#7e22ce', icon: '🔥' },
                     { id: 'j4', name: '獵人', color: '#15803d', icon: '🏹' },
                     { id: 'j5', name: '刺客', color: '#4b5563', icon: '🗡️' },
-                    { id: 'j6', name: '鐵匠', color: '#a16207', icon: '🔨' },
-                    { id: 'j7', name: '槍手', color: '#c2410c', icon: '🔫' }
+                    { id: 'j6', name: '商人', color: '#b45309', icon: '💰' }
                 ]);
-
                 const ui = ref({ modal: null, expandUnassigned: true, assigningMember: null, sortBy: 'name', openIconPickerId: null, targetGroup: null });
                 const form = ref({ id: null, name: '', jobId: 'j1' });
                 const importText = ref('');
@@ -621,16 +628,9 @@
                 const searchQuery = ref(''); // Search Query
                 const assigningMember = ref(null); // Independent ref for modal trigger
 
-                // 內建 Emoji 清單
-                const emojiList = [
-                    '⚔️', '🛡️', '🏹', '✨', '🔥', '❄️', '⚡', '🌪️', 
-                    '💧', '🌿', '💀', '⚰️', '💊', '🔨', '🪓', '💰', 
-                    '🛒', '🎸', '🎭', '🥊', '🥋', '🔫', '💣', '🐱', 
-                    '🦅', '⛪', '📖', '👑', '💎', '🆕', '👼', '🧛',
-                    '🩸', '🗡️', '🧿', '🧬', '🧪', '🔭', '📜', '🎵',
-                    '🎪', '🦄', '🐲', '🐾', '🕸️', '🦂', '🐍', '🦋',
-                    '👹', '👺', '👻', '👽', '🤖', '👾', '🎃', '🦴'
-                ];
+                // 內建 Emoji 清單 (略)
+                const emojiList = ['⚔️', '🛡️', '🏹', '✨', '🔥', '❄️', '⚡', '🌪️', '💧', '🌿', '💀', '⚰️', '💊', '🔨', '🪓', '💰', '🛒', '🎸', '🎭', '🥊', '🥋', '槍', '💣', '🐱', '🦅', '⛪', '📖', '👑', '💎', '🆕', '👼', '🧛'];
+                
                 let db, auth;
                 const appId = 'ro-guild-v5-pro';
 
