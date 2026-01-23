@@ -7,14 +7,18 @@
     
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="shortcut icon" href="icon.png" type="image/x-icon">
+    <!-- 引入 html2canvas 用於生成圖片 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- 引入 jsPDF 用於生成 PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="shortcut icon" href="icon.png" type="image/x-icon">
     <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
     <link rel="icon" type="image/png" sizes="16x16" href="icon.png"> 
     <meta name="apple-mobile-web-app-title" content="RO公會分組管理系統">
     <meta name="application-name" content="RO公會分組管理系統">
     <meta name="theme-color" content="#0d8de7">   
-    <link rel="manifest" href='manifest.json'>
+    <link rel="manifest" href='manifest.json'>    
     <style>
         :root { --ro-blue: #0d8de7; --ro-bg: #f0f8ff; }
         body {
@@ -53,6 +57,7 @@
             background-size: 1.5em;
         }
 
+        /* 手機版卡片特化 */
         @media (max-width: 768px) {
             .member-row {
                 grid-template-columns: 1fr auto !important;
@@ -69,15 +74,22 @@
         
         .animate-fade-in { animation: fadeIn 0.2s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        #report-content { font-family: Arial, Helvetica, sans-serif !important; }
         
+        /* 列表動畫 */
         .list-move, .list-enter-active, .list-leave-active { transition: all 0.3s ease; }
         .list-enter-from, .list-leave-to { opacity: 0; transform: translateX(30px); }
         .list-leave-active { position: absolute; }
+
+        /* 浮動底板過渡動畫 */
+        .drawer-enter-active, .drawer-leave-active { transition: transform 0.3s ease-in-out; }
+        .drawer-enter-from, .drawer-leave-to { transform: translateY(100%); }
     </style>
 </head>
 <body>
-    <div id="app" class="min-h-screen pb-20">
-        <!-- SVG 圖標 (保留所有圖標定義) -->
+    <div id="app" class="min-h-screen pb-40">
+        <!-- SVG 圖標 -->
         <svg style="display: none;">
             <symbol id="icon-crown" viewBox="0 0 24 24"><path d="M12 8.2l2.36 4.97 5.16.57-3.86 3.51 1.08 5.09L12 19.64 7.26 22.34l1.08-5.09-3.86-3.51 5.16-.57L12 8.2m0-3.66L9.08 10.5l-6.38.7 4.77 4.34-1.34 6.28L12 18.75l5.87 3.07-1.34-6.28 4.77-4.34-6.38-.7L12 4.54z" fill="currentColor"/></symbol>
             <symbol id="icon-users" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
@@ -93,6 +105,7 @@
             <symbol id="icon-poring" viewBox="0 0 24 24"><path d="M12 2C5.5 2 2 8 2 13.5c0 5.2 4 8.5 10 8.5s10-3.3 10-8.5C22 8 18.5 2 12 2z" fill="currentColor"/><circle cx="7.5" cy="11.5" r="1.8" fill="white"/><circle cx="16.5" cy="11.5" r="1.8" fill="white"/><path d="M10.5 15 Q 12 16.5 13.5 15" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/></symbol>
             <symbol id="icon-x" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
             <symbol id="icon-chevron-down" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></symbol>
+            <symbol id="icon-chevron-up" viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></symbol>
             <symbol id="icon-limit" viewBox="0 0 24 24"><path d="M8 11h3v10h2V11h3l-4-4-4 4zM4 3v2h16V3H4z"/></symbol>
             <symbol id="icon-add-user" viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
             <symbol id="icon-home" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></symbol>
@@ -187,13 +200,13 @@
                          <button @click="ui.modal = 'logsModal'" class="flex items-center justify-center gap-2 bg-white px-3 py-3 rounded-xl ro-card border-blue-500 text-blue-600 font-black text-xs md:text-sm hover:bg-blue-50 transition-colors">
                             <svg class="icon-svg"><use xlink:href="#icon-history"></use></svg> 操作紀錄
                         </button>
-                        <button @click="ui.modal = 'jobSettings'" class="flex items-center justify-center gap-2 bg-white px-3 py-3 rounded-xl ro-card border-blue-500 text-blue-600 font-black text-xs md:text-sm hover:bg-blue-50 transition-colors">
+                        <button @click="ui.modal = 'jobSettings'" class="col-span-2 md:col-auto flex items-center justify-center gap-2 bg-white px-3 py-3 rounded-xl ro-card border-blue-500 text-blue-600 font-black text-xs md:text-sm hover:bg-blue-50 transition-colors">
                             <svg class="icon-svg"><use xlink:href="#icon-briefcase"></use></svg> 職業設定
                         </button>
-                        <button @click="ui.modal = 'importMembers'" class="flex items-center justify-center gap-2 bg-orange-400 px-5 py-3 rounded-xl border-b-4 border-orange-600 text-white font-black text-xs md:text-sm active:translate-y-0.5 transition-all">
+                        <button @click="ui.modal = 'importMembers'" class="col-span-2 md:col-auto flex items-center justify-center gap-2 bg-orange-400 px-5 py-3 rounded-xl border-b-4 border-orange-600 text-white font-black text-xs md:text-sm active:translate-y-0.5 transition-all">
                             <svg class="icon-svg"><use xlink:href="#icon-import"></use></svg> 匯入名單
                         </button>
-                        <button @click="openShareModal" class="flex items-center justify-center gap-2 bg-pink-500 px-5 py-3 rounded-xl border-b-4 border-pink-700 text-white font-black text-xs md:text-sm active:translate-y-0.5 transition-all">
+                        <button @click="openShareModal" class="col-span-2 md:col-auto flex items-center justify-center gap-2 bg-pink-500 px-5 py-3 rounded-xl border-b-4 border-pink-700 text-white font-black text-xs md:text-sm active:translate-y-0.5 transition-all">
                             <svg class="icon-svg"><use xlink:href="#icon-share"></use></svg> 分享連結
                         </button>
                         <button @click="openAddMember" class="col-span-2 md:col-auto flex items-center justify-center gap-2 bg-[#0d8de7] px-5 py-3 rounded-xl border-b-4 border-blue-800 text-white font-black text-xs md:text-sm active:translate-y-0.5 transition-all">
@@ -202,41 +215,8 @@
                     </template>
                 </div>
 
-                <!-- 待分配名單 -->
-                <div v-if="unassignedMembers.length > 0 || !isReadOnly" class="mb-8 ro-card border-dashed border-blue-300 overflow-hidden no-print">
-                    <button @click="ui.expandUnassigned = !ui.expandUnassigned" class="w-full flex justify-between items-center p-4 bg-blue-50/50">
-                        <div class="flex items-center gap-3">
-                            <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-black">{{ unassignedMembers.length }}</span>
-                            <span class="font-black text-blue-700">待分配名單 (點擊分配)</span>
-                        </div>
-                        <span class="text-blue-400 font-bold text-xs">{{ ui.expandUnassigned ? '收合' : '展開' }}</span>
-                    </button>
-                    <div v-show="ui.expandUnassigned" class="p-4 bg-white grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-                        <div v-for="m in unassignedMembers" :key="m.id" 
-                             @click="openAssignMenu(m)"
-                             class="relative flex items-center gap-2 bg-gray-50 hover:bg-white p-2 rounded-xl border border-transparent hover:border-blue-200 hover:shadow-sm transition-all"
-                             :class="!isReadOnly ? 'cursor-pointer' : 'cursor-default'">
-                            
-                            <!-- Avatar -->
-                            <div class="w-10 h-10 rounded-lg flex items-center justify-center text-xl shadow-sm border border-gray-100 bg-white flex-shrink-0"
-                                 :style="{backgroundColor: getJob(m.jobId)?.color + '33'}">
-                                {{ getJob(m.jobId)?.icon }}
-                            </div>
-                            
-                            <!-- Info -->
-                            <div class="flex flex-col overflow-hidden leading-tight">
-                                <span class="truncate text-sm font-bold text-gray-700">{{ m.name }}</span>
-                                <span class="truncate text-[10px] font-bold opacity-80" :style="{color: getJob(m.jobId)?.color}">
-                                    {{ getJob(m.jobId)?.name }}
-                                </span>
-                            </div>
-                        </div>
-                        <div v-if="unassignedMembers.length === 0" class="col-span-full py-8 text-center text-gray-300 font-bold italic">所有冒險者皆已就位</div>
-                    </div>
-                </div>
-
                 <!-- 小組展示 (螢幕版 - 垂直條列 + 網格成員) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 no-print w-full">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-8 gap-3 no-print w-full">
                     <div v-for="(group, gIndex) in groups" :key="group.id" class="ro-card flex flex-col overflow-hidden min-h-[300px]">
                         <div class="p-2 bg-blue-50/50 border-b flex justify-between items-center">
                             <input v-model="group.name" @blur="!isReadOnly && syncData()" :disabled="isReadOnly"
@@ -325,6 +305,49 @@
                 </div>
             </template>
         </main>
+
+        <!-- 浮動待分配名單 (置底) -->
+        <div v-if="user && !isReadOnly" 
+             class="fixed bottom-0 left-0 right-0 z-50 bg-white shadow-[0_-5px_20px_rgba(0,0,0,0.15)] rounded-t-2xl border-t-4 border-blue-500 transition-transform duration-300 ease-in-out flex flex-col no-print max-w-6xl mx-auto"
+             :style="{ transform: ui.expandUnassigned ? 'translateY(0)' : 'translateY(calc(100% - 3.5rem))', height: ui.expandUnassigned ? '40vh' : 'auto' }">
+            
+            <!-- Header (Toggle) -->
+            <div @click="ui.expandUnassigned = !ui.expandUnassigned" class="flex justify-between items-center p-3 px-4 bg-blue-50/50 cursor-pointer hover:bg-blue-100/50 transition-colors rounded-t-xl h-14 flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full font-black">{{ unassignedMembers.length }}</div>
+                    <span class="font-black text-blue-700 text-sm">待分配名單 (點擊分配)</span>
+                </div>
+                <div class="text-blue-400 font-bold flex items-center gap-1 text-xs">
+                    {{ ui.expandUnassigned ? '收合' : '展開' }}
+                    <svg class="icon-svg transition-transform duration-300" :class="{'rotate-180': ui.expandUnassigned}"><use xlink:href="#icon-chevron-up"></use></svg>
+                </div>
+            </div>
+
+            <!-- Content List -->
+            <div class="p-3 bg-white overflow-y-auto custom-scroll grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 content-start flex-1">
+                <div v-for="m in unassignedMembers" :key="m.id" 
+                     @click="openAssignMenu(m)"
+                     class="relative flex items-center gap-2 bg-gray-50 hover:bg-white p-2 rounded-xl border border-transparent hover:border-blue-200 hover:shadow-sm transition-all h-14 cursor-pointer">
+                    
+                    <!-- Avatar -->
+                    <div class="w-9 h-9 rounded-lg flex items-center justify-center text-lg shadow-sm border border-gray-100 bg-white flex-shrink-0"
+                         :style="{backgroundColor: getJob(m.jobId)?.color + '33', color: getJob(m.jobId)?.color}">
+                        {{ getJob(m.jobId)?.icon }}
+                    </div>
+                    
+                    <!-- Info -->
+                    <div class="flex flex-col overflow-hidden leading-tight">
+                        <span class="truncate text-xs font-bold text-gray-700">{{ m.name }}</span>
+                        <span class="truncate text-[9px] font-bold opacity-80" :style="{color: getJob(m.jobId)?.color}">
+                            {{ getJob(m.jobId)?.name }}
+                        </span>
+                    </div>
+                </div>
+                <div v-if="unassignedMembers.length === 0" class="col-span-full py-8 text-center text-gray-300 font-bold italic text-xs">
+                    所有冒險者皆已就位
+                </div>
+            </div>
+        </div>
 
         <!-- 操作紀錄 Modal -->
         <div v-if="ui.modal === 'logsModal'" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4" @click.self="ui.modal = null">
@@ -554,28 +577,6 @@
             </div>
         </div>
 
-        <!-- 快速分配彈窗 (略) -->
-        <div v-if="ui.assigningMember" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4" @click.self="ui.assigningMember = null">
-            <div class="ro-card max-w-xs w-full bg-white p-6 shadow-2xl">
-                <div class="text-center mb-6">
-                    <div class="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black mb-2 italic">Assignment Order</div>
-                    <h4 class="font-black text-gray-700">派遣 <span class="text-blue-600">「{{ ui.assigningMember.name }}」</span> 至哪支小隊？</h4>
-                </div>
-                <div class="space-y-2 max-h-60 overflow-y-auto custom-scroll pr-1">
-                    <button v-for="group in groups" :key="group.id" @click="assignToGroup(group)" :disabled="group.members.length >= group.max && !group.members.includes(ui.assigningMember.id)" 
-                            :class="group.members.includes(ui.assigningMember.id) ? 'bg-blue-50 border-blue-200 cursor-default' : (group.members.length >= group.max ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'hover:bg-blue-50 border-blue-100')"
-                            class="w-full p-3 border-2 rounded-2xl font-black text-sm flex justify-between items-center transition-all">
-                        <span>{{ group.name }}</span>
-                        <div class="flex items-center gap-2">
-                            <span v-if="group.members.includes(ui.assigningMember.id)" class="text-[9px] text-blue-500 font-bold bg-white px-2 rounded-full border border-blue-200">目前所在</span>
-                            <span class="text-[10px] text-gray-400" v-else>{{ group.members.length }}/{{ group.max }}</span>
-                        </div>
-                    </button>
-                </div>
-                <button @click="ui.assigningMember = null" class="w-full mt-4 text-xs font-bold text-gray-400 py-2">稍後再說</button>
-            </div>
-        </div>
-
     </div>
 
     <script type="module">
@@ -619,6 +620,7 @@
                 const logs = ref([]);
                 const searchQuery = ref(''); // Search Query
                 const assigningMember = ref(null); // Independent ref for modal trigger
+
                 // 內建 Emoji 清單
                 const emojiList = [
                     '⚔️', '🛡️', '🏹', '✨', '🔥', '❄️', '⚡', '🌪️', 
@@ -785,7 +787,8 @@
 
                 // Data Persistence
                 const syncData = async () => {
-                    if (isReadOnly.value || !user.value) return;
+                    if (isReadOnly.value) return; // Prevent overwriting if read-only
+                    
                     const payload = JSON.parse(JSON.stringify({ 
                         members: members.value, 
                         groups: groups.value,
@@ -793,10 +796,16 @@
                         logs: logs.value,
                         updatedAt: new Date().toISOString() 
                     }));
-                    if (user.value.isAnonymous) {
+
+                    if (user.value && user.value.isAnonymous) {
+                         // Local storage fallback for guests (even simulated ones)
                         localStorage.setItem(`ro_data_${appId}`, JSON.stringify(payload));
-                    } else if (db) {
+                    } else if (db && user.value) {
+                         // Firestore for logged in users
                         await setDoc(doc(db, 'artifacts', appId, 'users', user.value.uid, 'data', 'guild'), payload);
+                    } else {
+                         // Fallback for pre-login state
+                         localStorage.setItem(`ro_data_${appId}`, JSON.stringify(payload));
                     }
                 };
 
@@ -910,17 +919,6 @@
                     syncData();
                 };
 
-                const exportCSV = () => {
-                    let csv = "姓名,職業,目前分隊\n";
-                    members.value.forEach(m => {
-                        const group = groups.value.find(g => g.members.includes(m.id));
-                        csv += `${m.name},${getJob(m.jobId)?.name},${group ? group.name : '未分配'}\n`;
-                    });
-                    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement("a"); link.href = url; link.download = `RO_Guild_${new Date().toLocaleDateString()}.csv`; link.click();
-                };
-
                 // Share Logic
                 const publishGuild = async () => {
                     if (!user.value || user.value.isAnonymous) return alert("訪客模式無法分享，請先註冊/登入");
@@ -960,6 +958,7 @@
                         members.value = tempSharedData.members || [];
                         groups.value = tempSharedData.groups || [];
                         if (tempSharedData.jobs) jobs.value = tempSharedData.jobs;
+                         if (tempSharedData.logs) logs.value = tempSharedData.logs;
                         // user.value = { email: 'Guest Viewer', isAnonymous: true }; // 移除這行，避免覆蓋登入狀態
                         isShareLocked.value = false;
                         // loading.value = false; // 不要在這裡關 loading，因為 onAuthStateChanged 也會處理
@@ -1029,6 +1028,18 @@
                 };
 
                 onMounted(async () => {
+                    // Pre-load data from localStorage if available (for login screen view)
+                    const local = localStorage.getItem(`ro_data_${appId}`);
+                    if(local) {
+                         try {
+                             const d = JSON.parse(local);
+                             members.value = d.members || [];
+                             groups.value = d.groups || [];
+                             if (d.jobs) jobs.value = d.jobs;
+                             if (d.logs) logs.value = d.logs;
+                         } catch(e) { console.error("Local data parse error", e); }
+                    }
+
                     const config = await loadConfig();
                     const urlParams = new URLSearchParams(window.location.search);
                     const shareId = urlParams.get('share');
@@ -1045,14 +1056,8 @@
                                 user.value = u;
                                 if (u && !isReadOnly.value) {
                                     if (u.isAnonymous) {
-                                        const local = localStorage.getItem(`ro_data_${appId}`);
-                                        if(local) {
-                                            const d = JSON.parse(local);
-                                            members.value = d.members || [];
-                                            groups.value = d.groups || [];
-                                            if (d.jobs) jobs.value = d.jobs;
-                                            if (d.logs) logs.value = d.logs;
-                                        }
+                                        // Already loaded from local above, but ensure sync
+                                        syncData();
                                     } else {
                                         onSnapshot(doc(db, 'artifacts', appId, 'users', u.uid, 'data', 'guild'), snap => {
                                             if (snap.exists()) {
@@ -1074,14 +1079,6 @@
                         
                         if (localStorage.getItem('ro_guest_mode') === 'true') {
                              user.value = { uid: 'guest-local', isAnonymous: true, email: '本地訪客' };
-                             const local = localStorage.getItem(`ro_data_${appId}`);
-                             if(local) {
-                                 const d = JSON.parse(local);
-                                 members.value = d.members || [];
-                                 groups.value = d.groups || [];
-                                 if (d.jobs) jobs.value = d.jobs;
-                                 if (d.logs) logs.value = d.logs;
-                             }
                         }
                         loading.value = false;
                     }
@@ -1091,7 +1088,7 @@
                     user, loading, isReadOnly, authView, authForm, members, groups, jobs, ui, form, importText,
                     unassignedMembers, jobStats, filteredMembers, findMember, getJob, previewImport, getMemberGroup,
                     handleEmailAuth, loginAsGuest, handleLogout, handleResetPassword,
-                    saveMember, editMember, deleteMember, exportCSV, addNewGroup, deleteGroup,
+                    saveMember, editMember, deleteMember, addNewGroup, deleteGroup,
                     openAssignMenu, assignToGroup, removeFromGroup, openAddMember, syncData,
                     addNewJob, deleteJob, confirmImport, emojiList, updateJobIcon,
                     publishGuild, copyLink, sharedLink, linkCopied, openShareModal,
