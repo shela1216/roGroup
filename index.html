@@ -160,13 +160,12 @@
                     <div class="space-y-4">
                         <template v-if="authView !== 'guest'">
                             <input v-model="authForm.email" type="email" placeholder="EMAIL" class="w-full px-4 py-3 rounded-xl border-2 border-blue-50 focus:border-blue-400 outline-none font-bold text-center">
-                            <input v-if="authView !== 'forgotPassword'" v-model="authForm.password" type="password" placeholder="PASSWORD" class="w-full px-4 py-3 rounded-xl border-2 border-blue-50 focus:border-blue-400 outline-none font-bold text-center">
+                            <input v-model="authForm.password" type="password" placeholder="PASSWORD" class="w-full px-4 py-3 rounded-xl border-2 border-blue-50 focus:border-blue-400 outline-none font-bold text-center">
                         </template>
                         <div v-if="authView === 'login'">
                             <button @click="handleEmailAuth('login')" class="w-full py-4 bg-blue-500 text-white font-black rounded-xl ro-btn border-b-blue-800 mb-3">立即登入</button>
                             <div class="flex justify-between text-xs font-bold text-blue-400 px-2">
                                 <button @click="authView = 'register'">註冊帳號</button>
-                                <button @click="authView = 'forgotPassword'">忘記密碼</button>
                                 <button @click="authView = 'guest'">訪客試用</button>
                             </div>
                         </div>
@@ -176,10 +175,6 @@
                         </div>
                         <div v-if="authView === 'guest'">
                             <button @click="loginAsGuest" class="w-full py-4 bg-orange-500 text-white font-black rounded-xl ro-btn border-b-orange-800 mb-3">開始試用</button>
-                            <button @click="authView = 'login'" class="w-full text-center text-xs font-bold text-blue-400">返回登入</button>
-                        </div>
-                        <div v-if="authView === 'forgotPassword'">
-                            <button @click="handleForgotPassword" class="w-full py-4 bg-purple-500 text-white font-black rounded-xl ro-btn border-b-purple-800 mb-3">發送重設密碼信</button>
                             <button @click="authView = 'login'" class="w-full text-center text-xs font-bold text-blue-400">返回登入</button>
                         </div>
                     </div>
@@ -621,7 +616,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword, updatePassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword, updatePassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Vue 3 全局引用
@@ -814,17 +809,6 @@
                    } catch(e) {
                        alert("修改失敗 (可能需要重新登入): " + e.message);
                    }
-                };
-
-                const handleForgotPassword = async () => {
-                    if (!authForm.value.email) return alert('請先輸入您的 EMAIL 以接收密碼重設信件');
-                    try {
-                        await sendPasswordResetEmail(auth, authForm.value.email);
-                        alert('密碼重設信件已成功發送！請前往您的信箱收信，重新設定後再回來登入。');
-                        authView.value = 'login';
-                    } catch (e) {
-                        alert('發送失敗 (請確認信箱是否正確)：' + e.message);
-                    }
                 };
 
                 // Data Persistence
@@ -1194,7 +1178,7 @@
                 return {
                     user, loading, isReadOnly, authView, authForm, members, groups, jobs, ui, form, importText,
                     unassignedMembers, jobStats, filteredMembers, findMember, getJob, previewImport, getMemberGroup,
-                    handleEmailAuth, loginAsGuest, handleLogout, handleResetPassword, handleForgotPassword,
+                    handleEmailAuth, loginAsGuest, handleLogout, handleResetPassword,
                     saveMember, editMember, deleteMember, addNewGroup, deleteGroup,
                     openAssignMenu, assignToGroup, removeFromGroup, openAddMember, syncData,
                     addNewJob, deleteJob, confirmImport, emojiList, updateJobIcon,
