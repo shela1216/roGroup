@@ -314,13 +314,14 @@
                     <svg class="icon-svg transition-transform duration-500" :class="{'rotate-180': ui.expandUnassigned}"><use href="#icon-chevron-up"></use></svg>
                 </div>
             </div>
-            <div class="p-4 bg-white overflow-y-auto custom-scroll grid grid-cols-2 sm:grid-cols-3 gap-3 content-start flex-1">
-                <div v-for="m in unassignedMembers" :key="m.id" @click="openAssignMenu(m)" class="group flex flex-col items-center gap-2 bg-gray-50 p-3 rounded-2xl border border-transparent hover:border-blue-200 transition-all cursor-pointer relative shadow-sm" :class="{'opacity-50 grayscale': m.isLeave}">
-                    <div class="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-3xl border border-gray-100 shadow-sm shrink-0" :style="{backgroundColor: getJob(m.jobId)?.color + '15'}">{{ getJob(m.jobId)?.icon }}</div>
-                    <div class="text-center overflow-hidden w-full leading-tight">
-                        <div class="text-xs font-black text-gray-800 truncate">{{ m.name }}</div>
-                        <div class="text-[9px] font-black uppercase tracking-widest mt-0.5" :style="{color: getJob(m.jobId)?.color}">{{ getJob(m.jobId)?.name }}</div>
+            <div class="flex-1 overflow-y-auto custom-scroll p-4 space-y-2 bg-white">
+                <div v-for="m in unassignedMembers" :key="m.id" @click="openAssignMenu(m)" class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-xl border border-transparent hover:border-blue-200 transition-all cursor-pointer relative shadow-sm" :class="{'opacity-50 grayscale': m.isLeave}">
+                    <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-2xl border border-gray-100 shrink-0 shadow-sm" :style="{backgroundColor: getJob(m.jobId)?.color + '15'}">{{ getJob(m.jobId)?.icon }}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-black text-gray-800 text-[11px] whitespace-nowrap">{{ m.name }}</div>
+                        <div class="text-[8px] font-black uppercase tracking-widest mt-0.5" :style="{color: getJob(m.jobId)?.color}">{{ getJob(m.jobId)?.name }}</div>
                     </div>
+                    <div v-if="m.isLeave" class="text-[8px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100 shrink-0">請假</div>
                 </div>
             </div>
         </div>
