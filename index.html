@@ -449,7 +449,22 @@
             <div v-if="ui.modal === 'importMembers'" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[250] p-4" @click.self="ui.modal = null">
                 <div class="ro-card max-w-lg w-full bg-white p-6 border-t-8 border-orange-500 shadow-2xl">
                     <h2 class="text-xl font-black text-blue-900 mb-6 flex items-center gap-2 tracking-tighter leading-none">📥 批量名單導入</h2>
-                    <textarea v-model="importText" placeholder="名稱,職業 (每行一位)" class="w-full h-48 p-4 bg-gray-50 border rounded-xl outline-none font-bold text-sm mb-6 shadow-inner focus:border-orange-400 transition-all custom-scroll"></textarea>
+                    <textarea v-model="importText" placeholder="名稱,職業 (每行一位)" class="w-full h-48 p-4 bg-gray-50 border rounded-xl outline-none font-bold text-sm mb-4 shadow-inner focus:border-orange-400 transition-all custom-scroll"></textarea>
+                    
+                    <!-- 預覽區塊 -->
+                    <div v-if="previewImport.length > 0" class="mb-6 max-h-40 overflow-y-auto border rounded-xl bg-gray-50 p-2 custom-scroll">
+                        <div v-for="(p, i) in previewImport" :key="i" class="flex items-center justify-between p-2 border-b last:border-0 text-xs">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-blue-900">{{ p.name }}</span>
+                                <span class="text-gray-400">/</span>
+                                <span class="text-gray-600">{{ getJob(p.jobId).name }}</span>
+                            </div>
+                            <span :class="p.isExisting ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'" class="px-2 py-0.5 rounded-full font-black scale-90">
+                                {{ p.isExisting ? '更新' : '新增' }}
+                            </span>
+                        </div>
+                    </div>
+
                     <div class="flex gap-3"><button @click="ui.modal = null" class="flex-1 py-4 bg-gray-100 text-gray-400 font-bold rounded-xl hover:bg-gray-200 transition-colors uppercase tracking-widest text-[10px] leading-none">Cancel</button><button @click="confirmImport" class="flex-1 py-4 bg-orange-500 text-white font-black rounded-xl border-b-4 border-orange-700 hover:bg-orange-600 transition-all uppercase tracking-widest text-[10px] leading-none">Confirm Import</button></div>
                 </div>
             </div>
@@ -555,7 +570,29 @@
                 const getSortedGroupMembers = (group) => { if (!group || !group.members || group.members.length === 0) return []; const list = [...group.members]; const effectiveLeader = group.leaderId || group.members[0]; const idx = list.indexOf(effectiveLeader); if (idx !== -1) { list.splice(idx, 1); list.unshift(effectiveLeader); } return list; };
                 const jobStats = computed(() => { const total = members.value.length || 1; return jobs.value.map(j => { const count = members.value.filter(m => m.jobId === j.id).length; return { ...j, count, percent: Math.round((count / total) * 100) }; }); });
                 const filteredMembers = computed(() => { let res = [...members.value]; if (searchQuery.value.trim()) { const q = searchQuery.value.trim().toLowerCase(); res = res.filter(m => m.name.toLowerCase().includes(q)); } return res.sort((a,b) => { if(ui.value.sortBy === 'job') { const ja = jobs.value.findIndex(j => j.id === a.jobId); const jb = jobs.value.findIndex(j => j.id === b.jobId); return ja - jb; } else if(ui.value.sortBy === 'group') { const ga = groups.value.findIndex(g => g.members.includes(a.id)); const gb = groups.value.findIndex(g => g.members.includes(b.id)); return (ga === -1 ? 999 : ga) - (gb === -1 ? 999 : gb); } return a.name.localeCompare(b.name, 'zh-TW'); }); });
-                const previewImport = computed(() => { if (!importText.value) return []; return importText.value.split(/\r?\n/).map(line => { const parts = line.split(/,|\t/).map(s => s.trim()).filter(s => s); if (parts.length > 0) { const name = parts[0]; const jobName = parts[1] || ''; let jobId = jobs.value[0].id; if (jobName) { const found = jobs.value.find(j => j.name.includes(jobName) || jobName.includes(j.name)); if (found) jobId = found.id; } return { name, jobId }; } return null; }).filter(x => x); });
+                const previewImport = computed(() => { 
+                    if (!importText.value) return []; 
+                    return importText.value.split(/\r?\n/).map(line => { 
+                        const parts = line.split(/,|\t/).map(s => s.trim()).filter(s => s); 
+                        if (parts.length > 0) { 
+                            const name = parts[0]; 
+                            const jobName = parts[1] || ''; 
+                            let jobId = jobs.value[0].id; 
+                            if (jobName) { 
+                                const found = jobs.value.find(j => j.name.includes(jobName) || jobName.includes(j.name)); 
+                                if (found) jobId = found.id; 
+                            } 
+                            const existing = members.value.find(m => m.name === name);
+                            return { 
+                                name, 
+                                jobId, 
+                                isExisting: !!existing, 
+                                existingId: existing ? existing.id : null 
+                            }; 
+                        } 
+                        return null; 
+                    }).filter(x => x); 
+                });
 
                 const formatLogMessage = (msg) => msg.replace(/\[(.*?)\]/g, '<span class="text-blue-600 bg-blue-100 px-1 py-0.5 rounded mx-0.5 border border-blue-200 font-black">$1</span>').replace(/：(.*)/g, '：<span class="text-orange-600 font-black">$1</span>');
                 const addLog = (message) => { const logId = 'L-' + Math.random().toString(36).substr(2, 4).toUpperCase(); logs.value.unshift({ id: logId, timestamp: new Date().toISOString(), message }); if (logs.value.length > 50) logs.value.pop(); syncData(); };
