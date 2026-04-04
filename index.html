@@ -479,7 +479,12 @@
                             <div class="flex items-center gap-2"><span class="text-[10px] text-gray-400 group-hover:text-blue-600 font-black leading-none">{{ group.members.length }} / {{ group.max }}</span></div>
                         </button>
                     </div>
-                    <button @click="ui.assigningMember = null" class="mt-6 text-gray-400 font-black text-[10px] hover:text-gray-600 transition-colors uppercase tracking-widest leading-none">Close</button>
+                    <div class="mt-6 pt-4 border-t border-gray-100 flex flex-col gap-3">
+                        <button @click="toggleLeave(ui.assigningMember); ui.assigningMember = null" class="w-full py-3 rounded-xl font-black text-xs transition-colors border shadow-sm" :class="ui.assigningMember.isLeave ? 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100' : 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100'">
+                            {{ ui.assigningMember.isLeave ? '取消請假 (狀態回歸)' : '設定為請假狀態' }}
+                        </button>
+                        <button @click="ui.assigningMember = null" class="text-gray-400 font-black text-[10px] hover:text-gray-600 transition-colors uppercase tracking-widest leading-none">Close</button>
+                    </div>
                 </div>
             </div>
 
