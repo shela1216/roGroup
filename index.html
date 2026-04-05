@@ -986,34 +986,34 @@
                         
                         <!-- 職業小統計 (過濾器) -->
                         <div class="flex gap-1.5 flex-wrap p-2 rounded-xl" style="background:var(--accent-glow);border:1px solid var(--card-border);">
-                            <div @click="ui.filterJobId = null"
+                            <div @click="ui.modalFilterJobId = null"
                                  class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
                                  :style="{
-                                     background: !ui.filterJobId ? 'linear-gradient(135deg,#2a55c0,#4a84e8)' : 'var(--card-bg)',
-                                     color: !ui.filterJobId ? '#fff' : 'var(--text-muted)',
-                                     border: '1px solid ' + (!ui.filterJobId ? '#1a3a90' : 'var(--card-border)'),
-                                     boxShadow: !ui.filterJobId ? '0 0 10px rgba(74,132,232,0.4)' : 'none'
+                                     background: !ui.modalFilterJobId ? 'linear-gradient(135deg,#2a55c0,#4a84e8)' : 'var(--card-bg)',
+                                     color: !ui.modalFilterJobId ? '#fff' : 'var(--text-muted)',
+                                     border: '1px solid ' + (!ui.modalFilterJobId ? '#1a3a90' : 'var(--card-border)'),
+                                     boxShadow: !ui.modalFilterJobId ? '0 0 10px rgba(74,132,232,0.4)' : 'none'
                                  }">
                                 <span>🌐</span><span>全部</span>
                             </div>
                             <template v-for="j in jobs" :key="'modal-stat-'+j.id">
-                                <div v-if="members.filter(m => m.jobId===j.id).length > 0"
-                                     @click="ui.filterJobId = ui.filterJobId === j.id ? null : j.id"
+                                <div v-if="unassignedMembers.filter(m => m.jobId===j.id).length > 0"
+                                     @click="ui.modalFilterJobId = ui.modalFilterJobId === j.id ? null : j.id"
                                      class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
                                      :style="{
-                                         background: ui.filterJobId === j.id ? j.color : j.color+'18',
-                                         color: ui.filterJobId === j.id ? '#fff' : j.color,
-                                         border: '1px solid ' + (ui.filterJobId === j.id ? j.color : j.color+'30'),
-                                         boxShadow: ui.filterJobId === j.id ? '0 0 10px '+j.color+'40' : 'none'
+                                         background: ui.modalFilterJobId === j.id ? j.color : j.color+'18',
+                                         color: ui.modalFilterJobId === j.id ? '#fff' : j.color,
+                                         border: '1px solid ' + (ui.modalFilterJobId === j.id ? j.color : j.color+'30'),
+                                         boxShadow: ui.modalFilterJobId === j.id ? '0 0 10px '+j.color+'40' : 'none'
                                      }">
-                                    <span>{{ j.icon }}</span><span>{{ members.filter(m=>m.jobId===j.id).length }}</span>
+                                    <span>{{ j.icon }}</span><span>{{ unassignedMembers.filter(m=>m.jobId===j.id).length }}</span>
                                 </div>
                             </template>
                         </div>
                     </div>
 
                     <div class="flex-1 overflow-y-auto space-y-1.5 custom-scroll pr-1">
-                        <div v-for="m in filteredMembers" :key="m.id" @click="addMemberToGroup(m)"
+                        <div v-for="m in modalFilteredMembers" :key="m.id" @click="addMemberToGroup(m)"
                              class="flex items-center gap-3 p-2.5 rounded-xl member-item group">
                             <div class="w-9 h-9 rounded-lg flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform" 
                                  :style="ui.theme==='dark' ? {backgroundColor:(getJob(m.jobId)?.color||'#4a84e8')+'cc',borderColor:(getJob(m.jobId)?.color||'#4a84e8')} : {backgroundColor:(getJob(m.jobId)?.color||'#4a84e8')+'15',borderColor:(getJob(m.jobId)?.color||'#4a84e8')+'30'}">{{ getJob(m.jobId).icon }}</div>
@@ -1023,7 +1023,7 @@
                             </div>
                             <div v-if="getMemberGroup(m.id)" class="text-[12px] font-black px-2 py-1 rounded-md shrink-0 tracking-widest" style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">{{ getMemberGroup(m.id).name }}</div>
                         </div>
-                        <div v-if="filteredMembers.length === 0" class="py-10 text-center opacity-30 font-black text-sm">查無符合條件的成員</div>
+                        <div v-if="modalFilteredMembers.length === 0" class="py-10 text-center opacity-30 font-black text-sm">查無符合條件的成員</div>
                     </div>
                 </div>
             </div>
@@ -1057,7 +1057,7 @@
                 const authView = ref('login'); const authForm = ref({ email: '', password: '' });
                 const members = ref([]); const groups = ref([]); const logs = ref([]); const searchQuery = ref('');
                 const jobs = ref([{ id: 'j1', name: '騎士', color: '#be123c', icon: '⚔️' }, { id: 'j2', name: '牧師', color: '#0369a1', icon: '✨' }, { id: 'j3', name: '巫師', color: '#7e22ce', icon: '🔥' }, { id: 'j4', name: '獵人', color: '#15803d', icon: '🏹' }, { id: 'j5', name: '刺客', color: '#4b5563', icon: '🗡️' }, { id: 'j6', name: '商人', color: '#b45309', icon: '💰' }]);
-                const ui = ref({ modal: null, expandUnassigned: true, assigningMember: null, sortBy: 'name', openIconPickerId: null, openColorPickerId: null, targetGroup: null, draggedGroupIndex: null, isSidebarCollapsed: false, theme: localStorage.getItem('ro_theme') || 'dark', filterJobId: null });
+                const ui = ref({ modal: null, expandUnassigned: true, assigningMember: null, sortBy: 'name', openIconPickerId: null, openColorPickerId: null, targetGroup: null, draggedGroupIndex: null, isSidebarCollapsed: false, theme: localStorage.getItem('ro_theme') || 'dark', filterJobId: null, modalFilterJobId: null });
                 watch(() => ui.value.theme, (newTheme) => {
                     localStorage.setItem('ro_theme', newTheme);
                     if (newTheme === 'dark') document.body.classList.add('theme-dark');
@@ -1083,6 +1083,17 @@
                 const getSortedGroupMembers = (group) => { if (!group || !group.members || group.members.length === 0) return []; const list = [...group.members]; const effectiveLeader = group.leaderId || group.members[0]; const idx = list.indexOf(effectiveLeader); if (idx !== -1) { list.splice(idx, 1); list.unshift(effectiveLeader); } return list; };
                 const jobStats = computed(() => { const total = members.value.length || 1; return jobs.value.map(j => { const count = members.value.filter(m => m.jobId === j.id).length; return { ...j, count, percent: Math.round((count / total) * 100) }; }); });
                 const filteredMembers = computed(() => { let res = [...members.value]; if (searchQuery.value.trim()) { const q = searchQuery.value.trim().toLowerCase(); res = res.filter(m => m.name.toLowerCase().includes(q)); } return res.sort((a,b) => { if(ui.value.sortBy === 'job') { const ja = jobs.value.findIndex(j => j.id === a.jobId); const jb = jobs.value.findIndex(j => j.id === b.jobId); return ja - jb; } else if(ui.value.sortBy === 'group') { const ga = groups.value.findIndex(g => g.members.includes(a.id)); const gb = groups.value.findIndex(g => g.members.includes(b.id)); return (ga === -1 ? 999 : ga) - (gb === -1 ? 999 : gb); } return a.name.localeCompare(b.name, 'zh-TW'); }); });
+                const modalFilteredMembers = computed(() => { 
+                    const assigned = new Set(); 
+                    groups.value.forEach(g => g.members.forEach(id => assigned.add(id))); 
+                    let res = members.value.filter(m => !assigned.has(m.id));
+                    if (ui.value.modalFilterJobId) res = res.filter(m => m.jobId === ui.value.modalFilterJobId);
+                    if (searchQuery.value.trim()) {
+                        const q = searchQuery.value.trim().toLowerCase();
+                        res = res.filter(m => m.name.toLowerCase().includes(q));
+                    }
+                    return res;
+                });
                 const previewImport = computed(() => { if (!importText.value) return []; return importText.value.split(/\r?\n/).map(line => { const parts = line.split(/,|\t/).map(s => s.trim()).filter(s => s); if (parts.length > 0) { const name = parts[0]; const jobName = parts[1] || ''; let jobId = jobs.value[0].id; if (jobName) { const found = jobs.value.find(j => j.name.includes(jobName) || jobName.includes(j.name)); if (found) jobId = found.id; } const existing = members.value.find(m => m.name === name); return { name, jobId, isExisting: !!existing, existingId: existing ? existing.id : null }; } return null; }).filter(x => x); });
 
                 const formatLogMessage = (msg) => msg.replace(/\[(.*?)\]/g, '<span style="color:#4a84e8;background:rgba(74,132,232,0.15);padding:1px 6px;border-radius:4px;margin:0 2px;border:1px solid rgba(74,132,232,0.25);font-weight:900;">$1</span>').replace(/：(.*)/g, '：<span style="color:#e8a838;font-weight:900;">$1</span>');
@@ -1107,7 +1118,7 @@
                 const updateGroupName = (group, e) => { const limit = 10; if (e.target.value.length > limit) { alert(`隊伍名稱限 ${limit} 字以內`); e.target.value = e.target.value.slice(0, limit); } group.name = e.target.value; };
                 const removeFromGroup = (g, mid) => { const m = findMember(mid); if(m) addLog(`退出：[${m.name}] 離開 [${g.name}]`); g.members = g.members.filter(id => id !== mid); if (g.leaderId === mid) g.leaderId = null; syncData(); };
                 const toggleLeader = (g, mid) => { g.leaderId = g.leaderId === mid ? null : mid; syncData(); };
-                const openSelectMemberForGroup = (g) => { ui.value.targetGroup = g; ui.value.modal = 'selectMemberForGroup'; };
+                const openSelectMemberForGroup = (g) => { ui.value.targetGroup = g; ui.value.modalFilterJobId = null; ui.value.modal = 'selectMemberForGroup'; };
                 const addMemberToGroup = (m) => { if (ui.value.targetGroup.members.length >= ui.value.targetGroup.max) return alert('滿了'); groups.value.forEach(grp => { const idx = grp.members.indexOf(m.id); if(idx !== -1) grp.members.splice(idx, 1); if(grp.leaderId === m.id) grp.leaderId = null; }); m.isLeave = false; ui.value.targetGroup.members.push(m.id); addLog(`指派：[${m.name}] 加入 [${ui.value.targetGroup.name}]`); ui.value.modal = null; syncData(); };
 
                 const onDragStart = (idx, e) => { if (isReadOnly.value || e.target.tagName === 'INPUT') { e.preventDefault(); return; } ui.value.draggedGroupIndex = idx; };
