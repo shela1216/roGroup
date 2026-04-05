@@ -1079,18 +1079,62 @@
                     return { backgroundColor: color + '15', color: color, border: '1px solid ' + color + '30' };
                 };
                 const getMemberGroup = (mid) => groups.value.find(g => g.members.includes(mid));
-                const unassignedMembers = computed(() => { const assigned = new Set(); groups.value.forEach(g => g.members.forEach(id => assigned.add(id))); return members.value.filter(m => !assigned.has(m.id)); });
-                const getSortedGroupMembers = (group) => { if (!group || !group.members || group.members.length === 0) return []; const list = [...group.members]; const effectiveLeader = group.leaderId || group.members[0]; const idx = list.indexOf(effectiveLeader); if (idx !== -1) { list.splice(idx, 1); list.unshift(effectiveLeader); } return list; };
-                const jobStats = computed(() => { const total = members.value.length || 1; return jobs.value.map(j => { const count = members.value.filter(m => m.jobId === j.id).length; return { ...j, count, percent: Math.round((count / total) * 100) }; }); });
-                const filteredMembers = computed(() => { let res = [...members.value]; if (searchQuery.value.trim()) { const q = searchQuery.value.trim().toLowerCase(); res = res.filter(m => m.name.toLowerCase().includes(q)); } return res.sort((a,b) => { if(ui.value.sortBy === 'job') { const ja = jobs.value.findIndex(j => j.id === a.jobId); const jb = jobs.value.findIndex(j => j.id === b.jobId); return ja - jb; } else if(ui.value.sortBy === 'group') { const ga = groups.value.findIndex(g => g.members.includes(a.id)); const gb = groups.value.findIndex(g => g.members.includes(b.id)); return (ga === -1 ? 999 : ga) - (gb === -1 ? 999 : gb); } return a.name.localeCompare(b.name, 'zh-TW'); }); });
+                const unassignedMembers = computed(() => { 
+                    const assigned = new Set(); 
+                    if (groups.value) {
+                        groups.value.forEach(g => { 
+                            if (g && g.members) g.members.forEach(id => assigned.add(id)); 
+                        }); 
+                    }
+                    return (members.value || []).filter(m => m && !assigned.has(m.id)); 
+                });
+                const getSortedGroupMembers = (group) => { 
+                    if (!group || !group.members || group.members.length === 0) return []; 
+                    const list = [...group.members]; 
+                    const effectiveLeader = group.leaderId || group.members[0]; 
+                    const idx = list.indexOf(effectiveLeader); 
+                    if (idx !== -1) { list.splice(idx, 1); list.unshift(effectiveLeader); } 
+                    return list; 
+                };
+                const jobStats = computed(() => { 
+                    const mems = members.value || [];
+                    const total = mems.length || 1; 
+                    return (jobs.value || []).map(j => { 
+                        const count = mems.filter(m => m && m.jobId === j.id).length; 
+                        return { ...j, count, percent: Math.round((count / total) * 100) }; 
+                    }); 
+                });
+                const filteredMembers = computed(() => { 
+                    let res = [...(members.value || [])]; 
+                    if (searchQuery.value && searchQuery.value.trim()) { 
+                        const q = searchQuery.value.trim().toLowerCase(); 
+                        res = res.filter(m => m && m.name.toLowerCase().includes(q)); 
+                    } 
+                    return res.sort((a,b) => { 
+                        if(ui.value.sortBy === 'job') { 
+                            const ja = (jobs.value || []).findIndex(j => j.id === a.jobId); 
+                            const jb = (jobs.value || []).findIndex(j => j.id === b.jobId); 
+                            return ja - jb; 
+                        } else if(ui.value.sortBy === 'group') { 
+                            const ga = (groups.value || []).findIndex(g => g.members && g.members.includes(a.id)); 
+                            const gb = (groups.value || []).findIndex(g => g.members && g.members.includes(b.id)); 
+                            return (ga === -1 ? 999 : ga) - (gb === -1 ? 999 : gb); 
+                        } 
+                        return (a.name || '').localeCompare(b.name || '', 'zh-TW'); 
+                    }); 
+                });
                 const modalFilteredMembers = computed(() => { 
                     const assigned = new Set(); 
-                    groups.value.forEach(g => g.members.forEach(id => assigned.add(id))); 
-                    let res = members.value.filter(m => !assigned.has(m.id));
+                    if (groups.value) {
+                        groups.value.forEach(g => { 
+                            if (g && g.members) g.members.forEach(id => assigned.add(id)); 
+                        }); 
+                    }
+                    let res = (members.value || []).filter(m => m && !assigned.has(m.id));
                     if (ui.value.modalFilterJobId) res = res.filter(m => m.jobId === ui.value.modalFilterJobId);
-                    if (searchQuery.value.trim()) {
+                    if (searchQuery.value && searchQuery.value.trim()) {
                         const q = searchQuery.value.trim().toLowerCase();
-                        res = res.filter(m => m.name.toLowerCase().includes(q));
+                        res = res.filter(m => m && m.name.toLowerCase().includes(q));
                     }
                     return res;
                 });
