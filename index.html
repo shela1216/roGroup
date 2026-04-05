@@ -982,7 +982,7 @@
                     
                     <!-- 搜尋與篩選 -->
                     <div class="space-y-3 mb-4 shrink-0">
-                        <input v-model="searchQuery" placeholder="搜尋冒險者..." class="w-full px-4 py-3 rounded-xl font-bold outline-none text-sm transition-all" style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
+                        <input v-model="ui.modalSearchQuery" placeholder="搜尋冒險者..." class="w-full px-4 py-3 rounded-xl font-bold outline-none text-sm transition-all" style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
                         
                         <!-- 職業小統計 (過濾器) -->
                         <div class="flex gap-1.5 flex-wrap p-2 rounded-xl" style="background:var(--accent-glow);border:1px solid var(--card-border);">
@@ -997,7 +997,7 @@
                                 <span>🌐</span><span>全部</span>
                             </div>
                             <template v-for="j in jobs" :key="'modal-stat-'+j.id">
-                                <div v-if="unassignedMembers.filter(m => m.jobId===j.id).length > 0"
+                                <div v-if="members.filter(m => m.jobId===j.id).length > 0"
                                      @click="ui.modalFilterJobId = ui.modalFilterJobId === j.id ? null : j.id"
                                      class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
                                      :style="{
@@ -1006,7 +1006,7 @@
                                          border: '1px solid ' + (ui.modalFilterJobId === j.id ? j.color : j.color+'30'),
                                          boxShadow: ui.modalFilterJobId === j.id ? '0 0 10px '+j.color+'40' : 'none'
                                      }">
-                                    <span>{{ j.icon }}</span><span>{{ unassignedMembers.filter(m=>m.jobId===j.id).length }}</span>
+                                    <span>{{ j.icon }}</span><span>{{ members.filter(m=>m.jobId===j.id).length }}</span>
                                 </div>
                             </template>
                         </div>
@@ -1057,7 +1057,7 @@
                 const authView = ref('login'); const authForm = ref({ email: '', password: '' });
                 const members = ref([]); const groups = ref([]); const logs = ref([]); const searchQuery = ref('');
                 const jobs = ref([{ id: 'j1', name: '騎士', color: '#be123c', icon: '⚔️' }, { id: 'j2', name: '牧師', color: '#0369a1', icon: '✨' }, { id: 'j3', name: '巫師', color: '#7e22ce', icon: '🔥' }, { id: 'j4', name: '獵人', color: '#15803d', icon: '🏹' }, { id: 'j5', name: '刺客', color: '#4b5563', icon: '🗡️' }, { id: 'j6', name: '商人', color: '#b45309', icon: '💰' }]);
-                const ui = ref({ modal: null, expandUnassigned: true, assigningMember: null, sortBy: 'name', openIconPickerId: null, openColorPickerId: null, targetGroup: null, draggedGroupIndex: null, isSidebarCollapsed: false, theme: localStorage.getItem('ro_theme') || 'dark', filterJobId: null, modalFilterJobId: null });
+                const ui = ref({ modal: null, expandUnassigned: true, assigningMember: null, sortBy: 'name', openIconPickerId: null, openColorPickerId: null, targetGroup: null, draggedGroupIndex: null, isSidebarCollapsed: false, theme: localStorage.getItem('ro_theme') || 'dark', filterJobId: null, modalFilterJobId: null, modalSearchQuery: '' });
                 watch(() => ui.value.theme, (newTheme) => {
                     localStorage.setItem('ro_theme', newTheme);
                     if (newTheme === 'dark') document.body.classList.add('theme-dark');
@@ -1124,19 +1124,13 @@
                     }); 
                 });
                 const modalFilteredMembers = computed(() => { 
-                    const assigned = new Set(); 
-                    if (groups.value) {
-                        groups.value.forEach(g => { 
-                            if (g && g.members) g.members.forEach(id => assigned.add(id)); 
-                        }); 
-                    }
-                    let res = (members.value || []).filter(m => m && !assigned.has(m.id));
+                    let res = [...(members.value || [])];
                     if (ui.value.modalFilterJobId) res = res.filter(m => m.jobId === ui.value.modalFilterJobId);
-                    if (searchQuery.value && searchQuery.value.trim()) {
-                        const q = searchQuery.value.trim().toLowerCase();
+                    if (ui.value.modalSearchQuery && ui.value.modalSearchQuery.trim()) {
+                        const q = ui.value.modalSearchQuery.trim().toLowerCase();
                         res = res.filter(m => m && m.name.toLowerCase().includes(q));
                     }
-                    return res;
+                    return res.sort((a,b) => (a.name || '').localeCompare(b.name || '', 'zh-TW'));
                 });
                 const previewImport = computed(() => { if (!importText.value) return []; return importText.value.split(/\r?\n/).map(line => { const parts = line.split(/,|\t/).map(s => s.trim()).filter(s => s); if (parts.length > 0) { const name = parts[0]; const jobName = parts[1] || ''; let jobId = jobs.value[0].id; if (jobName) { const found = jobs.value.find(j => j.name.includes(jobName) || jobName.includes(j.name)); if (found) jobId = found.id; } const existing = members.value.find(m => m.name === name); return { name, jobId, isExisting: !!existing, existingId: existing ? existing.id : null }; } return null; }).filter(x => x); });
 
@@ -1166,6 +1160,7 @@
                     if (!g) return;
                     ui.value.targetGroup = g; 
                     ui.value.modalFilterJobId = null; 
+                    ui.value.modalSearchQuery = '';
                     ui.value.modal = 'selectMemberForGroup'; 
                 };
                 const addMemberToGroup = (m) => { 
