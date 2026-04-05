@@ -977,19 +977,53 @@
 
             <!-- 選擇成員加入 -->
             <div v-if="ui.modal === 'selectMemberForGroup'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="max-w-md w-full p-6 max-h-[80vh] flex flex-col overflow-hidden rounded-2xl" style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+                <div class="max-w-md w-full p-6 max-h-[85vh] flex flex-col overflow-hidden rounded-2xl" style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
                     <h2 class="text-xl font-black mb-4 tracking-tighter" style="color:var(--text-primary);">加入至 <span style="color:#4a84e8;">{{ ui.targetGroup?.name }}</span></h2>
-                    <input v-model="searchQuery" placeholder="搜尋..." class="w-full px-4 py-3 rounded-xl mb-4 font-bold outline-none text-sm" style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
+                    
+                    <!-- 搜尋與篩選 -->
+                    <div class="space-y-3 mb-4 shrink-0">
+                        <input v-model="searchQuery" placeholder="搜尋冒險者..." class="w-full px-4 py-3 rounded-xl font-bold outline-none text-sm transition-all" style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
+                        
+                        <!-- 職業小統計 (過濾器) -->
+                        <div class="flex gap-1.5 flex-wrap p-2 rounded-xl" style="background:var(--accent-glow);border:1px solid var(--card-border);">
+                            <div @click="ui.filterJobId = null"
+                                 class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
+                                 :style="{
+                                     background: !ui.filterJobId ? 'linear-gradient(135deg,#2a55c0,#4a84e8)' : 'var(--card-bg)',
+                                     color: !ui.filterJobId ? '#fff' : 'var(--text-muted)',
+                                     border: '1px solid ' + (!ui.filterJobId ? '#1a3a90' : 'var(--card-border)'),
+                                     boxShadow: !ui.filterJobId ? '0 0 10px rgba(74,132,232,0.4)' : 'none'
+                                 }">
+                                <span>🌐</span><span>全部</span>
+                            </div>
+                            <template v-for="j in jobs" :key="'modal-stat-'+j.id">
+                                <div v-if="members.filter(m => m.jobId===j.id).length > 0"
+                                     @click="ui.filterJobId = ui.filterJobId === j.id ? null : j.id"
+                                     class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
+                                     :style="{
+                                         background: ui.filterJobId === j.id ? j.color : j.color+'18',
+                                         color: ui.filterJobId === j.id ? '#fff' : j.color,
+                                         border: '1px solid ' + (ui.filterJobId === j.id ? j.color : j.color+'30'),
+                                         boxShadow: ui.filterJobId === j.id ? '0 0 10px '+j.color+'40' : 'none'
+                                     }">
+                                    <span>{{ j.icon }}</span><span>{{ members.filter(m=>m.jobId===j.id).length }}</span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
                     <div class="flex-1 overflow-y-auto space-y-1.5 custom-scroll pr-1">
                         <div v-for="m in filteredMembers" :key="m.id" @click="addMemberToGroup(m)"
                              class="flex items-center gap-3 p-2.5 rounded-xl member-item group">
-                            <div class="w-9 h-9 rounded-lg flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform" :style="{backgroundColor:getJob(m.jobId).color+'15'}">{{ getJob(m.jobId).icon }}</div>
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform" 
+                                 :style="ui.theme==='dark' ? {backgroundColor:(getJob(m.jobId)?.color||'#4a84e8')+'cc',borderColor:(getJob(m.jobId)?.color||'#4a84e8')} : {backgroundColor:(getJob(m.jobId)?.color||'#4a84e8')+'15',borderColor:(getJob(m.jobId)?.color||'#4a84e8')+'30'}">{{ getJob(m.jobId).icon }}</div>
                             <div class="flex-1 min-w-0">
                                 <div class="font-black text-sm" style="color:var(--text-primary);">{{ m.name }}</div>
                                 <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit mt-1" :style="jobTagStyle(getJob(m.jobId).color)">{{ getJob(m.jobId).name }}</div>
                             </div>
                             <div v-if="getMemberGroup(m.id)" class="text-[12px] font-black px-2 py-1 rounded-md shrink-0 tracking-widest" style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">{{ getMemberGroup(m.id).name }}</div>
                         </div>
+                        <div v-if="filteredMembers.length === 0" class="py-10 text-center opacity-30 font-black text-sm">查無符合條件的成員</div>
                     </div>
                 </div>
             </div>
