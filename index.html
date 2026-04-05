@@ -555,6 +555,18 @@
 
                     <!-- 職業小統計 (兼過濾器) -->
                     <div class="px-3 py-2 flex gap-1.5 flex-wrap shrink-0" style="border-bottom:1px solid var(--sidebar-border);background:var(--accent-glow);">
+                        <!-- 取消過濾按鈕 -->
+                        <div @click="ui.filterJobId = null"
+                             class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
+                             :style="{
+                                 background: !ui.filterJobId ? 'linear-gradient(135deg,#2a55c0,#4a84e8)' : 'var(--card-bg)',
+                                 color: !ui.filterJobId ? '#fff' : 'var(--text-muted)',
+                                 border: '1px solid ' + (!ui.filterJobId ? '#1a3a90' : 'var(--card-border)'),
+                                 boxShadow: !ui.filterJobId ? '0 0 10px rgba(74,132,232,0.4)' : 'none'
+                             }">
+                            <span>🌐</span><span>全部</span>
+                        </div>
+
                         <template v-for="j in jobs" :key="'stat-'+j.id">
                             <div v-if="unassignedMembers.filter(m => m.jobId===j.id && !m.isLeave).length > 0"
                                  @click="ui.filterJobId = ui.filterJobId === j.id ? null : j.id"
