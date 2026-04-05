@@ -36,24 +36,24 @@
         }
 
         .theme-dark {
-            --app-bg: #0b1222;
-            --sidebar-bg: #111a2e;
-            --sidebar-border: #1e293b;
-            --card-bg: rgba(23, 33, 54, 0.85);
-            --card-border: #2d3d5a;
-            --card-header-bg: #1a2642;
+            --app-bg: #05070a;
+            --sidebar-bg: #0a0c14;
+            --sidebar-border: #1a1f2e;
+            --card-bg: rgba(13, 17, 28, 0.8);
+            --card-border: #242b3d;
+            --card-header-bg: rgba(20, 26, 42, 0.9);
             --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --text-muted: #8493a8;
-            --input-bg: #090f1d;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --input-bg: #020408;
             --nav-item-color: #94a3b8;
-            --nav-item-hover-bg: #1e293b;
-            --nav-item-hover-text: #f8fafc;
-            --modal-overlay: rgba(7, 11, 20, 0.9);
-            --item-bg: rgba(30, 41, 59, 0.5);
-            --item-hover-bg: rgba(51, 65, 85, 0.6);
-            --item-hover-border: #60a5fa;
-            --accent-glow: rgba(96, 165, 250, 0.15);
+            --nav-item-hover-bg: rgba(168, 85, 247, 0.1);
+            --nav-item-hover-text: #d8b4fe;
+            --modal-overlay: rgba(3, 5, 8, 0.95);
+            --item-bg: rgba(22, 28, 45, 0.4);
+            --item-hover-bg: rgba(30, 41, 59, 0.6);
+            --item-hover-border: #a855f7;
+            --accent-glow: rgba(168, 85, 247, 0.2);
         }
 
         body { font-family: 'Noto Sans TC', sans-serif; -webkit-print-color-adjust: exact; background-color: var(--app-bg); height: 100vh; overflow: hidden; color: var(--text-secondary); transition: background-color 0.3s, color 0.3s; }
@@ -112,14 +112,22 @@
             transition: all 0.2s ease; 
             overflow: hidden; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(12px);
         }
-        .theme-dark .ro-card { box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
-        .ro-card-header { background: var(--card-header-bg); border-bottom: 1px solid var(--card-border); padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
+        .theme-dark .ro-card { 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+            border-color: rgba(168, 85, 247, 0.1);
+        }
+        .ro-card-header { background: var(--card-header-bg); border-bottom: 1px solid var(--card-border); padding: 12px 16px; display: flex; align-items: center; gap: 10px; position: relative; }
+        .theme-dark .ro-card-header::after {
+            content: ''; position: absolute; bottom: -1px; left: 0; width: 40px; height: 1px;
+            background: linear-gradient(90deg, #a855f7, transparent);
+        }
 
         /* Member Items */
         .member-item { background: var(--item-bg); border: 1px solid var(--sidebar-border); transition: all 0.2s; cursor: pointer; color: var(--text-secondary); }
-        .member-item:hover { background: var(--item-hover-bg) !important; border-color: var(--item-hover-border) !important; color: var(--text-primary) !important; box-shadow: 0 2px 8px var(--accent-glow); }
+        .member-item:hover { background: var(--item-hover-bg) !important; border-color: var(--item-hover-border) !important; color: var(--text-primary) !important; box-shadow: 0 0 15px var(--accent-glow); }
+        .theme-dark .member-item:hover { border-color: #a855f7 !important; }
 
         /* Job section header in unassigned panel */
         .job-sec-hdr { display:flex; align-items:center; gap:6px; padding:4px 10px; font-size:9px; font-weight:900; letter-spacing:0.1em; text-transform:uppercase; color: var(--text-muted); border-radius:6px; background: var(--card-header-bg); border: 1px solid var(--card-border); margin-bottom:4px; margin-top:12px; }
