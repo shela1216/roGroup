@@ -287,7 +287,7 @@
             <div class="flex-1 flex flex-row overflow-hidden h-full">
 
                 <!-- 中間部署概況 -->
-                <main class="flex-1 h-full overflow-y-auto custom-scroll p-4 md:p-6 bg-[var(--app-bg)] transition-all">
+                <main class="flex-1 overflow-y-auto custom-scroll p-4 md:p-6 pb-20 md:pb-12 bg-[var(--app-bg)] transition-all">
 
                     <div v-if="loading" class="flex flex-col items-center justify-center py-20 h-full">
                         <div class="w-10 h-10 border-2 border-[#ffffff] border-t-[#4a84e8] rounded-full animate-spin mb-4"></div>
@@ -795,15 +795,16 @@
                     </div>
                     <div class="flex-1 overflow-y-auto p-3 space-y-1.5 custom-scroll">
                         <div v-for="m in filteredMembers" :key="m.id" class="flex items-center gap-3 p-3 rounded-xl member-item">
-                            <div class="w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm border shrink-0" style="background:rgba(74,132,232,0.1);color:#4a84e8;border-color:rgba(74,132,232,0.2);">{{ m.name.charAt(0) }}</div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center justify-between gap-2">
-                                    <div class="font-black text-sm truncate" style="color:var(--text-primary);">{{ m.name }}</div>
-                                    <div v-if="getMemberGroup(m.id)" class="text-[12px] font-black px-2 py-0.5 rounded-md shrink-0 tracking-widest" style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">{{ getMemberGroup(m.id).name }}</div>
-                                    <div v-else class="text-[12px] font-black px-2 py-0.5 rounded-md shrink-0 tracking-widest" style="background:rgba(0,0,0,0.03);color:#cbd5e1;border:1px solid var(--card-border);">未分配</div>
-                                </div>
-                                <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit mt-1" :style="jobTagStyle(getJob(m.jobId)?.color)">{{ getJob(m.jobId)?.icon }} {{ getJob(m.jobId)?.name }}</div>
+                            <div class="w-9 h-9 rounded-xl flex items-center justify-center text-xl border shrink-0 shadow-sm"
+                                 :style="ui.theme==='dark' ? {backgroundColor:(getJob(m.jobId)?.color||'#4a84e8')+'cc',borderColor:(getJob(m.jobId)?.color||'#4a84e8')} : {backgroundColor:(getJob(m.jobId)?.color||'#4a84e8')+'15',borderColor:(getJob(m.jobId)?.color||'#4a84e8')+'30'}">
+                                {{ getJob(m.jobId)?.icon }}
                             </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-black text-sm truncate" style="color:var(--text-primary);">{{ m.name }}</div>
+                                <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit mt-1" :style="jobTagStyle(getJob(m.jobId)?.color)">{{ getJob(m.jobId)?.name }}</div>
+                            </div>
+                            <div v-if="getMemberGroup(m.id)" class="text-[12px] font-black px-2 py-1 rounded-md shrink-0 tracking-widest" style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">{{ getMemberGroup(m.id).name }}</div>
+                            <div v-else class="text-[12px] font-black px-2 py-1 rounded-md shrink-0 tracking-widest" style="background:rgba(0,0,0,0.03);color:var(--text-muted);border:1px solid var(--card-border);">未分配</div>
                             <div class="flex gap-1 shrink-0">
                                 <button v-if="!isReadOnly" @click="toggleLeave(m)" class="p-2 rounded-lg transition-colors" :style="m.isLeave?'background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.25);':'background:rgba(255,255,255,0.05);color:#cbd5e1;border:1px solid var(--card-border);'"><svg class="icon-svg text-xs"><use href="#icon-coffee"></use></svg></button>
                                 <button v-if="!isReadOnly" @click="editMember(m)" class="p-2 rounded-lg transition-colors" style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);"><svg class="icon-svg text-xs"><use href="#icon-edit"></use></svg></button>
@@ -932,7 +933,7 @@
                                 <div class="font-black text-sm" style="color:var(--text-primary);">{{ m.name }}</div>
                                 <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit mt-1" :style="jobTagStyle(getJob(m.jobId).color)">{{ getJob(m.jobId).name }}</div>
                             </div>
-                            <div v-if="getMemberGroup(m.id)" class="text-[12px] font-black px-2 py-0.5 rounded-lg shrink-0" style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">{{ getMemberGroup(m.id).name }}</div>
+                            <div v-if="getMemberGroup(m.id)" class="text-[12px] font-black px-2 py-1 rounded-md shrink-0 tracking-widest" style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">{{ getMemberGroup(m.id).name }}</div>
                         </div>
                     </div>
                 </div>
