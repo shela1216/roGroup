@@ -368,7 +368,22 @@
                                  :draggable="!isReadOnly" @dragstart="onDragStart(gIndex,$event)" @dragover.prevent @dragenter.prevent @drop="onDrop(gIndex)" @dragend="ui.draggedGroupIndex=null">
 
                                 <!-- 彩色頂部 accent 條 -->
-                                <div class="h-1.5 w-full shrink-0" :style="{ background: groupColorsBg[gIndex % groupColorsBg.length] }"></div>
+                                <div class="relative group/accent">
+                                    <div class="h-1.5 w-full shrink-0 cursor-pointer hover:h-3 transition-all" 
+                                         :style="{ background: group.color || '#4a84e8' }"
+                                         @click="ui.openColorPickerId = group.id"></div>
+                                    
+                                    <!-- 顏色選擇器彈窗 -->
+                                    <div v-if="ui.openColorPickerId === group.id" 
+                                         class="absolute top-full left-0 mt-1 p-2 rounded-xl border z-[100] grid grid-cols-5 gap-1.5 w-44 shadow-2xl animate-in zoom-in duration-200"
+                                         style="background:var(--card-bg);border-color:var(--card-border);">
+                                        <div v-for="color in groupColorsBg" :key="color" 
+                                             @click="group.color = color; ui.openColorPickerId = null; syncData()"
+                                             class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform border border-white/20"
+                                             :style="{ background: color }"></div>
+                                        <div class="fixed inset-0 -z-10" @click="ui.openColorPickerId = null"></div>
+                                    </div>
+                                </div>
 
                                 <!-- 標題列 -->
                                 <div class="ro-card-header">
@@ -864,7 +879,7 @@
                 const authView = ref('login'); const authForm = ref({ email: '', password: '' });
                 const members = ref([]); const groups = ref([]); const logs = ref([]); const searchQuery = ref('');
                 const jobs = ref([{ id: 'j1', name: '騎士', color: '#be123c', icon: '⚔️' }, { id: 'j2', name: '牧師', color: '#0369a1', icon: '✨' }, { id: 'j3', name: '巫師', color: '#7e22ce', icon: '🔥' }, { id: 'j4', name: '獵人', color: '#15803d', icon: '🏹' }, { id: 'j5', name: '刺客', color: '#4b5563', icon: '🗡️' }, { id: 'j6', name: '商人', color: '#b45309', icon: '💰' }]);
-                const ui = ref({ modal: null, expandUnassigned: true, assigningMember: null, sortBy: 'name', openIconPickerId: null, targetGroup: null, draggedGroupIndex: null, isSidebarCollapsed: false, theme: localStorage.getItem('ro_theme') || 'dark' });
+                const ui = ref({ modal: null, expandUnassigned: true, assigningMember: null, sortBy: 'name', openIconPickerId: null, openColorPickerId: null, targetGroup: null, draggedGroupIndex: null, isSidebarCollapsed: false, theme: localStorage.getItem('ro_theme') || 'dark' });
                 watch(() => ui.value.theme, (newTheme) => {
                     localStorage.setItem('ro_theme', newTheme);
                     if (newTheme === 'dark') document.body.classList.add('theme-dark');
@@ -874,7 +889,7 @@
                 const importText = ref(''); const sharedLink = ref(''); const sharePassword = ref(''); const visitorPassword = ref('');
                 const isShareLocked = ref(false); const linkCopied = ref(false); let tempSharedData = null;
                 const emojiList = ['⚔️', '🛡️', '🏹', '✨', '🔥', '❄️', '⚡', '🌪️', '💧', '🌿', '💀', '⚰️', '💊', '🔨', '🪓', '💰', '🛒', '🎸', '🎭', '🥊', '🥋', '槍', '💣', '🐱', '🦅', '⛪', '📖', '👑', '💎', '🆕', '👼', '🧛'];
-                const groupColorsBg = ['#4a84e8','#e84a7a','#22c55e','#f59e0b','#a855f7','#06b6d4','#f97316','#ec4899','#10b981','#8b5cf6'];
+                const groupColorsBg = ['#4a84e8', '#e84a7a', '#22c55e', '#f59e0b', '#a855f7', '#06b6d4', '#f97316', '#ec4899', '#10b981', '#8b5cf6', '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#6366f1'];
                 const appId = 'ro-guild-v5-pro'; let db, auth;
 
                 const findMember = (id) => members.value.find(m => m.id === id);
@@ -891,7 +906,7 @@
                 const syncData = async () => { if (isReadOnly.value) return; const payload = { members: members.value, groups: groups.value, jobs: jobs.value, logs: logs.value, updatedAt: new Date().toISOString() }; localStorage.setItem(`ro_data_${appId}`, JSON.stringify(payload)); if (db && user.value && !user.value.isAnonymous) await setDoc(doc(db, 'artifacts', appId, 'users', user.value.uid, 'data', 'guild'), payload); };
 
                 const handleEmailAuth = async (type) => { if (!authForm.value.email || !authForm.value.password) return alert('請填寫完整資訊'); try { if (type === 'login') await signInWithEmailAndPassword(auth, authForm.value.email, authForm.value.password); else await createUserWithEmailAndPassword(auth, authForm.value.email, authForm.value.password); } catch (e) { alert('認證失敗: ' + e.message); } };
-                const loginAsGuest = () => { user.value = { uid: 'guest-local', isAnonymous: true, email: '本地訪客' }; localStorage.setItem('ro_guest_mode', 'true'); };
+                const loginAsGuest = () => { user.value = { uid: 'guest-local', isAnonymoous: true, email: '本地訪客' }; localStorage.setItem('ro_guest_mode', 'true'); };
                 const handleLogout = () => { if (auth) signOut(auth); user.value = null; members.value = []; groups.value = []; logs.value = []; localStorage.removeItem('ro_guest_mode'); };
 
                 const saveMember = () => { if (!form.value.name) return; if (form.value.id) { const idx = members.value.findIndex(m => m.id === form.value.id); if (idx !== -1) members.value[idx] = { ...form.value }; } else { members.value.push({ id: crypto.randomUUID(), name: form.value.name, jobId: form.value.jobId, isLeave: false }); addLog(`新增成員：[${form.value.name}]`); } syncData(); ui.value.modal = null; };
@@ -900,7 +915,7 @@
                 const openAddMember = () => { form.value = { id: null, name: '', jobId: jobs.value[0].id }; ui.value.modal = 'memberEdit'; };
                 const toggleLeave = (m) => { m.isLeave = !m.isLeave; if (m.isLeave) { addLog(`請假：[${m.name}]`); groups.value.forEach(g => { const idx = g.members.indexOf(m.id); if (idx !== -1) { g.members.splice(idx, 1); if (g.leaderId === m.id) g.leaderId = null; } }); } else { addLog(`回歸：[${m.name}]`); } syncData(); };
 
-                const addNewGroup = () => { const g = { id: crypto.randomUUID(), name: `小隊 ${groups.value.length + 1}`, max: 5, members: [], leaderId: null }; groups.value.push(g); addLog(`擴充：[${g.name}]`); syncData(); };
+                const addNewGroup = () => { const g = { id: crypto.randomUUID(), name: `小隊 ${groups.value.length + 1}`, max: 5, members: [], leaderId: null, color: '#4a84e8' }; groups.value.push(g); addLog(`擴充：[${g.name}]`); syncData(); };
                 const deleteGroup = (i) => { if(confirm('解散隊伍？')) { addLog(`解散：[${groups.value[i].name}]`); groups.value.splice(i, 1); syncData(); } };
                 const moveGroup = (index, dir) => { const newIdx = index + dir; if (newIdx < 0 || newIdx >= groups.value.length) return; const item = groups.value.splice(index, 1)[0]; groups.value.splice(newIdx, 0, item); syncData(); };
                 const openAssignMenu = (m) => { if (!isReadOnly.value && m) ui.value.assigningMember = m; };
