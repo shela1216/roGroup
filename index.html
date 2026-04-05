@@ -10,24 +10,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --app-bg: #f0f6ff;
-            --sidebar-bg: #ffffff;
-            --sidebar-border: #e2e8f0;
-            --card-bg: #ffffff;
-            --card-border: #d1dbe5;
-            --card-header-bg: #f8fafc;
-            --text-primary: #1e293b;
-            --text-secondary: #475569;
-            --text-muted: #94a3b8;
-            --input-bg: #ffffff;
-            --nav-item-color: #64748b;
-            --nav-item-hover-bg: #f1f5f9;
-            --nav-item-hover-text: #0f172a;
-            --modal-overlay: rgba(255, 255, 255, 0.6);
-            --item-bg: #f8fafc;
-            --item-hover-bg: #ffffff;
-            --item-hover-border: #4a84e8;
-            --accent-glow: rgba(74, 132, 232, 0.1);
+            --app-bg: #dde8fb;
+            --sidebar-bg: #eaf0fd;
+            --sidebar-border: #b8ccee;
+            --card-bg: rgba(255, 255, 255, 0.88);
+            --card-border: rgba(74, 132, 232, 0.28);
+            --card-header-bg: rgba(224, 236, 255, 0.92);
+            --text-primary: #0f172a;
+            --text-secondary: #1e3a6e;
+            --text-muted: #5070a8;
+            --input-bg: #f4f8ff;
+            --nav-item-color: #3d5a9c;
+            --nav-item-hover-bg: rgba(74, 132, 232, 0.15);
+            --nav-item-hover-text: #1d4ed8;
+            --modal-overlay: rgba(10, 25, 80, 0.55);
+            --item-bg: rgba(220, 234, 255, 0.6);
+            --item-hover-bg: rgba(200, 220, 255, 0.88);
+            --item-hover-border: #3a7ee0;
+            --accent-glow: rgba(74, 132, 232, 0.25);
             --btn-gold: linear-gradient(to bottom, #fde68a, #f59e0b);
             --btn-gold-border: #d97706;
             --btn-gold-text: #78350f;
@@ -60,7 +60,8 @@
         [v-cloak] { display: none; }
         .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(74, 132, 232, 0.35); border-radius: 10px; }
+        .theme-dark .custom-scroll::-webkit-scrollbar-thumb { background: #2a3550; }
         .poring-float { animation: floating 3s ease-in-out infinite; }
         @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
         .list-enter-active, .list-leave-active { transition: all 0.3s ease; }
@@ -86,9 +87,12 @@
             font-weight: 900;
         }
         .ro-btn-secondary {
-            background: rgba(148, 163, 184, 0.1);
+            background: rgba(74, 132, 232, 0.08);
             border-color: var(--card-border);
             color: var(--text-secondary);
+        }
+        .theme-dark .ro-btn-secondary {
+            background: rgba(148, 163, 184, 0.1);
         }
 
         /* Progress bars */
@@ -101,24 +105,29 @@
         /* Sidebar nav */
         .nav-item { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:10px; font-size:12px; font-weight:700; color: var(--nav-item-color); transition:all 0.15s; width:100%; text-align:left; position:relative; }
         .nav-item:hover { background: var(--nav-item-hover-bg); color: var(--nav-item-hover-text); }
-        .sidebar-tooltip { position:absolute; left:100%; top:50%; transform:translateY(-50%); margin-left:12px; background: var(--nav-item-hover-bg); color: var(--nav-item-hover-text); padding:6px 10px; border-radius:6px; font-size:12px; white-space:nowrap; opacity:0; pointer-events:none; transition:all 0.2s; z-index:100; box-shadow:0 4px 6px rgba(0,0,0,0.4); }
+        .sidebar-tooltip { position:absolute; left:100%; top:50%; transform:translateY(-50%); margin-left:12px; background: var(--card-bg); color: var(--nav-item-hover-text); padding:6px 10px; border-radius:6px; font-size:12px; white-space:nowrap; opacity:0; pointer-events:none; transition:all 0.2s; z-index:100; box-shadow:0 4px 12px rgba(74,132,232,0.25); border:1px solid var(--card-border); }
+        .theme-dark .sidebar-tooltip { box-shadow:0 4px 6px rgba(0,0,0,0.6); }
         .group:hover .sidebar-tooltip { opacity:1; transform:translateY(-50%) translateX(4px); }
 
         /* Cards - RO Sleek Glass Style */
-        .ro-card { 
-            background: var(--card-bg); 
-            border: 1px solid var(--card-border); 
-            border-radius: 12px; 
-            transition: all 0.2s ease; 
-            overflow: hidden; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        .ro-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(74, 132, 232, 0.12), 0 1px 4px rgba(74, 132, 232, 0.08);
             backdrop-filter: blur(12px);
         }
-        .theme-dark .ro-card { 
+        .theme-dark .ro-card {
             box-shadow: 0 8px 32px rgba(0,0,0,0.8);
             border-color: rgba(168, 85, 247, 0.1);
         }
         .ro-card-header { background: var(--card-header-bg); border-bottom: 1px solid var(--card-border); padding: 12px 16px; display: flex; align-items: center; gap: 10px; position: relative; }
+        .ro-card-header::after {
+            content: ''; position: absolute; bottom: -1px; left: 0; width: 48px; height: 1px;
+            background: linear-gradient(90deg, #4a84e8, transparent);
+        }
         .theme-dark .ro-card-header::after {
             content: ''; position: absolute; bottom: -1px; left: 0; width: 40px; height: 1px;
             background: linear-gradient(90deg, #a855f7, transparent);
