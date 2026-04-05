@@ -156,6 +156,7 @@
         <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></symbol>
         <symbol id="icon-limit" viewBox="0 0 24 24"><path d="M8 11h3v10h2V11h3l-4-4-4 4zM4 3v2h16V3H4z"/></symbol>
         <symbol id="icon-add-user" viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
+        <symbol id="icon-palette" viewBox="0 0 24 24"><path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10c1.38 0 2.5-1.12 2.5-2.5 0-.61-.23-1.21-.64-1.67-.08-.09-.13-.21-.13-.33 0-.28.22-.5.5-.5H16c3.31 0 6-2.69 6-6 0-4.96-4.49-9-10-9zm-4.5 8c-.83 0-1.5-.67-1.5-1.5S6.67 7 7.5 7s1.5.67 1.5 1.5S8.33 10 7.5 10zm3 4c-.83 0-1.5-.67-1.5-1.5S9.67 11 10.5 11s1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-5.5c-.83 0-1.5-.67-1.5-1.5S15.67 5.5 16.5 5.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></symbol>
         <symbol id="icon-history" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></symbol>
         <symbol id="icon-coffee" viewBox="0 0 24 24"><path d="M18.5 3H6c-1.1 0-2 .9-2 2v5.71c0 3.83 2.95 7.18 6.78 7.29 3.96.12 7.22-3.06 7.22-7v-1h.5c1.93 0 3.5-1.57 3.5-3.5S20.43 3 18.5 3zM16 8v-1H6V5h10v3zm2.5 0h-.5V5h.5c.83 0 1.5.67 1.5 1.5S19.33 8 18.5 8zM4 19h16v2H4v-2z"/></symbol>
         <symbol id="icon-search" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></symbol>
@@ -369,9 +370,16 @@
 
                                 <!-- 彩色頂部 accent 條 -->
                                 <div class="relative group/accent">
-                                    <div class="h-1.5 w-full shrink-0 cursor-pointer hover:h-3 transition-all" 
+                                    <div class="h-1.5 w-full shrink-0 cursor-pointer hover:h-5 transition-all flex items-center justify-center overflow-hidden" 
                                          :style="{ background: group.color || '#4a84e8' }"
-                                         @click="ui.openColorPickerId = group.id"></div>
+                                         @click="ui.openColorPickerId = group.id">
+                                        <!-- 手機版圖示提示 -->
+                                        <svg class="icon-svg md:hidden text-white/80 text-[10px]"><use href="#icon-palette"></use></svg>
+                                        <!-- 電腦版懸浮文字提示 -->
+                                        <span class="hidden md:group-hover/accent:block text-[10px] font-black text-white/90 uppercase tracking-widest animate-in slide-in-from-top-1">
+                                            點擊修改顏色
+                                        </span>
+                                    </div>
                                     
                                     <!-- 顏色選擇器彈窗 -->
                                     <div v-if="ui.openColorPickerId === group.id" 
