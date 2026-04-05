@@ -9,11 +9,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Noto Sans TC', sans-serif; -webkit-print-color-adjust: exact; background-color: #0e1a2b; height: 100vh; overflow: hidden; color: #c8d8ec; }
+        body { font-family: 'Noto Sans TC', sans-serif; -webkit-print-color-adjust: exact; background-color: #f0f6ff; height: 100vh; overflow: hidden; color: #334155; }
         [v-cloak] { display: none; }
         .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #2a3f58; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .poring-float { animation: floating 3s ease-in-out infinite; }
         @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
         .list-enter-active, .list-leave-active { transition: all 0.3s ease; }
@@ -24,25 +24,25 @@
         .ro-btn:active { transform: translateY(1px); border-bottom-width: 1px; }
 
         /* Progress bars */
-        .prog-track { background: #0a1420; border-radius: 99px; height: 6px; overflow: hidden; }
+        .prog-track { background: #f1f5f9; border-radius: 99px; height: 6px; overflow: hidden; }
         .prog-fill { height: 100%; border-radius: 99px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
         .prog-normal { background: linear-gradient(90deg, #4a84e8, #7ca8f5); }
         .prog-near   { background: linear-gradient(90deg, #f97316, #fb923c); }
         .prog-full   { background: linear-gradient(90deg, #e8a838, #fbbf24); }
 
         /* Sidebar nav */
-        .nav-item { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:10px; font-size:12px; font-weight:700; color:#6a8aaa; transition:all 0.15s; width:100%; text-align:left; }
-        .nav-item:hover { background:#1b2d42; color:#c8d8ec; }
+        .nav-item { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:10px; font-size:12px; font-weight:700; color:#64748b; transition:all 0.15s; width:100%; text-align:left; }
+        .nav-item:hover { background:#f1f5f9; color:#0f172a; }
 
         /* Cards */
-        .ro-card { background:#1b2d42; border:1px solid #28405a; border-radius:16px; transition:all 0.2s ease; }
+        .ro-card { background:#ffffff; border:1px solid #cbd5e1; border-radius:16px; transition:all 0.2s ease; }
 
         /* Job section header in unassigned panel */
-        .job-sec-hdr { display:flex; align-items:center; gap:6px; padding:4px 8px; font-size:8px; font-weight:900; letter-spacing:0.15em; text-transform:uppercase; color:#4a6a8a; border-radius:6px; background:#0a1420; margin-bottom:3px; margin-top:8px; }
+        .job-sec-hdr { display:flex; align-items:center; gap:6px; padding:4px 8px; font-size:8px; font-weight:900; letter-spacing:0.15em; text-transform:uppercase; color:#475569; border-radius:6px; background:#f1f5f9; margin-bottom:3px; margin-top:8px; }
         .job-sec-hdr:first-child { margin-top:0; }
     </style>
 </head>
-<body class="bg-[#0e1a2b]">
+<body class="bg-[#f0f6ff]">
     <svg style="display:none;">
         <symbol id="icon-poring" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></symbol>
         <symbol id="icon-users" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
@@ -69,25 +69,25 @@
         <symbol id="icon-search" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></symbol>
     </svg>
 
-    <div id="app" v-cloak class="h-screen flex flex-col md:flex-row overflow-hidden bg-[#0e1a2b]">
+    <div id="app" v-cloak class="h-screen flex flex-col md:flex-row overflow-hidden bg-[#f0f6ff]">
 
         <!-- ─── 左側導覽列 ─── -->
-        <aside v-if="user" class="hidden md:flex w-60 flex-col h-full shrink-0 overflow-y-auto custom-scroll" style="background:#0a1520;border-right:1px solid #1a2d40;">
-            <div class="p-5 flex flex-col items-center shrink-0" style="border-bottom:1px solid #1a2d40;">
+        <aside v-if="user" class="hidden md:flex w-60 flex-col h-full shrink-0 overflow-y-auto custom-scroll" style="background:#ffffff;border-right:1px solid #e2e8f0;">
+            <div class="p-5 flex flex-col items-center shrink-0" style="border-bottom:1px solid #e2e8f0;">
                 <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-3 poring-float" style="background:linear-gradient(135deg,#1e3d7e,#4a84e8);box-shadow:0 4px 15px rgba(74,132,232,0.35);">
                     <svg class="icon-svg text-white text-2xl"><use href="#icon-poring"></use></svg>
                 </div>
-                <h1 class="text-sm font-black tracking-tighter text-center" style="color:#e8f0fb;">RO 冒險公會管理</h1>
+                <h1 class="text-sm font-black tracking-tighter text-center" style="color:#0f172a;">RO 冒險公會管理</h1>
                 <p class="text-[9px] font-bold uppercase tracking-widest mt-1" style="color:#e8a838;">Guild Manager v5</p>
             </div>
             <nav class="flex-1 p-3 space-y-0.5">
-                <div class="px-2 py-2 text-[9px] font-black uppercase tracking-[0.2em]" style="color:#2a4060;">Dashboard</div>
+                <div class="px-2 py-2 text-[9px] font-black uppercase tracking-[0.2em]" style="color:#94a3b8;">Dashboard</div>
                 <button @click="ui.modal = 'jobStats'" class="nav-item"><svg class="icon-svg opacity-60"><use href="#icon-chart"></use></svg> 戰力統計</button>
                 <template v-if="!isReadOnly">
                     <button @click="ui.modal = 'memberList'" class="nav-item"><svg class="icon-svg opacity-60"><use href="#icon-users"></use></svg> 成員管理</button>
                     <button @click="ui.modal = 'logsModal'" class="nav-item"><svg class="icon-svg opacity-60"><use href="#icon-history"></use></svg> 操作紀錄</button>
                     <button @click="ui.modal = 'jobSettings'" class="nav-item"><svg class="icon-svg opacity-60"><use href="#icon-briefcase"></use></svg> 職業設定</button>
-                    <div class="px-2 pt-4 pb-1 text-[9px] font-black uppercase tracking-[0.2em]" style="color:#2a4060;">Admin</div>
+                    <div class="px-2 pt-4 pb-1 text-[9px] font-black uppercase tracking-[0.2em]" style="color:#94a3b8;">Admin</div>
                     <button @click="ui.modal = 'importMembers'" class="nav-item" style="color:#fb923c;"><svg class="icon-svg"><use href="#icon-import"></use></svg> 批量匯入</button>
                     <button @click="openShareModal" class="nav-item" style="color:#f472b6;"><svg class="icon-svg"><use href="#icon-share"></use></svg> 分享連結</button>
                     <button @click="openAddMember" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl font-black text-xs text-white mt-3 ro-btn" style="background:linear-gradient(135deg,#2a55c0,#4a84e8);border-bottom-color:#1a3a90;box-shadow:0 4px 12px rgba(74,132,232,0.3);">
@@ -95,9 +95,9 @@
                     </button>
                 </template>
             </nav>
-            <div class="p-3 shrink-0" style="border-top:1px solid #1a2d40;">
+            <div class="p-3 shrink-0" style="border-top:1px solid #e2e8f0;">
                 <div class="flex gap-2">
-                    <button @click="ui.modal = 'userProfile'" class="flex-1 p-2 rounded-lg flex justify-center transition-colors" style="background:#1b2d42;color:#6a8aaa;border:1px solid #28405a;"><svg class="icon-svg text-xs"><use href="#icon-settings"></use></svg></button>
+                    <button @click="ui.modal = 'userProfile'" class="flex-1 p-2 rounded-lg flex justify-center transition-colors" style="background:#ffffff;color:#64748b;border:1px solid #cbd5e1;"><svg class="icon-svg text-xs"><use href="#icon-settings"></use></svg></button>
                     <button @click="handleLogout" class="flex-1 p-2 rounded-lg flex justify-center transition-colors" style="background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2);"><svg class="icon-svg text-xs"><use href="#icon-logout"></use></svg></button>
                 </div>
             </div>
@@ -107,69 +107,69 @@
         <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
 
             <!-- 移動端導覽列 -->
-            <nav v-if="user" class="md:hidden p-4 pb-2 sticky top-0 z-50 shrink-0" style="background:#0a1520;border-bottom:1px solid #1a2d40;">
+            <nav v-if="user" class="md:hidden p-4 pb-2 sticky top-0 z-50 shrink-0" style="background:#ffffff;border-bottom:1px solid #e2e8f0;">
                 <div class="flex justify-between items-center mb-3">
                     <div class="flex items-center gap-2">
                         <span class="w-8 h-8 rounded-lg flex items-center justify-center poring-float text-white" style="background:linear-gradient(135deg,#1e3d7e,#4a84e8);"><svg class="icon-svg"><use href="#icon-poring"></use></svg></span>
-                        <span class="text-lg font-black tracking-tighter italic" style="color:#e8f0fb;">RO Guild</span>
+                        <span class="text-lg font-black tracking-tighter italic" style="color:#0f172a;">RO Guild</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button @click="ui.modal = 'userProfile'" class="p-2 rounded-lg" style="background:rgba(255,255,255,0.06);color:#c8d8ec;"><svg class="icon-svg"><use href="#icon-settings"></use></svg></button>
+                        <button @click="ui.modal = 'userProfile'" class="p-2 rounded-lg" style="background:rgba(0,0,0,0.04);color:#334155;"><svg class="icon-svg"><use href="#icon-settings"></use></svg></button>
                         <button @click="handleLogout" class="p-2 rounded-lg" style="background:rgba(239,68,68,0.15);color:#f87171;"><svg class="icon-svg"><use href="#icon-logout"></use></svg></button>
                     </div>
                 </div>
                 <div class="flex gap-2 overflow-x-auto pb-1 custom-scroll" style="scrollbar-width:none;">
-                    <button @click="ui.modal = 'jobStats'" class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1" style="background:rgba(255,255,255,0.07);color:#c8d8ec;"><svg class="icon-svg"><use href="#icon-chart"></use></svg> 戰力</button>
+                    <button @click="ui.modal = 'jobStats'" class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1" style="background:rgba(0,0,0,0.05);color:#334155;"><svg class="icon-svg"><use href="#icon-chart"></use></svg> 戰力</button>
                     <template v-if="!isReadOnly">
-                        <button @click="ui.modal = 'memberList'" class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1" style="background:rgba(255,255,255,0.07);color:#c8d8ec;"><svg class="icon-svg"><use href="#icon-users"></use></svg> 成員</button>
-                        <button @click="ui.modal = 'logsModal'" class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1" style="background:rgba(255,255,255,0.07);color:#c8d8ec;"><svg class="icon-svg"><use href="#icon-history"></use></svg> 紀錄</button>
-                        <button @click="ui.modal = 'jobSettings'" class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1" style="background:rgba(255,255,255,0.07);color:#c8d8ec;"><svg class="icon-svg"><use href="#icon-briefcase"></use></svg> 職業</button>
+                        <button @click="ui.modal = 'memberList'" class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1" style="background:rgba(0,0,0,0.05);color:#334155;"><svg class="icon-svg"><use href="#icon-users"></use></svg> 成員</button>
+                        <button @click="ui.modal = 'logsModal'" class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1" style="background:rgba(0,0,0,0.05);color:#334155;"><svg class="icon-svg"><use href="#icon-history"></use></svg> 紀錄</button>
+                        <button @click="ui.modal = 'jobSettings'" class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1" style="background:rgba(0,0,0,0.05);color:#334155;"><svg class="icon-svg"><use href="#icon-briefcase"></use></svg> 職業</button>
                     </template>
                 </div>
             </nav>
 
             <div v-if="isReadOnly" class="text-white text-center py-1.5 text-[10px] font-black tracking-widest uppercase shrink-0" style="background:linear-gradient(90deg,#d97706,#f59e0b);">
                 ⚔️ Visitor Mode (Read Only)
-                <button v-if="isOwner" @click="exitReadOnly" class="ml-2 px-2 py-0.5 rounded hover:bg-white/20 transition-colors" style="background:rgba(0,0,0,0.2);">Admin Login</button>
+                <button v-if="isOwner" @click="exitReadOnly" class="ml-2 px-2 py-0.5 rounded hover:bg-white/20 transition-colors" style="background:rgba(0,0,0,0.04);">Admin Login</button>
             </div>
 
             <!-- ─── 主佈局區域 ─── -->
             <div class="flex-1 flex flex-row overflow-hidden h-full">
 
                 <!-- 中間部署概況 -->
-                <main class="flex-1 h-full overflow-y-auto custom-scroll p-4 md:p-6 bg-[#0e1a2b] transition-all">
+                <main class="flex-1 h-full overflow-y-auto custom-scroll p-4 md:p-6 bg-[#f0f6ff] transition-all">
 
                     <div v-if="loading" class="flex flex-col items-center justify-center py-20 h-full">
-                        <div class="w-10 h-10 border-2 border-[#1b2d42] border-t-[#4a84e8] rounded-full animate-spin mb-4"></div>
+                        <div class="w-10 h-10 border-2 border-[#ffffff] border-t-[#4a84e8] rounded-full animate-spin mb-4"></div>
                         <p class="font-black text-[10px] tracking-widest uppercase" style="color:#4a84e8;">Initializing...</p>
                     </div>
 
                     <!-- 登入卡片 -->
                     <div v-else-if="!user" class="max-w-md mx-auto mt-12 px-4">
-                        <div class="ro-card p-10 text-center" style="border-top:4px solid #4a84e8;box-shadow:0 20px 50px rgba(0,0,0,0.5);">
+                        <div class="ro-card p-10 text-center" style="border-top:4px solid #4a84e8;box-shadow:0 20px 50px rgba(0,0,0,0.08);">
                             <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 poring-float" style="background:rgba(74,132,232,0.1);border:1px solid rgba(74,132,232,0.2);color:#4a84e8;">
                                 <svg class="icon-svg text-4xl"><use href="#icon-poring"></use></svg>
                             </div>
-                            <h1 class="text-2xl font-black mb-8 tracking-tighter uppercase" style="color:#e8f0fb;">冒險公會登入</h1>
+                            <h1 class="text-2xl font-black mb-8 tracking-tighter uppercase" style="color:#0f172a;">冒險公會登入</h1>
                             <div class="space-y-4">
                                 <template v-if="authView !== 'guest'">
-                                    <input v-model="authForm.email" type="email" placeholder="Email" class="w-full px-4 py-3 rounded-xl font-bold text-sm outline-none" style="background:#0a1420;border:1px solid #28405a;color:#c8d8ec;">
-                                    <input v-model="authForm.password" type="password" placeholder="Password" class="w-full px-4 py-3 rounded-xl font-bold text-sm outline-none" style="background:#0a1420;border:1px solid #28405a;color:#c8d8ec;">
+                                    <input v-model="authForm.email" type="email" placeholder="Email" class="w-full px-4 py-3 rounded-xl font-bold text-sm outline-none" style="background:#f1f5f9;border:1px solid #cbd5e1;color:#334155;">
+                                    <input v-model="authForm.password" type="password" placeholder="Password" class="w-full px-4 py-3 rounded-xl font-bold text-sm outline-none" style="background:#f1f5f9;border:1px solid #cbd5e1;color:#334155;">
                                 </template>
                                 <div v-if="authView === 'login'">
                                     <button @click="handleEmailAuth('login')" class="w-full py-3.5 text-white font-black rounded-xl ro-btn" style="background:linear-gradient(135deg,#2a55c0,#4a84e8);border-bottom-color:#1a3a90;">啟程探險</button>
-                                    <div class="flex items-center gap-4 text-[10px] font-black justify-center mt-6" style="color:#3a5570;">
-                                        <button @click="authView = 'register'" class="underline hover:text-[#c8d8ec] transition-colors">新成員登記</button>
-                                        <button @click="authView = 'guest'" class="underline hover:text-[#c8d8ec] transition-colors">訪客試用</button>
+                                    <div class="flex items-center gap-4 text-[10px] font-black justify-center mt-6" style="color:#64748b;">
+                                        <button @click="authView = 'register'" class="underline hover:text-[#334155] transition-colors">新成員登記</button>
+                                        <button @click="authView = 'guest'" class="underline hover:text-[#334155] transition-colors">訪客試用</button>
                                     </div>
                                 </div>
                                 <div v-if="authView === 'register'">
                                     <button @click="handleEmailAuth('register')" class="w-full py-3.5 text-white font-black rounded-xl ro-btn" style="background:linear-gradient(135deg,#15703a,#22c55e);border-bottom-color:#0d4a27;">完成登記</button>
-                                    <button @click="authView = 'login'" class="text-[10px] font-black mt-4 block mx-auto underline hover:text-[#c8d8ec] transition-colors" style="color:#3a5570;">返回登入</button>
+                                    <button @click="authView = 'login'" class="text-[10px] font-black mt-4 block mx-auto underline hover:text-[#334155] transition-colors" style="color:#64748b;">返回登入</button>
                                 </div>
                                 <div v-if="authView === 'guest'">
                                     <button @click="loginAsGuest" class="w-full py-3.5 text-white font-black rounded-xl ro-btn" style="background:linear-gradient(135deg,#c25a0a,#f97316);border-bottom-color:#8a3a05;">本地試用</button>
-                                    <button @click="authView = 'login'" class="text-[10px] font-black mt-4 block mx-auto underline hover:text-[#c8d8ec] transition-colors" style="color:#3a5570;">返回登入</button>
+                                    <button @click="authView = 'login'" class="text-[10px] font-black mt-4 block mx-auto underline hover:text-[#334155] transition-colors" style="color:#64748b;">返回登入</button>
                                 </div>
                             </div>
                         </div>
@@ -179,16 +179,16 @@
                         <!-- 頂部資訊列 -->
                         <div class="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4 shrink-0">
                             <div>
-                                <h2 class="text-xl font-black tracking-tighter" style="color:#e8f0fb;">當前部署概況</h2>
-                                <p class="text-[9px] font-bold uppercase tracking-widest mt-1" style="color:#2a4060;">Active Deployment Status</p>
+                                <h2 class="text-xl font-black tracking-tighter" style="color:#0f172a;">當前部署概況</h2>
+                                <p class="text-[9px] font-bold uppercase tracking-widest mt-1" style="color:#94a3b8;">Active Deployment Status</p>
                             </div>
                             <div class="flex gap-2 flex-wrap items-center">
-                                <div class="px-3 py-2 rounded-xl flex items-center gap-3 shadow-sm shrink-0" style="background:#1b2d42;border:1px solid #28405a;">
-                                    <span class="text-[9px] font-bold uppercase" style="color:#6a8aaa;">Team</span>
+                                <div class="px-3 py-2 rounded-xl flex items-center gap-3 shadow-sm shrink-0" style="background:#ffffff;border:1px solid #cbd5e1;">
+                                    <span class="text-[9px] font-bold uppercase" style="color:#64748b;">Team</span>
                                     <span class="text-base font-black" style="color:#4a84e8;">{{ groups.length }}</span>
                                 </div>
-                                <div class="px-3 py-2 rounded-xl flex items-center gap-3 shadow-sm shrink-0" style="background:#1b2d42;border:1px solid #28405a;">
-                                    <span class="text-[9px] font-bold uppercase" style="color:#6a8aaa;">Total</span>
+                                <div class="px-3 py-2 rounded-xl flex items-center gap-3 shadow-sm shrink-0" style="background:#ffffff;border:1px solid #cbd5e1;">
+                                    <span class="text-[9px] font-bold uppercase" style="color:#64748b;">Total</span>
                                     <span class="text-base font-black" style="color:#4a84e8;">{{ members.length }}</span>
                                 </div>
                                 <!-- 待指派 toggle (desktop) -->
@@ -196,11 +196,11 @@
                                         class="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl font-bold text-[11px] transition-all shrink-0"
                                         :style="ui.expandUnassigned
                                             ? 'background:linear-gradient(135deg,#2a55c0,#4a84e8);color:white;border:1px solid #1a3a90;box-shadow:0 2px 8px rgba(74,132,232,0.3);'
-                                            : 'background:#1b2d42;color:#4a84e8;border:1px solid #28405a;'">
+                                            : 'background:#ffffff;color:#4a84e8;border:1px solid #cbd5e1;'">
                                     <svg class="icon-svg text-xs"><use href="#icon-users"></use></svg>
                                     待指派名單
                                     <span class="font-black text-xs rounded-full w-5 h-5 flex items-center justify-center"
-                                          :style="ui.expandUnassigned ? 'background:rgba(255,255,255,0.25);' : 'background:#4a84e8;color:white;'">
+                                          :style="ui.expandUnassigned ? 'background:rgba(255,255,255,0.8);' : 'background:#4a84e8;color:white;'">
                                         {{ unassignedMembers.length }}
                                     </span>
                                     <svg class="icon-svg transition-transform duration-300" :class="{'rotate-180': ui.expandUnassigned}"><use href="#icon-chevron-right"></use></svg>
@@ -213,14 +213,14 @@
                             <div v-for="(group, gIndex) in groups" :key="group.id"
                                  class="ro-card flex flex-col overflow-hidden"
                                  :class="{'opacity-50 scale-95': ui.draggedGroupIndex === gIndex}"
-                                 :style="ui.draggedGroupIndex === gIndex ? 'border-style:dashed;border-color:#4a84e8;' : 'box-shadow:0 4px 20px rgba(0,0,0,0.35);min-height:320px;'"
+                                 :style="ui.draggedGroupIndex === gIndex ? 'border-style:dashed;border-color:#4a84e8;' : 'box-shadow:0 4px 20px rgba(0,0,0,0.06);min-height:320px;'"
                                  :draggable="!isReadOnly" @dragstart="onDragStart(gIndex,$event)" @dragover.prevent @dragenter.prevent @drop="onDrop(gIndex)" @dragend="ui.draggedGroupIndex=null">
 
                                 <!-- 彩色頂部 accent 條 -->
                                 <div class="h-1 w-full shrink-0" :style="{ background: groupColorsBg[gIndex % groupColorsBg.length] }"></div>
 
                                 <!-- 標題列 -->
-                                <div class="px-4 pt-4 pb-3 flex items-center gap-2 shrink-0" style="border-bottom:1px solid #1e3248;">
+                                <div class="px-4 pt-4 pb-3 flex items-center gap-2 shrink-0" style="border-bottom:1px solid #e2e8f0;">
                                     <div class="w-2 h-2 rounded-full shrink-0 transition-all"
                                          :style="group.members.length >= group.max
                                              ? 'background:#e8a838;box-shadow:0 0 8px rgba(232,168,56,0.6);'
@@ -228,7 +228,7 @@
                                     </div>
                                     <input v-model="group.name" @blur="!isReadOnly && syncData()" :disabled="isReadOnly"
                                            class="flex-1 font-black text-lg bg-transparent outline-none p-0 border-none focus:ring-0 tracking-tight min-w-0"
-                                           style="color:#e8f0fb;">
+                                           style="color:#0f172a;">
                                     <button v-if="!isReadOnly" @click="openSelectMemberForGroup(group)"
                                             class="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110 shrink-0"
                                             style="background:rgba(74,132,232,0.15);color:#4a84e8;border:1px solid rgba(74,132,232,0.25);">
@@ -236,13 +236,13 @@
                                     </button>
                                     <button v-if="!isReadOnly" @click="deleteGroup(gIndex)"
                                             class="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:bg-[rgba(248,113,113,0.12)] hover:text-[#f87171] shrink-0"
-                                            style="color:#3a5570;">
+                                            style="color:#64748b;">
                                         <svg class="icon-svg text-xs"><use href="#icon-trash"></use></svg>
                                     </button>
                                 </div>
 
                                 <!-- 進度條 -->
-                                <div class="px-4 py-2.5 shrink-0" style="border-bottom:1px solid #1e3248;">
+                                <div class="px-4 py-2.5 shrink-0" style="border-bottom:1px solid #e2e8f0;">
                                     <div class="flex items-center gap-2.5">
                                         <div class="flex-1 prog-track">
                                             <div class="prog-fill"
@@ -252,9 +252,9 @@
                                         </div>
                                         <span class="text-[11px] font-black tabular-nums shrink-0"
                                               :style="group.members.length >= group.max ? 'color:#e8a838;' : 'color:#4a84e8;'">
-                                            {{ group.members.length }}<span style="color:#2a4060;">/{{ group.max }}</span>
+                                            {{ group.members.length }}<span style="color:#94a3b8;">/{{ group.max }}</span>
                                         </span>
-                                        <span class="text-[9px] font-bold shrink-0" style="color:#2a4060;">
+                                        <span class="text-[9px] font-bold shrink-0" style="color:#94a3b8;">
                                             {{ group.max > 0 ? Math.round(group.members.length / group.max * 100) : 0 }}%
                                         </span>
                                     </div>
@@ -266,9 +266,9 @@
                                         <div v-for="mId in getSortedGroupMembers(group)" :key="mId"
                                              @click="openAssignMenu(findMember(mId))"
                                              class="flex justify-between items-center p-2.5 rounded-xl border cursor-pointer transition-all"
-                                             style="background:#142030;border-color:#1e3248;"
-                                             @mouseenter="$event.currentTarget.style.background='#1b2d42';$event.currentTarget.style.borderColor='#3a5570';"
-                                             @mouseleave="$event.currentTarget.style.background='#142030';$event.currentTarget.style.borderColor='#1e3248';">
+                                             style="background:#f8fafc;border-color:#e2e8f0;"
+                                             @mouseenter="$event.currentTarget.style.background='#f1f5f9';$event.currentTarget.style.borderColor='#64748b';"
+                                             @mouseleave="$event.currentTarget.style.background='#f8fafc';$event.currentTarget.style.borderColor='#e2e8f0';">
 
                                             <div class="flex items-center gap-3 flex-1 min-w-0">
                                                 <!-- Avatar -->
@@ -280,7 +280,7 @@
                                                     <div class="flex items-center gap-1.5">
                                                         <svg v-if="group.leaderId === mId || (!group.leaderId && group.members[0] === mId)"
                                                              class="icon-svg text-[10px] shrink-0" style="color:#e8a838;"><use href="#icon-crown"></use></svg>
-                                                        <span class="text-sm font-black whitespace-nowrap" style="color:#e8f0fb;">{{ findMember(mId)?.name }}</span>
+                                                        <span class="text-sm font-black whitespace-nowrap" style="color:#0f172a;">{{ findMember(mId)?.name }}</span>
                                                     </div>
                                                     <span class="text-[9px] font-bold uppercase tracking-widest whitespace-nowrap opacity-80"
                                                           :style="{color: getJob(findMember(mId)?.jobId)?.color}">
@@ -294,7 +294,7 @@
                                                         class="p-1.5 rounded-lg flex items-center justify-center transition-all hover:scale-110"
                                                         :style="(group.leaderId === mId || (!group.leaderId && group.members[0] === mId))
                                                             ? 'background:rgba(232,168,56,0.15);color:#e8a838;border:1px solid rgba(232,168,56,0.3);'
-                                                            : 'color:#2a4060;'">
+                                                            : 'color:#94a3b8;'">
                                                     <svg class="icon-svg text-[12px]"><use href="#icon-crown"></use></svg>
                                                 </button>
                                                 <button v-if="!isReadOnly" @click.stop="removeFromGroup(group, mId)"
@@ -309,32 +309,32 @@
                                          v-for="i in (group.max - group.members.length)"
                                          @click="openSelectMemberForGroup(group)"
                                          class="border-2 border-dashed rounded-xl p-2.5 flex items-center gap-3 transition-all cursor-pointer"
-                                         style="border-color:#1e3248;"
+                                         style="border-color:#e2e8f0;"
                                          @mouseenter="$event.currentTarget.style.borderColor='#4a84e8';$event.currentTarget.style.background='rgba(74,132,232,0.04)';"
-                                         @mouseleave="$event.currentTarget.style.borderColor='#1e3248';$event.currentTarget.style.background='';">
-                                        <div class="w-9 h-9 rounded-full flex items-center justify-center transition-colors" style="background:rgba(255,255,255,0.03);color:#2a4060;">
+                                         @mouseleave="$event.currentTarget.style.borderColor='#e2e8f0';$event.currentTarget.style.background='';">
+                                        <div class="w-9 h-9 rounded-full flex items-center justify-center transition-colors" style="background:rgba(0,0,0,0.02);color:#94a3b8;">
                                             <svg class="icon-svg text-sm"><use href="#icon-plus"></use></svg>
                                         </div>
-                                        <span class="text-[10px] font-black uppercase tracking-widest" style="color:#2a4060;">指派成員</span>
+                                        <span class="text-[10px] font-black uppercase tracking-widest" style="color:#94a3b8;">指派成員</span>
                                     </div>
                                 </div>
 
                                 <!-- 底部控制列 -->
-                                <div class="px-4 py-2.5 flex justify-between items-center shrink-0" style="border-top:1px solid #1e3248;background:rgba(0,0,0,0.15);">
+                                <div class="px-4 py-2.5 flex justify-between items-center shrink-0" style="border-top:1px solid #e2e8f0;background:rgba(0,0,0,0.03);">
                                     <div class="flex gap-1">
                                         <button v-if="!isReadOnly" @click="moveGroup(gIndex,-1)" :disabled="gIndex===0"
                                                 class="w-7 h-7 rounded-lg flex items-center justify-center transition-all disabled:opacity-20 hover:text-[#4a84e8]"
-                                                style="background:#1b2d42;color:#6a8aaa;border:1px solid #28405a;">
+                                                style="background:#ffffff;color:#64748b;border:1px solid #cbd5e1;">
                                             <svg class="icon-svg text-[11px]"><use href="#icon-chevron-left"></use></svg>
                                         </button>
                                         <button v-if="!isReadOnly" @click="moveGroup(gIndex,1)" :disabled="gIndex===groups.length-1"
                                                 class="w-7 h-7 rounded-lg flex items-center justify-center transition-all disabled:opacity-20 hover:text-[#4a84e8]"
-                                                style="background:#1b2d42;color:#6a8aaa;border:1px solid #28405a;">
+                                                style="background:#ffffff;color:#64748b;border:1px solid #cbd5e1;">
                                             <svg class="icon-svg text-[11px]"><use href="#icon-chevron-right"></use></svg>
                                         </button>
                                     </div>
-                                    <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[10px] font-black" style="background:#1b2d42;border:1px solid #28405a;">
-                                        <span class="tracking-widest uppercase" style="color:#3a5570;">人數上限</span>
+                                    <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[10px] font-black" style="background:#ffffff;border:1px solid #cbd5e1;">
+                                        <span class="tracking-widest uppercase" style="color:#64748b;">人數上限</span>
                                         <input type="number" v-model.number="group.max" @change="!isReadOnly && syncData()" :disabled="isReadOnly"
                                                class="w-6 text-center border-none p-0 focus:ring-0 bg-transparent font-black outline-none" style="color:#4a84e8;">
                                     </div>
@@ -344,14 +344,14 @@
                             <!-- 新增隊伍按鈕 -->
                             <button v-if="!isReadOnly" @click="addNewGroup"
                                     class="ro-card border-dashed border-2 flex flex-col items-center justify-center p-6 transition-all group"
-                                    style="min-height:280px;border-color:#1e3248;"
+                                    style="min-height:280px;border-color:#e2e8f0;"
                                     @mouseenter="$event.currentTarget.style.borderColor='#4a84e8';"
-                                    @mouseleave="$event.currentTarget.style.borderColor='#1e3248';">
+                                    @mouseleave="$event.currentTarget.style.borderColor='#e2e8f0';">
                                 <div class="w-10 h-10 rounded-xl border border-dashed flex items-center justify-center mb-2 transition-transform group-hover:scale-110"
-                                     style="border-color:#1e3248;color:#2a4060;">
+                                     style="border-color:#e2e8f0;color:#94a3b8;">
                                     <svg class="icon-svg text-lg"><use href="#icon-plus"></use></svg>
                                 </div>
-                                <span class="font-black text-[8px] tracking-[0.2em] uppercase" style="color:#2a4060;">New Team</span>
+                                <span class="font-black text-[8px] tracking-[0.2em] uppercase" style="color:#94a3b8;">New Team</span>
                             </button>
                         </div>
                     </template>
@@ -360,31 +360,31 @@
                 <!-- ─── 右側待指派面板 ─── -->
                 <aside v-if="user && !loading && ui.expandUnassigned"
                        class="hidden md:flex flex-col h-full z-40 shrink-0 overflow-hidden"
-                       style="width:296px;background:#0a1520;border-left:1px solid #1a2d40;box-shadow:-4px 0 24px rgba(0,0,0,0.3);">
+                       style="width:296px;background:#ffffff;border-left:1px solid #e2e8f0;box-shadow:-4px 0 24px rgba(0,0,0,0.05);">
 
                     <!-- 面板標題 -->
-                    <div class="px-5 py-4 flex justify-between items-center shrink-0" style="border-bottom:1px solid #1a2d40;">
+                    <div class="px-5 py-4 flex justify-between items-center shrink-0" style="border-bottom:1px solid #e2e8f0;">
                         <div class="flex items-center gap-3">
                             <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black text-white" style="background:linear-gradient(135deg,#2a55c0,#4a84e8);">{{ unassignedMembers.length }}</div>
-                            <h2 class="font-black tracking-tighter text-sm uppercase" style="color:#e8f0fb;">待指派名單</h2>
+                            <h2 class="font-black tracking-tighter text-sm uppercase" style="color:#0f172a;">待指派名單</h2>
                         </div>
-                        <button @click="ui.expandUnassigned = false" class="p-1.5 rounded-lg transition-colors hover:bg-[#1b2d42]" style="color:#3a5570;" title="關閉面板">
+                        <button @click="ui.expandUnassigned = false" class="p-1.5 rounded-lg transition-colors hover:bg-[#ffffff]" style="color:#64748b;" title="關閉面板">
                             <svg class="icon-svg text-sm"><use href="#icon-chevron-right"></use></svg>
                         </button>
                     </div>
 
                     <!-- 搜尋 -->
-                    <div class="p-3 shrink-0" style="border-bottom:1px solid #1a2d40;">
+                    <div class="p-3 shrink-0" style="border-bottom:1px solid #e2e8f0;">
                         <div class="relative">
-                            <svg class="icon-svg absolute left-3 top-1/2 -translate-y-1/2 text-[10px]" style="color:#3a5570;"><use href="#icon-search"></use></svg>
+                            <svg class="icon-svg absolute left-3 top-1/2 -translate-y-1/2 text-[10px]" style="color:#64748b;"><use href="#icon-search"></use></svg>
                             <input v-model="searchQuery" placeholder="搜尋冒險者..."
                                    class="w-full pl-8 pr-4 py-2 rounded-xl text-[11px] font-bold outline-none transition-all"
-                                   style="background:#0e1a2b;border:1px solid #28405a;color:#c8d8ec;">
+                                   style="background:#f0f6ff;border:1px solid #cbd5e1;color:#334155;">
                         </div>
                     </div>
 
                     <!-- 職業小統計 -->
-                    <div class="px-3 py-2 flex gap-1.5 flex-wrap shrink-0" style="border-bottom:1px solid #1a2d40;background:rgba(0,0,0,0.2);">
+                    <div class="px-3 py-2 flex gap-1.5 flex-wrap shrink-0" style="border-bottom:1px solid #e2e8f0;background:rgba(0,0,0,0.04);">
                         <template v-for="j in jobs" :key="'stat-'+j.id">
                             <div v-if="unassignedMembers.filter(m => m.jobId===j.id && !m.isLeave).length > 0"
                                  class="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-black"
@@ -413,15 +413,15 @@
                                 <div v-for="m in unassignedMembers.filter(m=>m.jobId===j.id&&!m.isLeave&&(!searchQuery||m.name.toLowerCase().includes(searchQuery.toLowerCase())))"
                                      :key="m.id" @click="openAssignMenu(m)"
                                      class="flex items-center gap-2.5 p-2 rounded-xl cursor-pointer transition-all mb-1"
-                                     style="background:#142030;border:1px solid transparent;"
-                                     @mouseenter="$event.currentTarget.style.borderColor='#3a5570';$event.currentTarget.style.background='#1b2d42';"
-                                     @mouseleave="$event.currentTarget.style.borderColor='transparent';$event.currentTarget.style.background='#142030';">
+                                     style="background:#f8fafc;border:1px solid transparent;"
+                                     @mouseenter="$event.currentTarget.style.borderColor='#64748b';$event.currentTarget.style.background='#ffffff';"
+                                     @mouseleave="$event.currentTarget.style.borderColor='transparent';$event.currentTarget.style.background='#f8fafc';">
                                     <div class="w-8 h-8 rounded-lg flex items-center justify-center text-lg shrink-0"
                                          :style="{backgroundColor:j.color+'15',border:'1px solid '+j.color+'25'}">{{ j.icon }}</div>
                                     <div class="flex-1 min-w-0">
-                                        <div class="font-black text-xs whitespace-nowrap" style="color:#c8d8ec;">{{ m.name }}</div>
+                                        <div class="font-black text-xs whitespace-nowrap" style="color:#334155;">{{ m.name }}</div>
                                     </div>
-                                    <svg class="icon-svg text-[10px] shrink-0" style="color:#2a4060;"><use href="#icon-chevron-right"></use></svg>
+                                    <svg class="icon-svg text-[10px] shrink-0" style="color:#94a3b8;"><use href="#icon-chevron-right"></use></svg>
                                 </div>
                             </template>
                         </template>
@@ -435,21 +435,21 @@
                             <div v-for="m in unassignedMembers.filter(m=>m.isLeave)" :key="m.id+'-lv'"
                                  @click="openAssignMenu(m)"
                                  class="flex items-center gap-2.5 p-2 rounded-xl cursor-pointer transition-all mb-1 opacity-60"
-                                 style="background:#142030;border:1px solid transparent;"
+                                 style="background:#f8fafc;border:1px solid transparent;"
                                  @mouseenter="$event.currentTarget.style.borderColor='rgba(245,158,11,0.3)';"
                                  @mouseleave="$event.currentTarget.style.borderColor='transparent';">
                                 <div class="w-8 h-8 rounded-lg flex items-center justify-center text-lg shrink-0" :style="{backgroundColor:getJob(m.jobId)?.color+'15'}">{{ getJob(m.jobId)?.icon }}</div>
-                                <div class="flex-1 min-w-0"><div class="font-black text-xs" style="color:#c8d8ec;">{{ m.name }}</div></div>
+                                <div class="flex-1 min-w-0"><div class="font-black text-xs" style="color:#334155;">{{ m.name }}</div></div>
                                 <span class="text-[8px] font-black px-1.5 py-0.5 rounded shrink-0" style="background:rgba(245,158,11,0.15);color:#f59e0b;">請假</span>
                             </div>
                         </template>
 
                         <!-- 全部已指派 -->
                         <div v-if="unassignedMembers.length === 0" class="py-16 text-center flex flex-col items-center opacity-30">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center mb-4" style="background:rgba(255,255,255,0.04);">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center mb-4" style="background:rgba(0,0,0,0.03);">
                                 <svg class="icon-svg text-lg"><use href="#icon-check"></use></svg>
                             </div>
-                            <p class="text-[8px] font-black uppercase tracking-widest italic" style="color:#3a5570;">All Deployed</p>
+                            <p class="text-[8px] font-black uppercase tracking-widest italic" style="color:#64748b;">All Deployed</p>
                         </div>
                     </div>
                 </aside>
@@ -459,13 +459,13 @@
         <!-- ─── 移動端底部待分配 ─── -->
         <div v-if="user && !loading && (unassignedMembers.length > 0 || isReadOnly)"
              class="md:hidden fixed bottom-0 left-0 right-0 z-[100] flex flex-col no-print transition-transform duration-500 ease-out"
-             :style="{ transform: ui.expandUnassigned ? 'translateY(0)' : 'translateY(calc(100% - 4rem))', height:'45vh', background:'#0a1520', borderTop:'2px solid #4a84e8', borderRadius:'20px 20px 0 0', boxShadow:'0 -10px 40px rgba(0,0,0,0.5)' }">
+             :style="{ transform: ui.expandUnassigned ? 'translateY(0)' : 'translateY(calc(100% - 4rem))', height:'45vh', background:'#ffffff', borderTop:'2px solid #4a84e8', borderRadius:'20px 20px 0 0', boxShadow:'0 -10px 40px rgba(0,0,0,0.08)' }">
             <div @click="ui.expandUnassigned = !ui.expandUnassigned"
                  class="flex justify-between items-center px-5 cursor-pointer shrink-0 h-16"
-                 style="border-bottom:1px solid #1a2d40;">
+                 style="border-bottom:1px solid #e2e8f0;">
                 <div class="flex items-center gap-3">
                     <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black text-white" style="background:linear-gradient(135deg,#2a55c0,#4a84e8);">{{ unassignedMembers.length }}</div>
-                    <span class="font-black text-sm tracking-tight" style="color:#e8f0fb;">待分配名單</span>
+                    <span class="font-black text-sm tracking-tight" style="color:#0f172a;">待分配名單</span>
                 </div>
                 <div class="flex items-center gap-2 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest" style="background:rgba(74,132,232,0.15);color:#4a84e8;">
                     {{ ui.expandUnassigned ? 'Close' : 'View' }}
@@ -476,10 +476,10 @@
                 <div v-for="m in unassignedMembers" :key="m.id" @click="openAssignMenu(m)"
                      class="flex items-center gap-3 p-2.5 rounded-xl cursor-pointer transition-all"
                      :class="{'opacity-50':m.isLeave}"
-                     style="background:#142030;border:1px solid #1e3248;">
+                     style="background:#f8fafc;border:1px solid #e2e8f0;">
                     <div class="w-9 h-9 rounded-lg flex items-center justify-center text-xl shrink-0" :style="{backgroundColor:getJob(m.jobId)?.color+'15'}">{{ getJob(m.jobId)?.icon }}</div>
                     <div class="flex-1 min-w-0">
-                        <div class="font-black text-xs" style="color:#c8d8ec;">{{ m.name }}</div>
+                        <div class="font-black text-xs" style="color:#334155;">{{ m.name }}</div>
                         <div class="text-[8px] font-black uppercase tracking-widest mt-0.5" :style="{color:getJob(m.jobId)?.color}">{{ getJob(m.jobId)?.name }}</div>
                     </div>
                     <div v-if="m.isLeave" class="text-[8px] font-black px-1.5 py-0.5 rounded shrink-0" style="background:rgba(245,158,11,0.15);color:#f59e0b;">請假</div>
@@ -491,19 +491,19 @@
         <template v-if="user">
 
             <!-- 戰力統計 -->
-            <div v-if="ui.modal === 'jobStats'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="max-w-md w-full p-6 max-h-[80vh] flex flex-col overflow-hidden rounded-2xl" style="background:#1b2d42;border:1px solid #2a3f58;border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <div class="border-b pb-4 mb-4 flex justify-between items-center shrink-0" style="border-color:#28405a;">
-                        <h2 class="text-xl font-black flex items-center gap-2" style="color:#e8f0fb;"><svg class="icon-svg" style="color:#4a84e8;"><use href="#icon-chart"></use></svg> 職業戰力統計</h2>
-                        <button @click="ui.modal = null" class="font-black text-xl px-2 rounded transition-colors hover:bg-[#28405a]" style="color:#3a5570;">✕</button>
+            <div v-if="ui.modal === 'jobStats'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:rgba(255,255,255,0.6);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="max-w-md w-full p-6 max-h-[80vh] flex flex-col overflow-hidden rounded-2xl" style="background:#ffffff;border:1px solid #cbd5e1;border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.1);">
+                    <div class="border-b pb-4 mb-4 flex justify-between items-center shrink-0" style="border-color:#cbd5e1;">
+                        <h2 class="text-xl font-black flex items-center gap-2" style="color:#0f172a;"><svg class="icon-svg" style="color:#4a84e8;"><use href="#icon-chart"></use></svg> 職業戰力統計</h2>
+                        <button @click="ui.modal = null" class="font-black text-xl px-2 rounded transition-colors hover:bg-[#cbd5e1]" style="color:#64748b;">✕</button>
                     </div>
                     <div class="flex-1 overflow-y-auto space-y-3 custom-scroll pr-2">
-                        <div v-for="job in jobStats" :key="job.id" class="p-3 rounded-xl border flex items-center gap-4" style="background:#142030;border-color:#1e3248;">
+                        <div v-for="job in jobStats" :key="job.id" class="p-3 rounded-xl border flex items-center gap-4" style="background:#f8fafc;border-color:#e2e8f0;">
                             <div class="w-10 h-10 rounded-lg flex items-center justify-center text-xl shrink-0" :style="{backgroundColor:job.color+'15'}">{{ job.icon }}</div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex justify-between items-center mb-1.5">
                                     <span class="font-black text-sm" :style="{color:job.color}">{{ job.name }}</span>
-                                    <span class="font-black text-sm" style="color:#c8d8ec;">{{ job.count }} <span class="font-bold text-xs" style="color:#6a8aaa;">人</span></span>
+                                    <span class="font-black text-sm" style="color:#334155;">{{ job.count }} <span class="font-bold text-xs" style="color:#64748b;">人</span></span>
                                 </div>
                                 <div class="prog-track">
                                     <div class="prog-fill transition-all duration-700" :style="{width:job.percent+'%',background:job.color}"></div>
@@ -515,67 +515,67 @@
             </div>
 
             <!-- 日誌 -->
-            <div v-if="ui.modal === 'logsModal'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="max-w-lg w-full p-6 max-h-[80vh] flex flex-col overflow-hidden rounded-2xl" style="background:#1b2d42;border:1px solid #2a3f58;border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <div class="flex justify-between items-center mb-5 border-b pb-4 shrink-0" style="border-color:#28405a;">
+            <div v-if="ui.modal === 'logsModal'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:rgba(255,255,255,0.6);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="max-w-lg w-full p-6 max-h-[80vh] flex flex-col overflow-hidden rounded-2xl" style="background:#ffffff;border:1px solid #cbd5e1;border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.1);">
+                    <div class="flex justify-between items-center mb-5 border-b pb-4 shrink-0" style="border-color:#cbd5e1;">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(74,132,232,0.15);color:#4a84e8;"><svg class="icon-svg"><use href="#icon-history"></use></svg></div>
-                            <h2 class="text-xl font-black tracking-tighter" style="color:#e8f0fb;">冒險公會日誌</h2>
+                            <h2 class="text-xl font-black tracking-tighter" style="color:#0f172a;">冒險公會日誌</h2>
                         </div>
                         <button @click="clearLogs" class="text-[10px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest transition-colors" style="color:#f87171;border:1px solid rgba(248,113,113,0.2);">清空紀錄</button>
                     </div>
                     <div class="flex-1 overflow-y-auto custom-scroll pr-2 space-y-2">
                         <div v-for="log in logs" :key="log.id" class="p-3 rounded-2xl flex items-start gap-3 border transition-all"
-                             style="background:#142030;border-color:#1e3248;"
-                             @mouseenter="$event.currentTarget.style.borderColor='#3a5570';$event.currentTarget.style.background='#1b2d42';"
-                             @mouseleave="$event.currentTarget.style.borderColor='#1e3248';$event.currentTarget.style.background='#142030';">
+                             style="background:#f8fafc;border-color:#e2e8f0;"
+                             @mouseenter="$event.currentTarget.style.borderColor='#64748b';$event.currentTarget.style.background='#ffffff';"
+                             @mouseleave="$event.currentTarget.style.borderColor='#e2e8f0';$event.currentTarget.style.background='#f8fafc';">
                             <div class="shrink-0 mt-0.5">
-                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black" style="background:#1b2d42;border:1px solid #28405a;">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black" style="background:#ffffff;border:1px solid #cbd5e1;">
                                     {{ log.message.includes('新增')?'➕':log.message.includes('刪除')?'🗑️':log.message.includes('加入')?'🛡️':log.message.includes('指派')?'🏹':log.message.includes('解散')?'💣':log.message.includes('請假')?'☕':'✨' }}
                                 </div>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <span class="text-[9px] font-black uppercase" style="color:#2a4060;">{{ new Date(log.timestamp).toLocaleTimeString() }}</span>
-                                <p class="text-sm font-bold leading-relaxed mt-0.5" style="color:#c8d8ec;" v-html="formatLogMessage(log.message)"></p>
+                                <span class="text-[9px] font-black uppercase" style="color:#94a3b8;">{{ new Date(log.timestamp).toLocaleTimeString() }}</span>
+                                <p class="text-sm font-bold leading-relaxed mt-0.5" style="color:#334155;" v-html="formatLogMessage(log.message)"></p>
                             </div>
                         </div>
-                        <div v-if="logs.length === 0" class="py-20 text-center font-black uppercase tracking-[0.3em] italic" style="color:#2a4060;">No Logs</div>
+                        <div v-if="logs.length === 0" class="py-20 text-center font-black uppercase tracking-[0.3em] italic" style="color:#94a3b8;">No Logs</div>
                     </div>
-                    <button @click="ui.modal = null" class="w-full mt-5 py-3.5 font-black rounded-2xl uppercase tracking-widest text-[10px] transition-colors" style="background:#142030;color:#6a8aaa;border:1px solid #28405a;">Back to Guild</button>
+                    <button @click="ui.modal = null" class="w-full mt-5 py-3.5 font-black rounded-2xl uppercase tracking-widest text-[10px] transition-colors" style="background:#f8fafc;color:#64748b;border:1px solid #cbd5e1;">Back to Guild</button>
                 </div>
             </div>
 
             <!-- 成員管理 -->
-            <div v-if="ui.modal === 'memberList'" class="fixed inset-0 flex items-center justify-center z-[250] p-0 md:p-4" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="w-full h-full md:h-auto md:max-w-3xl md:max-h-[85vh] flex flex-col overflow-hidden md:rounded-2xl" style="background:#1b2d42;border:1px solid #2a3f58;border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <div class="p-5 flex justify-between items-center shrink-0" style="border-bottom:1px solid #28405a;background:rgba(74,132,232,0.05);">
-                        <h2 class="text-xl font-black flex items-center gap-2 tracking-tighter" style="color:#e8f0fb;"><svg class="icon-svg" style="color:#4a84e8;"><use href="#icon-users"></use></svg> 成員名冊管理</h2>
-                        <button @click="ui.modal = null" class="font-black text-xl px-2 rounded transition-colors" style="color:#3a5570;">✕</button>
+            <div v-if="ui.modal === 'memberList'" class="fixed inset-0 flex items-center justify-center z-[250] p-0 md:p-4" style="background:rgba(255,255,255,0.6);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="w-full h-full md:h-auto md:max-w-3xl md:max-h-[85vh] flex flex-col overflow-hidden md:rounded-2xl" style="background:#ffffff;border:1px solid #cbd5e1;border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.1);">
+                    <div class="p-5 flex justify-between items-center shrink-0" style="border-bottom:1px solid #cbd5e1;background:rgba(74,132,232,0.05);">
+                        <h2 class="text-xl font-black flex items-center gap-2 tracking-tighter" style="color:#0f172a;"><svg class="icon-svg" style="color:#4a84e8;"><use href="#icon-users"></use></svg> 成員名冊管理</h2>
+                        <button @click="ui.modal = null" class="font-black text-xl px-2 rounded transition-colors" style="color:#64748b;">✕</button>
                     </div>
-                    <div class="p-3 flex gap-2 shrink-0 border-b flex-col md:flex-row" style="background:#142030;border-color:#28405a;">
-                        <input v-model="searchQuery" placeholder="搜尋冒險者..." class="flex-1 px-4 py-2.5 rounded-xl font-bold text-sm outline-none" style="background:#0e1a2b;border:1px solid #28405a;color:#c8d8ec;">
+                    <div class="p-3 flex gap-2 shrink-0 border-b flex-col md:flex-row" style="background:#f8fafc;border-color:#cbd5e1;">
+                        <input v-model="searchQuery" placeholder="搜尋冒險者..." class="flex-1 px-4 py-2.5 rounded-xl font-bold text-sm outline-none" style="background:#f0f6ff;border:1px solid #cbd5e1;color:#334155;">
                         <div class="flex gap-2">
-                            <button @click="ui.sortBy='name'" class="px-3 py-2 rounded-xl text-xs font-bold transition-colors" :style="ui.sortBy==='name'?'background:#4a84e8;color:white;':'background:#1b2d42;color:#6a8aaa;border:1px solid #28405a;'">名稱</button>
-                            <button @click="ui.sortBy='job'" class="px-3 py-2 rounded-xl text-xs font-bold transition-colors" :style="ui.sortBy==='job'?'background:#4a84e8;color:white;':'background:#1b2d42;color:#6a8aaa;border:1px solid #28405a;'">職業</button>
-                            <button @click="ui.sortBy='group'" class="px-3 py-2 rounded-xl text-xs font-bold transition-colors" :style="ui.sortBy==='group'?'background:#4a84e8;color:white;':'background:#1b2d42;color:#6a8aaa;border:1px solid #28405a;'">隊伍</button>
+                            <button @click="ui.sortBy='name'" class="px-3 py-2 rounded-xl text-xs font-bold transition-colors" :style="ui.sortBy==='name'?'background:#4a84e8;color:white;':'background:#ffffff;color:#64748b;border:1px solid #cbd5e1;'">名稱</button>
+                            <button @click="ui.sortBy='job'" class="px-3 py-2 rounded-xl text-xs font-bold transition-colors" :style="ui.sortBy==='job'?'background:#4a84e8;color:white;':'background:#ffffff;color:#64748b;border:1px solid #cbd5e1;'">職業</button>
+                            <button @click="ui.sortBy='group'" class="px-3 py-2 rounded-xl text-xs font-bold transition-colors" :style="ui.sortBy==='group'?'background:#4a84e8;color:white;':'background:#ffffff;color:#64748b;border:1px solid #cbd5e1;'">隊伍</button>
                         </div>
                     </div>
                     <div class="flex-1 overflow-y-auto p-3 space-y-1.5 custom-scroll">
                         <div v-for="m in filteredMembers" :key="m.id" class="flex items-center gap-3 p-3 rounded-xl border transition-all"
-                             style="background:#142030;border-color:#1e3248;"
-                             @mouseenter="$event.currentTarget.style.borderColor='#3a5570';"
-                             @mouseleave="$event.currentTarget.style.borderColor='#1e3248';">
+                             style="background:#f8fafc;border-color:#e2e8f0;"
+                             @mouseenter="$event.currentTarget.style.borderColor='#64748b';"
+                             @mouseleave="$event.currentTarget.style.borderColor='#e2e8f0';">
                             <div class="w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm border shrink-0" style="background:rgba(74,132,232,0.1);color:#4a84e8;border-color:rgba(74,132,232,0.2);">{{ m.name.charAt(0) }}</div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between gap-2">
-                                    <div class="font-black text-sm truncate" style="color:#e8f0fb;">{{ m.name }}</div>
+                                    <div class="font-black text-sm truncate" style="color:#0f172a;">{{ m.name }}</div>
                                     <div v-if="getMemberGroup(m.id)" class="text-[9px] font-black px-2 py-0.5 rounded-md shrink-0 tracking-widest" style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">{{ getMemberGroup(m.id).name }}</div>
-                                    <div v-else class="text-[9px] font-black px-2 py-0.5 rounded-md shrink-0 tracking-widest" style="background:rgba(255,255,255,0.04);color:#4a6a8a;border:1px solid #28405a;">未分配</div>
+                                    <div v-else class="text-[9px] font-black px-2 py-0.5 rounded-md shrink-0 tracking-widest" style="background:rgba(0,0,0,0.03);color:#475569;border:1px solid #cbd5e1;">未分配</div>
                                 </div>
                                 <div class="text-[10px] font-black mt-0.5 truncate uppercase tracking-widest" :style="{color:getJob(m.jobId)?.color}">{{ getJob(m.jobId)?.icon }} {{ getJob(m.jobId)?.name }}</div>
                             </div>
                             <div class="flex gap-1 shrink-0">
-                                <button v-if="!isReadOnly" @click="toggleLeave(m)" class="p-2 rounded-lg transition-colors" :style="m.isLeave?'background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.25);':'background:rgba(255,255,255,0.05);color:#4a6a8a;border:1px solid #28405a;'"><svg class="icon-svg text-xs"><use href="#icon-coffee"></use></svg></button>
+                                <button v-if="!isReadOnly" @click="toggleLeave(m)" class="p-2 rounded-lg transition-colors" :style="m.isLeave?'background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.25);':'background:rgba(0,0,0,0.04);color:#475569;border:1px solid #cbd5e1;'"><svg class="icon-svg text-xs"><use href="#icon-coffee"></use></svg></button>
                                 <button v-if="!isReadOnly" @click="editMember(m)" class="p-2 rounded-lg transition-colors" style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);"><svg class="icon-svg text-xs"><use href="#icon-edit"></use></svg></button>
                                 <button v-if="!isReadOnly" @click="deleteMember(m.id)" class="p-2 rounded-lg transition-colors" style="background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.2);"><svg class="icon-svg text-xs"><use href="#icon-trash"></use></svg></button>
                             </div>
@@ -585,24 +585,24 @@
             </div>
 
             <!-- 職業設定 -->
-            <div v-if="ui.modal === 'jobSettings'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="max-w-md w-full p-6 flex flex-col max-h-[85vh] overflow-hidden rounded-2xl" style="background:#1b2d42;border:1px solid #2a3f58;border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <div class="flex justify-between items-center mb-5 border-b pb-4 shrink-0" style="border-color:#28405a;">
-                        <h2 class="text-xl font-black flex items-center gap-2 tracking-tighter" style="color:#e8f0fb;">🛠️ 職業屬性管理</h2>
-                        <button @click="ui.modal = null" class="px-2 rounded transition-colors" style="color:#3a5570;">✕</button>
+            <div v-if="ui.modal === 'jobSettings'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:rgba(255,255,255,0.6);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="max-w-md w-full p-6 flex flex-col max-h-[85vh] overflow-hidden rounded-2xl" style="background:#ffffff;border:1px solid #cbd5e1;border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.1);">
+                    <div class="flex justify-between items-center mb-5 border-b pb-4 shrink-0" style="border-color:#cbd5e1;">
+                        <h2 class="text-xl font-black flex items-center gap-2 tracking-tighter" style="color:#0f172a;">🛠️ 職業屬性管理</h2>
+                        <button @click="ui.modal = null" class="px-2 rounded transition-colors" style="color:#64748b;">✕</button>
                     </div>
                     <div class="flex-1 overflow-y-auto space-y-2 custom-scroll pr-1">
-                        <div v-for="job in jobs" :key="job.id" class="flex items-center gap-3 p-3 rounded-2xl border transition-all" style="background:#142030;border-color:#1e3248;">
+                        <div v-for="job in jobs" :key="job.id" class="flex items-center gap-3 p-3 rounded-2xl border transition-all" style="background:#f8fafc;border-color:#e2e8f0;">
                             <div class="relative shrink-0">
-                                <button @click="ui.openIconPickerId = job.id" class="w-10 h-10 rounded-lg border flex items-center justify-center text-xl hover:border-[#4a84e8] transition-all" style="background:#1b2d42;border-color:#28405a;">{{ job.icon }}</button>
+                                <button @click="ui.openIconPickerId = job.id" class="w-10 h-10 rounded-lg border flex items-center justify-center text-xl hover:border-[#4a84e8] transition-all" style="background:#ffffff;border-color:#cbd5e1;">{{ job.icon }}</button>
                                 <div v-if="ui.openIconPickerId === job.id" @click="ui.openIconPickerId = null" class="fixed inset-0 z-[290]"></div>
-                                <div v-if="ui.openIconPickerId === job.id" class="absolute top-full left-0 mt-2 p-2 shadow-2xl rounded-2xl border z-[300] grid grid-cols-6 gap-1 w-48 animate-in zoom-in duration-200" style="background:#1b2d42;border-color:#28405a;box-shadow:0 10px 40px rgba(0,0,0,0.6);">
+                                <div v-if="ui.openIconPickerId === job.id" class="absolute top-full left-0 mt-2 p-2 shadow-2xl rounded-2xl border z-[300] grid grid-cols-6 gap-1 w-48 animate-in zoom-in duration-200" style="background:#ffffff;border-color:#cbd5e1;box-shadow:0 10px 40px rgba(0,0,0,0.1);">
                                     <button v-for="emoji in emojiList" @click="updateJobIcon(emoji)" class="w-7 h-7 flex items-center justify-center rounded transition-colors hover:bg-[rgba(74,132,232,0.15)]">{{ emoji }}</button>
                                 </div>
                             </div>
-                            <input v-model="job.name" @blur="syncData" class="flex-1 px-3 py-2 rounded-lg font-bold outline-none text-xs min-w-0" style="background:#0e1a2b;border:1px solid #28405a;color:#c8d8ec;">
+                            <input v-model="job.name" @blur="syncData" class="flex-1 px-3 py-2 rounded-lg font-bold outline-none text-xs min-w-0" style="background:#f0f6ff;border:1px solid #cbd5e1;color:#334155;">
                             <input type="color" v-model="job.color" @change="syncData" class="w-8 h-8 p-0 border-none bg-transparent cursor-pointer rounded overflow-hidden shrink-0">
-                            <button @click="deleteJob(job.id)" class="p-1 shrink-0 transition-colors hover:text-[#f87171]" style="color:#2a4060;"><svg class="icon-svg text-xs"><use href="#icon-trash"></use></svg></button>
+                            <button @click="deleteJob(job.id)" class="p-1 shrink-0 transition-colors hover:text-[#f87171]" style="color:#94a3b8;"><svg class="icon-svg text-xs"><use href="#icon-trash"></use></svg></button>
                         </div>
                     </div>
                     <button @click="addNewJob" class="w-full mt-5 py-3.5 font-black rounded-xl transition-colors text-[10px] tracking-widest uppercase" style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">+ New Job Class</button>
@@ -610,35 +610,35 @@
             </div>
 
             <!-- 批次導入 -->
-            <div v-if="ui.modal === 'importMembers'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="max-w-lg w-full p-6 rounded-2xl" style="background:#1b2d42;border:1px solid #2a3f58;border-top:4px solid #fb923c;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <h2 class="text-xl font-black mb-5 flex items-center gap-2 tracking-tighter" style="color:#e8f0fb;">📥 批量名單導入</h2>
-                    <textarea v-model="importText" placeholder="名稱,職業 (每行一位)" class="w-full h-48 p-4 rounded-xl outline-none font-bold text-sm mb-4 custom-scroll" style="background:#0e1a2b;border:1px solid #28405a;color:#c8d8ec;resize:none;"></textarea>
-                    <div v-if="previewImport.length > 0" class="mb-5 max-h-40 overflow-y-auto rounded-xl p-2 custom-scroll" style="border:1px solid #28405a;background:#142030;">
-                        <div v-for="(p,i) in previewImport" :key="i" class="flex items-center justify-between p-2 text-xs" style="border-bottom:1px solid #1e3248;">
+            <div v-if="ui.modal === 'importMembers'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:rgba(255,255,255,0.6);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="max-w-lg w-full p-6 rounded-2xl" style="background:#ffffff;border:1px solid #cbd5e1;border-top:4px solid #fb923c;box-shadow:0 20px 60px rgba(0,0,0,0.1);">
+                    <h2 class="text-xl font-black mb-5 flex items-center gap-2 tracking-tighter" style="color:#0f172a;">📥 批量名單導入</h2>
+                    <textarea v-model="importText" placeholder="名稱,職業 (每行一位)" class="w-full h-48 p-4 rounded-xl outline-none font-bold text-sm mb-4 custom-scroll" style="background:#f0f6ff;border:1px solid #cbd5e1;color:#334155;resize:none;"></textarea>
+                    <div v-if="previewImport.length > 0" class="mb-5 max-h-40 overflow-y-auto rounded-xl p-2 custom-scroll" style="border:1px solid #cbd5e1;background:#f8fafc;">
+                        <div v-for="(p,i) in previewImport" :key="i" class="flex items-center justify-between p-2 text-xs" style="border-bottom:1px solid #e2e8f0;">
                             <div class="flex items-center gap-2">
-                                <span class="font-bold" style="color:#e8f0fb;">{{ p.name }}</span>
-                                <span style="color:#2a4060;">/</span>
-                                <span style="color:#6a8aaa;">{{ getJob(p.jobId).name }}</span>
+                                <span class="font-bold" style="color:#0f172a;">{{ p.name }}</span>
+                                <span style="color:#94a3b8;">/</span>
+                                <span style="color:#64748b;">{{ getJob(p.jobId).name }}</span>
                             </div>
                             <span class="px-2 py-0.5 rounded-full font-black text-[10px]" :style="p.isExisting?'background:rgba(74,132,232,0.15);color:#4a84e8;':'background:rgba(34,197,94,0.15);color:#22c55e;'">{{ p.isExisting?'更新':'新增' }}</span>
                         </div>
                     </div>
                     <div class="flex gap-3">
-                        <button @click="ui.modal = null" class="flex-1 py-3.5 font-bold rounded-xl uppercase tracking-widest text-[10px] transition-colors" style="background:#142030;color:#6a8aaa;border:1px solid #28405a;">Cancel</button>
+                        <button @click="ui.modal = null" class="flex-1 py-3.5 font-bold rounded-xl uppercase tracking-widest text-[10px] transition-colors" style="background:#f8fafc;color:#64748b;border:1px solid #cbd5e1;">Cancel</button>
                         <button @click="confirmImport" class="flex-1 py-3.5 text-white font-black rounded-xl ro-btn uppercase tracking-widest text-[10px]" style="background:linear-gradient(135deg,#c25a0a,#f97316);border-bottom-color:#8a3a05;">Confirm Import</button>
                     </div>
                 </div>
             </div>
 
             <!-- 分享 -->
-            <div v-if="ui.modal === 'shareModal'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="max-w-sm w-full p-8 text-center rounded-2xl" style="background:#1b2d42;border:1px solid #2a3f58;border-top:4px solid #f472b6;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <h2 class="text-xl font-black mb-6 flex items-center justify-center gap-2 tracking-tighter" style="color:#e8f0fb;">💖 部署情報分享</h2>
+            <div v-if="ui.modal === 'shareModal'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:rgba(255,255,255,0.6);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="max-w-sm w-full p-8 text-center rounded-2xl" style="background:#ffffff;border:1px solid #cbd5e1;border-top:4px solid #f472b6;box-shadow:0 20px 60px rgba(0,0,0,0.1);">
+                    <h2 class="text-xl font-black mb-6 flex items-center justify-center gap-2 tracking-tighter" style="color:#0f172a;">💖 部署情報分享</h2>
                     <div class="space-y-4 mb-7">
-                        <input v-model="sharePassword" placeholder="存取密碼 (選填)" class="w-full px-4 py-3 rounded-xl font-bold text-sm text-center outline-none" style="background:#0e1a2b;border:1px solid #28405a;color:#c8d8ec;">
+                        <input v-model="sharePassword" placeholder="存取密碼 (選填)" class="w-full px-4 py-3 rounded-xl font-bold text-sm text-center outline-none" style="background:#f0f6ff;border:1px solid #cbd5e1;color:#334155;">
                         <div class="flex gap-2">
-                            <input readonly :value="sharedLink" class="flex-1 px-4 py-3 rounded-xl font-bold text-[10px] outline-none" style="background:#0e1a2b;border:1px solid #28405a;color:#f472b6;">
+                            <input readonly :value="sharedLink" class="flex-1 px-4 py-3 rounded-xl font-bold text-[10px] outline-none" style="background:#f0f6ff;border:1px solid #cbd5e1;color:#f472b6;">
                             <button @click="copyLink" class="px-4 py-2 rounded-xl active:scale-90 transition-transform shrink-0" style="background:#f472b6;color:white;"><svg class="icon-svg"><use :href="linkCopied ? '#icon-check' : '#icon-copy'"></use></svg></button>
                         </div>
                     </div>
@@ -647,18 +647,18 @@
             </div>
 
             <!-- 成員指派 -->
-            <div v-if="ui.assigningMember" class="fixed inset-0 flex items-center justify-center z-[300] p-4" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);" @click.self="ui.assigningMember = null">
-                <div class="max-w-xs w-full p-7 text-center rounded-2xl" style="background:#1b2d42;border:1px solid #2a3f58;border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+            <div v-if="ui.assigningMember" class="fixed inset-0 flex items-center justify-center z-[300] p-4" style="background:rgba(255,255,255,0.6);backdrop-filter:blur(4px);" @click.self="ui.assigningMember = null">
+                <div class="max-w-xs w-full p-7 text-center rounded-2xl" style="background:#ffffff;border:1px solid #cbd5e1;border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.1);">
                     <div class="flex items-center justify-center gap-2 mb-5">
                         <div class="w-10 h-10 rounded-full flex items-center justify-center text-xl" :style="{backgroundColor:getJob(ui.assigningMember.jobId)?.color+'20'}">{{ getJob(ui.assigningMember.jobId)?.icon }}</div>
-                        <h4 class="font-black text-sm" style="color:#e8f0fb;">派遣 <span style="color:#4a84e8;">「{{ ui.assigningMember.name }}」</span></h4>
+                        <h4 class="font-black text-sm" style="color:#0f172a;">派遣 <span style="color:#4a84e8;">「{{ ui.assigningMember.name }}」</span></h4>
                     </div>
                     <div class="space-y-1.5 max-h-64 overflow-y-auto custom-scroll pr-1 mb-5">
                         <button v-for="group in groups" :key="group.id" @click="assignToGroup(group)" :disabled="group.members.length >= group.max"
                                 class="w-full p-3 rounded-xl font-bold text-xs flex justify-between items-center transition-all disabled:opacity-30"
-                                style="background:#142030;border:1px solid #1e3248;color:#c8d8ec;"
+                                style="background:#f8fafc;border:1px solid #e2e8f0;color:#334155;"
                                 @mouseenter="if(!$event.currentTarget.disabled){$event.currentTarget.style.borderColor='#4a84e8';$event.currentTarget.style.background='rgba(74,132,232,0.1)';}"
-                                @mouseleave="$event.currentTarget.style.borderColor='#1e3248';$event.currentTarget.style.background='#142030';">
+                                @mouseleave="$event.currentTarget.style.borderColor='#e2e8f0';$event.currentTarget.style.background='#f8fafc';">
                             <span>{{ group.name }}</span>
                             <div class="flex items-center gap-2">
                                 <div class="w-14 prog-track">
@@ -668,45 +668,45 @@
                             </div>
                         </button>
                     </div>
-                    <div class="pt-4 border-t flex flex-col gap-2.5" style="border-color:#28405a;">
+                    <div class="pt-4 border-t flex flex-col gap-2.5" style="border-color:#cbd5e1;">
                         <button @click="toggleLeave(ui.assigningMember); ui.assigningMember = null" class="w-full py-2.5 rounded-xl font-black text-xs transition-colors border"
                                 :style="ui.assigningMember.isLeave?'background:rgba(34,197,94,0.1);color:#22c55e;border-color:rgba(34,197,94,0.2);':'background:rgba(245,158,11,0.1);color:#f59e0b;border-color:rgba(245,158,11,0.2);'">
                             {{ ui.assigningMember.isLeave ? '取消請假 (狀態回歸)' : '設定為請假狀態' }}
                         </button>
-                        <button @click="ui.assigningMember = null" class="font-black text-[10px] transition-colors uppercase tracking-widest" style="color:#2a4060;">Close</button>
+                        <button @click="ui.assigningMember = null" class="font-black text-[10px] transition-colors uppercase tracking-widest" style="color:#94a3b8;">Close</button>
                     </div>
                 </div>
             </div>
 
             <!-- 成員編輯 -->
-            <div v-if="ui.modal === 'memberEdit'" class="fixed inset-0 flex items-center justify-center z-[300] p-4" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="max-w-sm w-full p-8 text-center rounded-2xl" style="background:#1b2d42;border:1px solid #2a3f58;border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <h3 class="font-black mb-6 text-lg tracking-tighter" style="color:#e8f0fb;">{{ form.id ? '修正成員資訊' : '新成員入團登記' }}</h3>
-                    <input v-model="form.name" placeholder="名稱" class="w-full p-3.5 rounded-xl mb-4 font-bold outline-none text-center text-sm" style="background:#0e1a2b;border:1px solid #28405a;color:#c8d8ec;">
-                    <select v-model="form.jobId" class="w-full p-3.5 rounded-xl mb-7 font-bold outline-none text-sm" style="background:#0e1a2b;border:1px solid #28405a;color:#c8d8ec;">
+            <div v-if="ui.modal === 'memberEdit'" class="fixed inset-0 flex items-center justify-center z-[300] p-4" style="background:rgba(255,255,255,0.6);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="max-w-sm w-full p-8 text-center rounded-2xl" style="background:#ffffff;border:1px solid #cbd5e1;border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.1);">
+                    <h3 class="font-black mb-6 text-lg tracking-tighter" style="color:#0f172a;">{{ form.id ? '修正成員資訊' : '新成員入團登記' }}</h3>
+                    <input v-model="form.name" placeholder="名稱" class="w-full p-3.5 rounded-xl mb-4 font-bold outline-none text-center text-sm" style="background:#f0f6ff;border:1px solid #cbd5e1;color:#334155;">
+                    <select v-model="form.jobId" class="w-full p-3.5 rounded-xl mb-7 font-bold outline-none text-sm" style="background:#f0f6ff;border:1px solid #cbd5e1;color:#334155;">
                         <option v-for="job in jobs" :key="job.id" :value="job.id">{{ job.icon }} {{ job.name }}</option>
                     </select>
                     <div class="flex gap-3">
-                        <button @click="ui.modal = null" class="flex-1 py-3.5 font-bold rounded-xl uppercase tracking-widest text-[10px] transition-colors" style="background:#142030;color:#6a8aaa;border:1px solid #28405a;">Cancel</button>
+                        <button @click="ui.modal = null" class="flex-1 py-3.5 font-bold rounded-xl uppercase tracking-widest text-[10px] transition-colors" style="background:#f8fafc;color:#64748b;border:1px solid #cbd5e1;">Cancel</button>
                         <button @click="saveMember" class="flex-1 py-3.5 text-white font-black rounded-xl ro-btn uppercase tracking-widest text-[10px]" style="background:linear-gradient(135deg,#2a55c0,#4a84e8);border-bottom-color:#1a3a90;">Save</button>
                     </div>
                 </div>
             </div>
 
             <!-- 選擇成員加入 -->
-            <div v-if="ui.modal === 'selectMemberForGroup'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="max-w-md w-full p-6 max-h-[80vh] flex flex-col overflow-hidden rounded-2xl" style="background:#1b2d42;border:1px solid #2a3f58;border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <h2 class="text-xl font-black mb-4 tracking-tighter" style="color:#e8f0fb;">加入至 <span style="color:#4a84e8;">{{ ui.targetGroup?.name }}</span></h2>
-                    <input v-model="searchQuery" placeholder="搜尋..." class="w-full px-4 py-3 rounded-xl mb-4 font-bold outline-none text-sm" style="background:#0e1a2b;border:1px solid #28405a;color:#c8d8ec;">
+            <div v-if="ui.modal === 'selectMemberForGroup'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:rgba(255,255,255,0.6);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="max-w-md w-full p-6 max-h-[80vh] flex flex-col overflow-hidden rounded-2xl" style="background:#ffffff;border:1px solid #cbd5e1;border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.1);">
+                    <h2 class="text-xl font-black mb-4 tracking-tighter" style="color:#0f172a;">加入至 <span style="color:#4a84e8;">{{ ui.targetGroup?.name }}</span></h2>
+                    <input v-model="searchQuery" placeholder="搜尋..." class="w-full px-4 py-3 rounded-xl mb-4 font-bold outline-none text-sm" style="background:#f0f6ff;border:1px solid #cbd5e1;color:#334155;">
                     <div class="flex-1 overflow-y-auto space-y-1.5 custom-scroll pr-1">
                         <div v-for="m in filteredMembers" :key="m.id" @click="addMemberToGroup(m)"
                              class="flex items-center gap-3 p-2.5 rounded-xl cursor-pointer group transition-all"
-                             style="background:#142030;border:1px solid #1e3248;"
+                             style="background:#f8fafc;border:1px solid #e2e8f0;"
                              @mouseenter="$event.currentTarget.style.borderColor='#4a84e8';"
-                             @mouseleave="$event.currentTarget.style.borderColor='#1e3248';">
+                             @mouseleave="$event.currentTarget.style.borderColor='#e2e8f0';">
                             <div class="w-9 h-9 rounded-lg flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform" :style="{backgroundColor:getJob(m.jobId).color+'15'}">{{ getJob(m.jobId).icon }}</div>
                             <div class="flex-1 min-w-0">
-                                <div class="font-black text-sm" style="color:#e8f0fb;">{{ m.name }}</div>
+                                <div class="font-black text-sm" style="color:#0f172a;">{{ m.name }}</div>
                                 <div class="text-[10px] font-black tracking-widest uppercase opacity-60" :style="{color:getJob(m.jobId).color}">{{ getJob(m.jobId).name }}</div>
                             </div>
                             <div v-if="getMemberGroup(m.id)" class="text-[8px] font-black px-2 py-0.5 rounded-lg shrink-0" style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">{{ getMemberGroup(m.id).name }}</div>
@@ -716,15 +716,15 @@
             </div>
 
             <!-- 個人資料 -->
-            <div v-if="ui.modal === 'userProfile'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="max-w-sm w-full p-8 rounded-2xl" style="background:#1b2d42;border:1px solid #2a3f58;border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <h2 class="text-xl font-black mb-6 tracking-tighter flex items-center gap-2" style="color:#e8f0fb;">⚙️ 管理帳號設定</h2>
+            <div v-if="ui.modal === 'userProfile'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:rgba(255,255,255,0.6);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="max-w-sm w-full p-8 rounded-2xl" style="background:#ffffff;border:1px solid #cbd5e1;border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.1);">
+                    <h2 class="text-xl font-black mb-6 tracking-tighter flex items-center gap-2" style="color:#0f172a;">⚙️ 管理帳號設定</h2>
                     <div class="space-y-4">
-                        <div class="p-4 rounded-xl" style="background:#142030;border:1px solid #28405a;">
-                            <div class="text-[9px] font-black mb-1 uppercase tracking-widest" style="color:#2a4060;">Account</div>
+                        <div class="p-4 rounded-xl" style="background:#f8fafc;border:1px solid #cbd5e1;">
+                            <div class="text-[9px] font-black mb-1 uppercase tracking-widest" style="color:#94a3b8;">Account</div>
                             <div class="font-black text-sm break-all mt-1" style="color:#4a84e8;">{{ user.isAnonymous ? 'Temporary Visitor' : user.email }}</div>
                         </div>
-                        <button @click="ui.modal = null" class="w-full py-3.5 font-bold rounded-xl uppercase tracking-widest text-[10px] transition-colors" style="background:#142030;color:#6a8aaa;border:1px solid #28405a;">Close</button>
+                        <button @click="ui.modal = null" class="w-full py-3.5 font-bold rounded-xl uppercase tracking-widest text-[10px] transition-colors" style="background:#f8fafc;color:#64748b;border:1px solid #cbd5e1;">Close</button>
                     </div>
                 </div>
             </div>
