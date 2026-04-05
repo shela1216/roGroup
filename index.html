@@ -167,7 +167,9 @@
         <!-- ─── 左側導覽列 ─── -->
         <aside v-if="user" class="hidden md:flex flex-col h-full shrink-0 overflow-y-auto custom-scroll transition-all duration-300 relative" :class="ui.isSidebarCollapsed ? 'w-20' : 'w-60'" style="background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);">
             <!-- 縮放按鈕 -->
-            <button @click="ui.isSidebarCollapsed = !ui.isSidebarCollapsed" class="absolute top-6 -right-3 w-6 h-6 rounded-full flex items-center justify-center text-[#cbd5e1] hover:text-white transition-colors z-[60]" style="background:var(--sidebar-border);border:1px solid #334155;box-shadow:0 2px 4px rgba(0,0,0,0.6);">
+            <button @click="ui.isSidebarCollapsed = !ui.isSidebarCollapsed" 
+                    class="absolute top-6 -right-3 w-6 h-6 rounded-full flex items-center justify-center transition-all z-[60] shadow-md border hover:scale-110" 
+                    style="background:var(--sidebar-bg);border-color:var(--sidebar-border);color:var(--text-primary);">
                 <svg class="icon-svg text-[12px] transition-transform duration-300" :class="{'rotate-180': ui.isSidebarCollapsed}"><use href="#icon-chevron-left"></use></svg>
             </button>
 
