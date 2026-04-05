@@ -12,38 +12,38 @@
         :root {
             --app-bg: #f0f6ff;
             --sidebar-bg: #ffffff;
-            --sidebar-border: var(--text-secondary);
+            --sidebar-border: #e2e8f0;
             --card-bg: #ffffff;
             --card-border: #cbd5e1;
-            --text-primary: var(--sidebar-bg);
+            --text-primary: #0f172a;
             --text-secondary: #334155;
             --text-muted: #64748b;
-            --input-bg: #f0f6ff;
+            --input-bg: #ffffff;
             --nav-item-color: #64748b;
             --nav-item-hover-bg: #f1f5f9;
-            --nav-item-hover-text: var(--sidebar-bg);
+            --nav-item-hover-text: #0f172a;
             --modal-overlay: rgba(255, 255, 255, 0.6);
-            --item-bg: var(--text-primary);
-            --item-hover-bg: #f1f5f9;
-            --item-hover-border: #64748b;
+            --item-bg: #f8fafc;
+            --item-hover-bg: #ffffff;
+            --item-hover-border: #4a84e8;
         }
 
         .theme-dark {
-            --app-bg: var(--app-bg);
-            --sidebar-bg: var(--sidebar-bg);
-            --sidebar-border: var(--sidebar-border);
-            --card-bg: var(--card-bg);
-            --card-border: var(--card-border);
-            --text-primary: var(--text-primary);
-            --text-secondary: var(--text-secondary);
-            --text-muted: var(--text-muted);
-            --input-bg: var(--app-bg);
-            --nav-item-color: var(--text-muted);
-            --nav-item-hover-bg: var(--sidebar-border);
-            --nav-item-hover-text: var(--text-primary);
+            --app-bg: #090f1d;
+            --sidebar-bg: #0f172a;
+            --sidebar-border: #1e293b;
+            --card-bg: #131c31;
+            --card-border: #3b5380;
+            --text-primary: #f8fafc;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --input-bg: #090f1d;
+            --nav-item-color: #94a3b8;
+            --nav-item-hover-bg: #1e293b;
+            --nav-item-hover-text: #f8fafc;
             --modal-overlay: rgba(9, 15, 29, 0.85);
-            --item-bg: var(--item-bg);
-            --item-hover-bg: var(--item-hover-bg);
+            --item-bg: #1b2742;
+            --item-hover-bg: #223254;
             --item-hover-border: #60a5fa;
         }
 
@@ -62,7 +62,7 @@
         .ro-btn:active { transform: translateY(1px); border-bottom-width: 1px; }
 
         /* Progress bars */
-        .prog-track { background: var(--item-hover-bg); border-radius: 99px; height: 6px; overflow: hidden; }
+        .prog-track { background: var(--item-hover-bg); border-radius: 99px; height: 6px; overflow: hidden; border: 1px solid var(--sidebar-border); }
         .prog-fill { height: 100%; border-radius: 99px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
         .prog-normal { background: linear-gradient(90deg, #4a84e8, #7ca8f5); }
         .prog-near   { background: linear-gradient(90deg, #f97316, #fb923c); }
@@ -78,8 +78,8 @@
         .ro-card { background: var(--card-bg); border:1px solid var(--card-border); border-radius:16px; transition:all 0.2s ease; }
 
         /* Member Items */
-        .member-item { background: var(--item-bg); border: 1px solid var(--card-border); transition: all 0.2s; cursor: pointer; }
-        .member-item:hover { background: var(--item-hover-bg) !important; border-color: var(--item-hover-border) !important; }
+        .member-item { background: var(--item-bg); border: 1px solid var(--sidebar-border); transition: all 0.2s; cursor: pointer; color: var(--text-secondary); }
+        .member-item:hover { background: var(--item-hover-bg) !important; border-color: var(--item-hover-border) !important; color: var(--text-primary) !important; }
 
         /* Job section header in unassigned panel */
         .job-sec-hdr { display:flex; align-items:center; gap:6px; padding:4px 8px; font-size:8px; font-weight:900; letter-spacing:0.15em; text-transform:uppercase; color: var(--text-muted); border-radius:6px; background: var(--item-hover-bg); margin-bottom:3px; margin-top:8px; }
@@ -823,7 +823,11 @@
                 const members = ref([]); const groups = ref([]); const logs = ref([]); const searchQuery = ref('');
                 const jobs = ref([{ id: 'j1', name: '騎士', color: '#be123c', icon: '⚔️' }, { id: 'j2', name: '牧師', color: '#0369a1', icon: '✨' }, { id: 'j3', name: '巫師', color: '#7e22ce', icon: '🔥' }, { id: 'j4', name: '獵人', color: '#15803d', icon: '🏹' }, { id: 'j5', name: '刺客', color: '#4b5563', icon: '🗡️' }, { id: 'j6', name: '商人', color: '#b45309', icon: '💰' }]);
                 const ui = ref({ modal: null, expandUnassigned: true, assigningMember: null, sortBy: 'name', openIconPickerId: null, targetGroup: null, draggedGroupIndex: null, isSidebarCollapsed: false, theme: localStorage.getItem('ro_theme') || 'dark' });
-                watch(() => ui.value.theme, (newTheme) => { localStorage.setItem('ro_theme', newTheme); });
+                watch(() => ui.value.theme, (newTheme) => {
+                    localStorage.setItem('ro_theme', newTheme);
+                    if (newTheme === 'dark') document.body.classList.add('theme-dark');
+                    else document.body.classList.remove('theme-dark');
+                }, { immediate: true });
                 const form = ref({ id: null, name: '', jobId: 'j1' });
                 const importText = ref(''); const sharedLink = ref(''); const sharePassword = ref(''); const visitorPassword = ref('');
                 const isShareLocked = ref(false); const linkCopied = ref(false); let tempSharedData = null;
