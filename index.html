@@ -658,8 +658,45 @@
                     <svg class="icon-svg transition-transform duration-500" :class="{'rotate-180': ui.expandUnassigned}"><use href="#icon-chevron-up"></use></svg>
                 </div>
             </div>
+
+            <!-- 手機版職業篩選列 -->
+            <div v-show="ui.expandUnassigned" class="px-3 py-2 flex gap-1.5 overflow-x-auto shrink-0 custom-scroll" style="background:var(--accent-glow);border-bottom:1px solid var(--sidebar-border);scrollbar-width:none;">
+                <div @click="ui.filterJobId = null"
+                     class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-black shrink-0 transition-all"
+                     :style="{
+                         background: !ui.filterJobId ? 'linear-gradient(135deg,#2a55c0,#4a84e8)' : 'var(--card-bg)',
+                         color: !ui.filterJobId ? '#fff' : 'var(--text-muted)',
+                         border: '1px solid ' + (!ui.filterJobId ? '#1a3a90' : 'var(--card-border)')
+                     }">
+                    <span>🌐</span><span>全部</span>
+                </div>
+                <template v-for="j in jobs" :key="'mob-filter-'+j.id">
+                    <div v-if="unassignedMembers.filter(m => m.jobId===j.id && !m.isLeave).length > 0"
+                         @click="ui.filterJobId = ui.filterJobId === j.id ? null : j.id"
+                         class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-black shrink-0 transition-all"
+                         :style="{
+                             background: ui.filterJobId === j.id ? j.color : 'var(--card-bg)',
+                             color: ui.filterJobId === j.id ? '#fff' : j.color,
+                             border: '1px solid ' + (ui.filterJobId === j.id ? j.color : 'var(--card-border)')
+                         }">
+                        <span>{{ j.icon }}</span><span>{{ unassignedMembers.filter(m=>m.jobId===j.id&&!m.isLeave).length }}</span>
+                    </div>
+                </template>
+                <div v-if="unassignedMembers.filter(m=>m.isLeave).length > 0"
+                     @click="ui.filterJobId = ui.filterJobId === 'leave' ? null : 'leave'"
+                     class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-black shrink-0 transition-all"
+                     :style="{
+                         background: ui.filterJobId === 'leave' ? '#f59e0b' : 'var(--card-bg)',
+                         color: ui.filterJobId === 'leave' ? '#fff' : '#f59e0b',
+                         border: '1px solid ' + (ui.filterJobId === 'leave' ? '#f59e0b' : 'var(--card-border)')
+                     }">
+                    ☕ {{ unassignedMembers.filter(m=>m.isLeave).length }}
+                </div>
+            </div>
+
             <div class="flex-1 overflow-y-auto custom-scroll p-3 space-y-1.5" style="background:var(--app-bg);">
-                <div v-for="m in unassignedMembers" :key="m.id" @click="openAssignMenu(m)"
+                <div v-for="m in unassignedMembers.filter(m => !ui.filterJobId || (ui.filterJobId === 'leave' ? m.isLeave : (m.jobId === ui.filterJobId && !m.isLeave)))" 
+                     :key="m.id" @click="openAssignMenu(m)"
                      class="flex items-center gap-3 p-2.5 rounded-xl member-item"
                      :class="{'opacity-50':m.isLeave}">
                     <div class="w-9 h-9 rounded-lg flex items-center justify-center text-xl shrink-0" :style="{backgroundColor:getJob(m.jobId)?.color+'15'}">{{ getJob(m.jobId)?.icon }}</div>
