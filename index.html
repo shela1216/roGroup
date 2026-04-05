@@ -139,7 +139,24 @@
         .theme-dark .member-item:hover { border-color: #a855f7 !important; }
 
         /* Job section header in unassigned panel */
-        .job-sec-hdr { display:flex; align-items:center; gap:6px; padding:4px 10px; font-size:12px; font-weight:900; letter-spacing:0.1em; text-transform:uppercase; color: var(--text-muted); border-radius:6px; background: var(--card-header-bg); border: 1px solid var(--card-border); margin-bottom:4px; margin-top:12px; }
+        .job-sec-hdr { 
+            display:flex; 
+            align-items:center; 
+            gap:8px; 
+            padding:12px 4px 6px 4px; 
+            font-size:11px; 
+            font-weight:950; 
+            letter-spacing:0.15em; 
+            text-transform:uppercase; 
+            color: var(--text-muted); 
+            margin-top:20px; 
+            margin-bottom:8px;
+            border-bottom: 2px solid var(--sidebar-border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: var(--card-bg);
+        }
         .job-sec-hdr:first-child { margin-top:0; }
     </style>
 </head>
