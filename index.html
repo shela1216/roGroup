@@ -291,6 +291,9 @@
                         <button @click="ui.modal = 'memberList'" class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1" style="background:var(--item-bg);border:1px solid var(--card-border);color:var(--text-secondary);"><svg class="icon-svg"><use href="#icon-users"></use></svg> 成員</button>
                         <button @click="ui.modal = 'logsModal'" class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1" style="background:var(--item-bg);border:1px solid var(--card-border);color:var(--text-secondary);"><svg class="icon-svg"><use href="#icon-history"></use></svg> 紀錄</button>
                         <button @click="ui.modal = 'jobSettings'" class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1" style="background:var(--item-bg);border:1px solid var(--card-border);color:var(--text-secondary);"><svg class="icon-svg"><use href="#icon-briefcase"></use></svg> 職業</button>
+                        <button @click="openAddMember" class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1" style="background:rgba(232,168,56,0.15);border:1px solid rgba(232,168,56,0.25);color:#e8a838;"><svg class="icon-svg"><use href="#icon-plus"></use></svg> 招募</button>
+                        <button @click="ui.modal = 'importMembers'" class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1" style="background:rgba(251,146,60,0.15);border:1px solid rgba(251,146,60,0.25);color:#fb923c;"><svg class="icon-svg"><use href="#icon-import"></use></svg> 匯入</button>
+                        <button @click="openShareModal" class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1" style="background:rgba(244,114,182,0.15);border:1px solid rgba(244,114,182,0.25);color:#f472b6;"><svg class="icon-svg"><use href="#icon-share"></use></svg> 分享</button>
                     </template>
                 </div>
             </nav>
