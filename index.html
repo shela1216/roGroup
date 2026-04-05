@@ -341,7 +341,7 @@
             <div class="flex-1 flex flex-row overflow-hidden h-full">
 
                 <!-- 中間部署概況 -->
-                <main class="flex-1 overflow-y-auto custom-scroll p-4 md:p-6 pb-20 md:pb-12 bg-[var(--app-bg)] transition-all">
+                <main class="flex-1 overflow-y-auto custom-scroll p-2 md:p-4 pb-20 md:pb-12 bg-[var(--app-bg)] transition-all">
 
                     <div v-if="loading" class="flex flex-col items-center justify-center py-20 h-full">
                         <div class="w-10 h-10 border-2 border-[#ffffff] border-t-[#4a84e8] rounded-full animate-spin mb-4"></div>
@@ -396,7 +396,7 @@
 
                     <template v-else>
                         <!-- 頂部資訊列 -->
-                        <div class="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4 shrink-0">
+                        <div class="mb-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4 shrink-0">
                             <div>
                                 <h2 class="text-xl font-black tracking-tighter" style="color:var(--text-primary);">當前部署概況</h2>
                                 <p class="text-[12px] font-bold uppercase tracking-widest mt-1" style="color:var(--text-muted);">Active Deployment Status</p>
@@ -428,7 +428,7 @@
                         </div>
 
                         <!-- 分隊網格 -->
-                        <div class="grid grid-cols-[repeat(auto-fill,minmax(268px,1fr))] gap-4 no-print">
+                        <div class="grid grid-cols-[repeat(auto-fill,minmax(268px,1fr))] gap-2 no-print">
                             <div v-for="(group, gIndex) in groups" :key="group.id"
                                  class="ro-card flex flex-col relative"
                                  :class="{'opacity-50 scale-95': ui.draggedGroupIndex === gIndex}"
@@ -553,12 +553,6 @@
                                             <svg class="icon-svg text-[10px]"><use href="#icon-plus"></use></svg>
                                         </div>
                                         <span class="text-[10px] font-black uppercase tracking-widest" style="color:var(--text-muted);">Empty Slot</span>
-                                    </div>
-                                </div>
-
-                                <!-- 底部操作列 (桌面版限定) -->
-                                <div class="px-3 py-2 border-t mt-auto flex items-center justify-between" style="border-color:var(--card-border);background:var(--accent-glow);">
-                                        <span class="text-[12px] font-black uppercase tracking-widest" style="color:var(--text-muted);">指派成員</span>
                                     </div>
                                 </div>
 
