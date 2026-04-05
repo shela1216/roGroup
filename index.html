@@ -553,18 +553,30 @@
                         </div>
                     </div>
 
-                    <!-- 職業小統計 -->
+                    <!-- 職業小統計 (兼過濾器) -->
                     <div class="px-3 py-2 flex gap-1.5 flex-wrap shrink-0" style="border-bottom:1px solid var(--sidebar-border);background:var(--accent-glow);">
                         <template v-for="j in jobs" :key="'stat-'+j.id">
                             <div v-if="unassignedMembers.filter(m => m.jobId===j.id && !m.isLeave).length > 0"
-                                 class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black"
-                                 :style="{background:j.color+'18',color:j.color,border:'1px solid '+j.color+'30'}">
+                                 @click="ui.filterJobId = ui.filterJobId === j.id ? null : j.id"
+                                 class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
+                                 :style="{
+                                     background: ui.filterJobId === j.id ? j.color : j.color+'18',
+                                     color: ui.filterJobId === j.id ? '#fff' : j.color,
+                                     border: '1px solid ' + (ui.filterJobId === j.id ? j.color : j.color+'30'),
+                                     boxShadow: ui.filterJobId === j.id ? '0 0 10px '+j.color+'40' : 'none'
+                                 }">
                                 <span>{{ j.icon }}</span><span>{{ unassignedMembers.filter(m=>m.jobId===j.id&&!m.isLeave).length }}</span>
                             </div>
                         </template>
                         <div v-if="unassignedMembers.filter(m=>m.isLeave).length > 0"
-                             class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black"
-                             style="background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);">
+                             @click="ui.filterJobId = ui.filterJobId === 'leave' ? null : 'leave'"
+                             class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
+                             :style="{
+                                 background: ui.filterJobId === 'leave' ? '#f59e0b' : 'rgba(245,158,11,0.1)',
+                                 color: ui.filterJobId === 'leave' ? '#fff' : '#f59e0b',
+                                 border: '1px solid ' + (ui.filterJobId === 'leave' ? '#f59e0b' : 'rgba(245,158,11,0.2)'),
+                                 boxShadow: ui.filterJobId === 'leave' ? '0 0 10px rgba(245,158,11,0.4)' : 'none'
+                             }">
                             ☕ {{ unassignedMembers.filter(m=>m.isLeave).length }}
                         </div>
                     </div>
@@ -572,7 +584,7 @@
                     <!-- 成員列表（依職業分組） -->
                     <div class="flex-1 overflow-y-auto custom-scroll px-3 pb-3">
                         <template v-for="j in jobs" :key="'grp-'+j.id">
-                            <template v-if="unassignedMembers.filter(m=>m.jobId===j.id&&!m.isLeave&&(!searchQuery||m.name.toLowerCase().includes(searchQuery.toLowerCase()))).length > 0">
+                            <template v-if="(!ui.filterJobId || ui.filterJobId === j.id) && unassignedMembers.filter(m=>m.jobId===j.id&&!m.isLeave&&(!searchQuery||m.name.toLowerCase().includes(searchQuery.toLowerCase()))).length > 0">
                                 <div class="job-sec-hdr">
                                     <span>{{ j.icon }}</span>
                                     <span :style="{color:j.color}">{{ j.name }}</span>
@@ -593,7 +605,7 @@
                         </template>
 
                         <!-- 請假區塊 -->
-                        <template v-if="unassignedMembers.filter(m=>m.isLeave).length > 0">
+                        <template v-if="(!ui.filterJobId || ui.filterJobId === 'leave') && unassignedMembers.filter(m=>m.isLeave).length > 0">
                             <div class="job-sec-hdr">
                                 <span>☕</span><span style="color:#f59e0b;">請假中</span>
                                 <span class="ml-auto px-1.5 rounded text-[12px]" style="background:rgba(245,158,11,0.15);color:#f59e0b;">{{ unassignedMembers.filter(m=>m.isLeave).length }}</span>
@@ -893,7 +905,7 @@
                 const authView = ref('login'); const authForm = ref({ email: '', password: '' });
                 const members = ref([]); const groups = ref([]); const logs = ref([]); const searchQuery = ref('');
                 const jobs = ref([{ id: 'j1', name: '騎士', color: '#be123c', icon: '⚔️' }, { id: 'j2', name: '牧師', color: '#0369a1', icon: '✨' }, { id: 'j3', name: '巫師', color: '#7e22ce', icon: '🔥' }, { id: 'j4', name: '獵人', color: '#15803d', icon: '🏹' }, { id: 'j5', name: '刺客', color: '#4b5563', icon: '🗡️' }, { id: 'j6', name: '商人', color: '#b45309', icon: '💰' }]);
-                const ui = ref({ modal: null, expandUnassigned: true, assigningMember: null, sortBy: 'name', openIconPickerId: null, openColorPickerId: null, targetGroup: null, draggedGroupIndex: null, isSidebarCollapsed: false, theme: localStorage.getItem('ro_theme') || 'dark' });
+                const ui = ref({ modal: null, expandUnassigned: true, assigningMember: null, sortBy: 'name', openIconPickerId: null, openColorPickerId: null, targetGroup: null, draggedGroupIndex: null, isSidebarCollapsed: false, theme: localStorage.getItem('ro_theme') || 'dark', filterJobId: null });
                 watch(() => ui.value.theme, (newTheme) => {
                     localStorage.setItem('ro_theme', newTheme);
                     if (newTheme === 'dark') document.body.classList.add('theme-dark');
