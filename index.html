@@ -492,7 +492,8 @@
                                 </div>
 
                                 <!-- 進度條與狀態 -->
-                                <div class="px-4 py-3 bg-[var(--accent-glow)] flex items-center justify-between border-b" style="border-color:var(--card-border);">
+                                <div class="px-4 py-2 flex items-center justify-between border-b" 
+                                     style="background:rgba(0,0,0,0.03); border-color:var(--card-border); border-left: 2px solid rgba(74,132,232,0.1); border-right: 2px solid rgba(74,132,232,0.1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
                                     <div class="flex-1 max-w-[140px] prog-track">
                                         <div class="prog-fill"
                                              :class="group.members.length >= group.max ? 'prog-full' : group.members.length >= group.max * 0.6 ? 'prog-near' : 'prog-normal'"
