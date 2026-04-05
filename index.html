@@ -165,76 +165,78 @@
     <div id="app" v-cloak :class="ui.theme === 'dark' ? 'theme-dark' : ''" class="h-screen flex flex-col md:flex-row overflow-hidden bg-[var(--app-bg)]">
 
         <!-- ─── 左側導覽列 ─── -->
-        <aside v-if="user" class="hidden md:flex flex-col h-full shrink-0 overflow-y-auto custom-scroll transition-all duration-300 relative" :class="ui.isSidebarCollapsed ? 'w-20' : 'w-60'" style="background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);">
+        <aside v-if="user" class="hidden md:flex flex-col h-full shrink-0 transition-all duration-300 relative z-[100]" :class="ui.isSidebarCollapsed ? 'w-20' : 'w-60'" style="background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);overflow:visible;">
             <!-- 縮放按鈕 -->
             <button @click="ui.isSidebarCollapsed = !ui.isSidebarCollapsed" 
-                    class="absolute top-6 -right-3 w-6 h-6 rounded-full flex items-center justify-center transition-all z-[60] shadow-md border hover:scale-110" 
+                    class="absolute top-6 -right-3 w-6 h-6 rounded-full flex items-center justify-center transition-all z-[110] shadow-md border hover:scale-110" 
                     style="background:var(--sidebar-bg);border-color:var(--sidebar-border);color:var(--text-primary);">
                 <svg class="icon-svg text-[12px] transition-transform duration-300" :class="{'rotate-180': ui.isSidebarCollapsed}"><use href="#icon-chevron-left"></use></svg>
             </button>
 
-            <div class="p-5 flex flex-col items-center shrink-0" style="border-bottom:1px solid var(--sidebar-border);">
-                <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-3 poring-float" style="background:linear-gradient(135deg,#1e3d7e,#4a84e8);box-shadow:0 4px 15px rgba(74,132,232,0.35);">
-                    <svg class="icon-svg text-white text-2xl"><use href="#icon-poring"></use></svg>
+            <div class="flex flex-col h-full w-full overflow-y-auto custom-scroll overflow-x-hidden">
+                <div class="p-5 flex flex-col items-center shrink-0" style="border-bottom:1px solid var(--sidebar-border);">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-3 poring-float" style="background:linear-gradient(135deg,#1e3d7e,#4a84e8);box-shadow:0 4px 15px rgba(74,132,232,0.35);">
+                        <svg class="icon-svg text-white text-2xl"><use href="#icon-poring"></use></svg>
+                    </div>
+                    <h1 v-show="!ui.isSidebarCollapsed" class="text-sm font-black tracking-tighter text-center transition-opacity" style="color:var(--text-primary);">RO 冒險公會管理</h1>
+                    <p v-show="!ui.isSidebarCollapsed" class="text-[12px] font-bold uppercase tracking-widest mt-1 transition-opacity" style="color:#e8a838;">Guild Manager v5</p>
                 </div>
-                <h1 v-show="!ui.isSidebarCollapsed" class="text-sm font-black tracking-tighter text-center transition-opacity" style="color:var(--text-primary);">RO 冒險公會管理</h1>
-                <p v-show="!ui.isSidebarCollapsed" class="text-[12px] font-bold uppercase tracking-widest mt-1 transition-opacity" style="color:#e8a838;">Guild Manager v5</p>
-            </div>
-            <nav class="flex-1 p-3 space-y-0.5">
-                <div v-show="!ui.isSidebarCollapsed" class="px-2 py-2 text-[12px] font-black uppercase tracking-[0.2em]" style="color:var(--text-muted);">Dashboard</div>
-                <button @click="ui.modal = 'jobStats'" class="nav-item group" :class="{'justify-center': ui.isSidebarCollapsed}">
-                    <svg class="icon-svg opacity-60"><use href="#icon-chart"></use></svg>
-                    <span v-show="!ui.isSidebarCollapsed">戰力統計</span>
-                    <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">戰力統計</div>
-                </button>
-                <template v-if="!isReadOnly">
-                    <button @click="ui.modal = 'memberList'" class="nav-item group" :class="{'justify-center': ui.isSidebarCollapsed}">
-                        <svg class="icon-svg opacity-60"><use href="#icon-users"></use></svg>
-                        <span v-show="!ui.isSidebarCollapsed">成員管理</span>
-                        <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">成員管理</div>
+                <nav class="flex-1 p-3 space-y-0.5">
+                    <div v-show="!ui.isSidebarCollapsed" class="px-2 py-2 text-[12px] font-black uppercase tracking-[0.2em]" style="color:var(--text-muted);">Dashboard</div>
+                    <button @click="ui.modal = 'jobStats'" class="nav-item group" :class="{'justify-center': ui.isSidebarCollapsed}">
+                        <svg class="icon-svg opacity-60"><use href="#icon-chart"></use></svg>
+                        <span v-show="!ui.isSidebarCollapsed">戰力統計</span>
+                        <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">戰力統計</div>
                     </button>
-                    <button @click="ui.modal = 'logsModal'" class="nav-item group" :class="{'justify-center': ui.isSidebarCollapsed}">
-                        <svg class="icon-svg opacity-60"><use href="#icon-history"></use></svg>
-                        <span v-show="!ui.isSidebarCollapsed">操作紀錄</span>
-                        <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">操作紀錄</div>
+                    <template v-if="!isReadOnly">
+                        <button @click="ui.modal = 'memberList'" class="nav-item group" :class="{'justify-center': ui.isSidebarCollapsed}">
+                            <svg class="icon-svg opacity-60"><use href="#icon-users"></use></svg>
+                            <span v-show="!ui.isSidebarCollapsed">成員管理</span>
+                            <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">成員管理</div>
+                        </button>
+                        <button @click="ui.modal = 'logsModal'" class="nav-item group" :class="{'justify-center': ui.isSidebarCollapsed}">
+                            <svg class="icon-svg opacity-60"><use href="#icon-history"></use></svg>
+                            <span v-show="!ui.isSidebarCollapsed">操作紀錄</span>
+                            <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">操作紀錄</div>
+                        </button>
+                        <button @click="ui.modal = 'jobSettings'" class="nav-item group" :class="{'justify-center': ui.isSidebarCollapsed}">
+                            <svg class="icon-svg opacity-60"><use href="#icon-briefcase"></use></svg>
+                            <span v-show="!ui.isSidebarCollapsed">職業設定</span>
+                            <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">職業設定</div>
+                        </button>
+                        <div v-show="!ui.isSidebarCollapsed" class="px-2 pt-4 pb-1 text-[12px] font-black uppercase tracking-[0.2em]" style="color:var(--text-muted);">Admin</div>
+                        <button @click="ui.modal = 'importMembers'" class="nav-item group" style="color:#fb923c;" :class="{'justify-center': ui.isSidebarCollapsed}">
+                            <svg class="icon-svg"><use href="#icon-import"></use></svg>
+                            <span v-show="!ui.isSidebarCollapsed">批量匯入</span>
+                            <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">批量匯入</div>
+                        </button>
+                        <button @click="openShareModal" class="nav-item group" style="color:#f472b6;" :class="{'justify-center': ui.isSidebarCollapsed}">
+                            <svg class="icon-svg"><use href="#icon-share"></use></svg>
+                            <span v-show="!ui.isSidebarCollapsed">分享連結</span>
+                            <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">分享連結</div>
+                        </button>
+                        <button @click="openAddMember" class="w-full flex items-center gap-2 rounded-xl font-black text-xs mt-3 ro-btn ro-btn-gold group" :class="ui.isSidebarCollapsed ? 'p-2 justify-center' : 'px-3 py-2.5 justify-center'" style="position:relative;">
+                            <svg class="icon-svg"><use href="#icon-plus"></use></svg>
+                            <span v-show="!ui.isSidebarCollapsed">招募成員</span>
+                            <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">招募成員</div>
+                        </button>
+                    </template>
+                </nav>
+                <div class="p-3 shrink-0 flex gap-2" :class="ui.isSidebarCollapsed ? 'flex-col' : ''" style="border-top:1px solid var(--sidebar-border);">
+                    <button @click="ui.theme = (ui.theme === 'dark' ? 'light' : 'dark')" class="flex-1 p-2 rounded-lg flex items-center justify-center transition-colors group relative" style="background:var(--item-bg);color:var(--text-muted);border:1px solid var(--card-border);">
+                        <span v-if="ui.theme === 'dark'">🌙</span>
+                        <span v-else>☀️</span>
+                        <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">切換主題</div>
                     </button>
-                    <button @click="ui.modal = 'jobSettings'" class="nav-item group" :class="{'justify-center': ui.isSidebarCollapsed}">
-                        <svg class="icon-svg opacity-60"><use href="#icon-briefcase"></use></svg>
-                        <span v-show="!ui.isSidebarCollapsed">職業設定</span>
-                        <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">職業設定</div>
+                    <button @click="ui.modal = 'userProfile'" class="flex-1 p-2 rounded-lg flex items-center justify-center transition-colors group relative" style="background:var(--item-bg);color:var(--text-muted);border:1px solid var(--card-border);">
+                        <svg class="icon-svg text-xs"><use href="#icon-settings"></use></svg>
+                        <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">管理帳號設定</div>
                     </button>
-                    <div v-show="!ui.isSidebarCollapsed" class="px-2 pt-4 pb-1 text-[12px] font-black uppercase tracking-[0.2em]" style="color:var(--text-muted);">Admin</div>
-                    <button @click="ui.modal = 'importMembers'" class="nav-item group" style="color:#fb923c;" :class="{'justify-center': ui.isSidebarCollapsed}">
-                        <svg class="icon-svg"><use href="#icon-import"></use></svg>
-                        <span v-show="!ui.isSidebarCollapsed">批量匯入</span>
-                        <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">批量匯入</div>
+                    <button @click="handleLogout" class="flex-1 p-2 rounded-lg flex items-center justify-center transition-colors group relative" style="background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2);">
+                        <svg class="icon-svg text-xs"><use href="#icon-logout"></use></svg>
+                        <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">登出</div>
                     </button>
-                    <button @click="openShareModal" class="nav-item group" style="color:#f472b6;" :class="{'justify-center': ui.isSidebarCollapsed}">
-                        <svg class="icon-svg"><use href="#icon-share"></use></svg>
-                        <span v-show="!ui.isSidebarCollapsed">分享連結</span>
-                        <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">分享連結</div>
-                    </button>
-                    <button @click="openAddMember" class="w-full flex items-center gap-2 rounded-xl font-black text-xs mt-3 ro-btn ro-btn-gold group" :class="ui.isSidebarCollapsed ? 'p-2 justify-center' : 'px-3 py-2.5 justify-center'" style="position:relative;">
-                        <svg class="icon-svg"><use href="#icon-plus"></use></svg>
-                        <span v-show="!ui.isSidebarCollapsed">招募成員</span>
-                        <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">招募成員</div>
-                    </button>
-                </template>
-            </nav>
-            <div class="p-3 shrink-0 flex gap-2" :class="ui.isSidebarCollapsed ? 'flex-col' : ''" style="border-top:1px solid var(--sidebar-border);">
-                <button @click="ui.theme = (ui.theme === 'dark' ? 'light' : 'dark')" class="flex-1 p-2 rounded-lg flex items-center justify-center transition-colors group relative" style="background:var(--item-bg);color:var(--text-muted);border:1px solid var(--card-border);">
-                    <span v-if="ui.theme === 'dark'">🌙</span>
-                    <span v-else>☀️</span>
-                    <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">切換主題</div>
-                </button>
-                <button @click="ui.modal = 'userProfile'" class="flex-1 p-2 rounded-lg flex items-center justify-center transition-colors group relative" style="background:var(--item-bg);color:var(--text-muted);border:1px solid var(--card-border);">
-                    <svg class="icon-svg text-xs"><use href="#icon-settings"></use></svg>
-                    <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">管理帳號設定</div>
-                </button>
-                <button @click="handleLogout" class="flex-1 p-2 rounded-lg flex items-center justify-center transition-colors group relative" style="background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2);">
-                    <svg class="icon-svg text-xs"><use href="#icon-logout"></use></svg>
-                    <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">登出</div>
-                </button>
+                </div>
             </div>
         </aside>
 
