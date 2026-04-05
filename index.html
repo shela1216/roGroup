@@ -143,19 +143,19 @@
             display:flex; 
             align-items:center; 
             gap:8px; 
-            padding:12px 4px 6px 4px; 
+            padding:16px 0 6px 0; 
             font-size:11px; 
             font-weight:950; 
             letter-spacing:0.15em; 
             text-transform:uppercase; 
             color: var(--text-muted); 
-            margin-top:20px; 
+            margin-top:4px; 
             margin-bottom:8px;
             border-bottom: 2px solid var(--sidebar-border);
             position: sticky;
             top: 0;
             z-index: 10;
-            background: var(--card-bg);
+            background: var(--sidebar-bg);
         }
         .job-sec-hdr:first-child { margin-top:0; }
     </style>
@@ -341,7 +341,7 @@
             <div class="flex-1 flex flex-row overflow-hidden h-full">
 
                 <!-- 中間部署概況 -->
-                <main class="flex-1 overflow-y-auto custom-scroll p-2 md:p-4 pb-20 md:pb-12 bg-[var(--app-bg)] transition-all">
+                <main class="flex-1 overflow-y-auto custom-scroll p-2 md:p-4 md:pr-6 pb-20 md:pb-12 bg-[var(--app-bg)] transition-all">
 
                     <div v-if="loading" class="flex flex-col items-center justify-center py-20 h-full">
                         <div class="w-10 h-10 border-2 border-[#ffffff] border-t-[#4a84e8] rounded-full animate-spin mb-4"></div>
