@@ -28,27 +28,32 @@
             --item-hover-bg: #ffffff;
             --item-hover-border: #4a84e8;
             --accent-glow: rgba(74, 132, 232, 0.1);
+            --btn-gold: linear-gradient(to bottom, #fde68a, #f59e0b);
+            --btn-gold-border: #d97706;
+            --btn-gold-text: #78350f;
+            --btn-blue: linear-gradient(to bottom, #60a5fa, #2563eb);
+            --btn-blue-border: #1d4ed8;
         }
 
         .theme-dark {
-            --app-bg: #090f1d;
-            --sidebar-bg: #0f172a;
+            --app-bg: #0b1222;
+            --sidebar-bg: #111a2e;
             --sidebar-border: #1e293b;
-            --card-bg: #131c31;
-            --card-border: #2a3f66;
-            --card-header-bg: #1b2742;
+            --card-bg: rgba(23, 33, 54, 0.85);
+            --card-border: #2d3d5a;
+            --card-header-bg: #1a2642;
             --text-primary: #f8fafc;
             --text-secondary: #cbd5e1;
-            --text-muted: #94a3b8;
+            --text-muted: #8493a8;
             --input-bg: #090f1d;
             --nav-item-color: #94a3b8;
             --nav-item-hover-bg: #1e293b;
             --nav-item-hover-text: #f8fafc;
-            --modal-overlay: rgba(9, 15, 29, 0.85);
-            --item-bg: #1b2742;
-            --item-hover-bg: #223254;
+            --modal-overlay: rgba(7, 11, 20, 0.9);
+            --item-bg: rgba(30, 41, 59, 0.5);
+            --item-hover-bg: rgba(51, 65, 85, 0.6);
             --item-hover-border: #60a5fa;
-            --accent-glow: rgba(74, 132, 232, 0.2);
+            --accent-glow: rgba(96, 165, 250, 0.15);
         }
 
         body { font-family: 'Noto Sans TC', sans-serif; -webkit-print-color-adjust: exact; background-color: var(--app-bg); height: 100vh; overflow: hidden; color: var(--text-secondary); transition: background-color 0.3s, color 0.3s; }
@@ -62,8 +67,29 @@
         .list-enter-from, .list-leave-to { opacity: 0; transform: translateX(10px); }
         .icon-svg { width: 1.2em; height: 1.2em; fill: currentColor; display: inline-block; vertical-align: middle; }
         .no-print { @media print { display: none !important; } }
-        .ro-btn { transition: all 0.15s; position: relative; border-bottom-width: 3px; }
-        .ro-btn:active { transform: translateY(1px); border-bottom-width: 1px; }
+        
+        /* RO Sleek Buttons */
+        .ro-btn { 
+            transition: all 0.15s; 
+            position: relative; 
+            border: 1px solid var(--btn-blue-border);
+            background: var(--btn-blue);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .ro-btn:active { transform: translateY(1px); box-shadow: none; }
+        .ro-btn-gold {
+            background: var(--btn-gold);
+            border-color: var(--btn-gold-border);
+            color: var(--btn-gold-text);
+            font-weight: 900;
+        }
+        .ro-btn-secondary {
+            background: rgba(148, 163, 184, 0.1);
+            border-color: var(--card-border);
+            color: var(--text-secondary);
+        }
 
         /* Progress bars */
         .prog-track { background: var(--app-bg); border-radius: 99px; height: 6px; overflow: hidden; border: 1px solid var(--sidebar-border); }
@@ -78,9 +104,17 @@
         .sidebar-tooltip { position:absolute; left:100%; top:50%; transform:translateY(-50%); margin-left:12px; background: var(--nav-item-hover-bg); color: var(--nav-item-hover-text); padding:6px 10px; border-radius:6px; font-size:12px; white-space:nowrap; opacity:0; pointer-events:none; transition:all 0.2s; z-index:100; box-shadow:0 4px 6px rgba(0,0,0,0.4); }
         .group:hover .sidebar-tooltip { opacity:1; transform:translateY(-50%) translateX(4px); }
 
-        /* Cards - RO Guild Style */
-        .ro-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; transition: all 0.2s ease; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .theme-dark .ro-card { box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+        /* Cards - RO Sleek Glass Style */
+        .ro-card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--card-border); 
+            border-radius: 12px; 
+            transition: all 0.2s ease; 
+            overflow: hidden; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            backdrop-filter: blur(8px);
+        }
+        .theme-dark .ro-card { box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
         .ro-card-header { background: var(--card-header-bg); border-bottom: 1px solid var(--card-border); padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
 
         /* Member Items */
@@ -169,7 +203,7 @@
                         <span v-show="!ui.isSidebarCollapsed">分享連結</span>
                         <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">分享連結</div>
                     </button>
-                    <button @click="openAddMember" class="w-full flex items-center gap-2 rounded-xl font-black text-xs text-white mt-3 ro-btn group" :class="ui.isSidebarCollapsed ? 'p-2 justify-center' : 'px-3 py-2.5 justify-center'" style="background:linear-gradient(135deg,#2a55c0,#4a84e8);border-bottom-color:#1a3a90;box-shadow:0 4px 12px rgba(74,132,232,0.3);position:relative;">
+                    <button @click="openAddMember" class="w-full flex items-center gap-2 rounded-xl font-black text-xs mt-3 ro-btn ro-btn-gold group" :class="ui.isSidebarCollapsed ? 'p-2 justify-center' : 'px-3 py-2.5 justify-center'" style="position:relative;">
                         <svg class="icon-svg"><use href="#icon-plus"></use></svg>
                         <span v-show="!ui.isSidebarCollapsed">招募成員</span>
                         <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">招募成員</div>
@@ -247,8 +281,8 @@
                             <h1 class="text-2xl font-black mb-2 tracking-tighter uppercase" style="color:var(--text-primary);">情報已加密</h1>
                             <p class="text-[10px] font-bold uppercase tracking-widest mb-8" style="color:var(--text-muted);">Restricted Access</p>
                             <div class="space-y-4">
-                                <input v-model="visitorPassword" type="password" placeholder="請輸入存取密碼" class="w-full px-4 py-3 rounded-xl font-bold text-sm text-center outline-none" style="background:var(--item-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
-                                <button @click="unlockShare" class="w-full py-3.5 text-white font-black rounded-xl ro-btn" style="background:linear-gradient(135deg,#db2777,#f472b6);border-bottom-color:#9d174d;">解鎖內容</button>
+                                <input v-model="visitorPassword" type="password" placeholder="請輸入存取密碼" class="w-full px-4 py-3 rounded-xl font-bold text-sm text-center outline-none" style="background:var(--item-hover-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
+                                <button @click="unlockShare" class="w-full py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold">解鎖內容</button>
                             </div>
                         </div>
                     </div>
@@ -266,18 +300,18 @@
                                     <input v-model="authForm.password" type="password" placeholder="Password" class="w-full px-4 py-3 rounded-xl font-bold text-sm outline-none" style="background:var(--item-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
                                 </template>
                                 <div v-if="authView === 'login'">
-                                    <button @click="handleEmailAuth('login')" class="w-full py-3.5 text-white font-black rounded-xl ro-btn" style="background:linear-gradient(135deg,#2a55c0,#4a84e8);border-bottom-color:#1a3a90;">啟程探險</button>
+                                    <button @click="handleEmailAuth('login')" class="w-full py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold">啟程探險</button>
                                     <div class="flex items-center gap-4 text-[10px] font-black justify-center mt-6" style="color:var(--text-muted);">
                                         <button @click="authView = 'register'" class="underline hover:text-var(--text-primary) transition-colors">新成員登記</button>
                                         <button @click="authView = 'guest'" class="underline hover:text-var(--text-primary) transition-colors">訪客試用</button>
                                     </div>
                                 </div>
                                 <div v-if="authView === 'register'">
-                                    <button @click="handleEmailAuth('register')" class="w-full py-3.5 text-white font-black rounded-xl ro-btn" style="background:linear-gradient(135deg,#15703a,#22c55e);border-bottom-color:#0d4a27;">完成登記</button>
+                                    <button @click="handleEmailAuth('register')" class="w-full py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold">完成登記</button>
                                     <button @click="authView = 'login'" class="text-[10px] font-black mt-4 block mx-auto underline hover:text-var(--text-primary) transition-colors" style="color:var(--text-muted);">返回登入</button>
                                 </div>
                                 <div v-if="authView === 'guest'">
-                                    <button @click="loginAsGuest" class="w-full py-3.5 text-white font-black rounded-xl ro-btn" style="background:linear-gradient(135deg,#c25a0a,#f97316);border-bottom-color:#8a3a05;">本地試用</button>
+                                    <button @click="loginAsGuest" class="w-full py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold">本地試用</button>
                                     <button @click="authView = 'login'" class="text-[10px] font-black mt-4 block mx-auto underline hover:text-var(--text-primary) transition-colors" style="color:var(--text-muted);">返回登入</button>
                                 </div>
                             </div>
@@ -558,10 +592,10 @@
                  class="flex justify-between items-center px-5 cursor-pointer shrink-0 h-16"
                  style="border-bottom:1px solid var(--sidebar-border);background:var(--card-header-bg);border-radius:20px 20px 0 0;">
                 <div class="flex items-center gap-3">
-                    <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black text-white" style="background:linear-gradient(135deg,#2a55c0,#4a84e8);">{{ unassignedMembers.length }}</div>
+                    <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black text-white" style="background:var(--btn-gold);border:1px solid var(--btn-gold-border);color:var(--btn-gold-text);">{{ unassignedMembers.length }}</div>
                     <span class="font-black text-sm tracking-tight" style="color:var(--text-primary);">待分配名單</span>
                 </div>
-                <div class="flex items-center gap-2 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest" style="background:rgba(74,132,232,0.15);color:#4a84e8;">
+                <div class="flex items-center gap-2 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ro-btn ro-btn-gold">
                     {{ ui.expandUnassigned ? 'Close' : 'View' }}
                     <svg class="icon-svg transition-transform duration-500" :class="{'rotate-180': ui.expandUnassigned}"><use href="#icon-chevron-up"></use></svg>
                 </div>
@@ -713,8 +747,8 @@
                         </div>
                     </div>
                     <div class="flex gap-3">
-                        <button @click="ui.modal = null" class="flex-1 py-3.5 font-bold rounded-xl uppercase tracking-widest text-[10px] transition-colors" style="background:var(--item-bg);color:var(--text-muted);border:1px solid var(--card-border);">Cancel</button>
-                        <button @click="confirmImport" class="flex-1 py-3.5 text-white font-black rounded-xl ro-btn uppercase tracking-widest text-[10px]" style="background:linear-gradient(135deg,#c25a0a,#f97316);border-bottom-color:#8a3a05;">Confirm Import</button>
+                        <button @click="ui.modal = null" class="flex-1 py-3.5 font-bold rounded-xl uppercase tracking-widest text-[10px] transition-colors ro-btn ro-btn-secondary">Cancel</button>
+                        <button @click="confirmImport" class="flex-1 py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold uppercase tracking-widest text-[10px]">Confirm Import</button>
                     </div>
                 </div>
             </div>
@@ -730,7 +764,7 @@
                             <button @click="copyLink" class="px-4 py-2 rounded-xl active:scale-90 transition-transform shrink-0" style="background:#f472b6;color:white;"><svg class="icon-svg"><use :href="linkCopied ? '#icon-check' : '#icon-copy'"></use></svg></button>
                         </div>
                     </div>
-                    <button @click="publishGuild" class="w-full py-4 text-white font-black rounded-xl ro-btn tracking-widest uppercase text-[10px]" style="background:linear-gradient(135deg,#2a55c0,#4a84e8);border-bottom-color:#1a3a90;">Publish Link</button>
+                    <button @click="publishGuild" class="w-full py-4 text-white font-black rounded-xl ro-btn ro-btn-gold tracking-widest uppercase text-[10px]">Publish Link</button>
                 </div>
             </div>
 
@@ -771,8 +805,8 @@
                         <option v-for="job in jobs" :key="job.id" :value="job.id">{{ job.icon }} {{ job.name }}</option>
                     </select>
                     <div class="flex gap-3">
-                        <button @click="ui.modal = null" class="flex-1 py-3.5 font-bold rounded-xl uppercase tracking-widest text-[10px] transition-colors" style="background:var(--item-bg);color:var(--text-muted);border:1px solid var(--card-border);">Cancel</button>
-                        <button @click="saveMember" class="flex-1 py-3.5 text-white font-black rounded-xl ro-btn uppercase tracking-widest text-[10px]" style="background:linear-gradient(135deg,#2a55c0,#4a84e8);border-bottom-color:#1a3a90;">Save</button>
+                        <button @click="ui.modal = null" class="flex-1 py-3.5 font-bold rounded-xl uppercase tracking-widest text-[10px] transition-colors ro-btn ro-btn-secondary">Cancel</button>
+                        <button @click="saveMember" class="flex-1 py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold uppercase tracking-widest text-[10px]">Save</button>
                     </div>
                 </div>
             </div>
@@ -805,7 +839,7 @@
                             <div class="text-[9px] font-black mb-1 uppercase tracking-widest" style="color:var(--text-muted);">Account</div>
                             <div class="font-black text-sm break-all mt-1" style="color:#4a84e8;">{{ user.isAnonymous ? 'Temporary Visitor' : user.email }}</div>
                         </div>
-                        <button @click="ui.modal = null" class="w-full py-3.5 font-bold rounded-xl uppercase tracking-widest text-[10px] transition-colors" style="background:var(--item-bg);color:var(--text-muted);border:1px solid var(--card-border);">Close</button>
+                        <button @click="ui.modal = null" class="w-full py-3.5 font-bold rounded-xl uppercase tracking-widest text-[10px] transition-colors ro-btn ro-btn-secondary">Close</button>
                     </div>
                 </div>
             </div>
