@@ -470,7 +470,7 @@
                                                              class="icon-svg text-[12px] shrink-0" style="color:#e8a838;"><use href="#icon-crown"></use></svg>
                                                         <span class="text-sm font-black whitespace-nowrap">{{ findMember(mId)?.name }}</span>
                                                     </div>
-                                                    <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit" :style="{backgroundColor: getJob(findMember(mId)?.jobId)?.color + '15', color: getJob(findMember(mId)?.jobId)?.color, border: '1px solid ' + getJob(findMember(mId)?.jobId)?.color + '30'}">{{ getJob(findMember(mId)?.jobId)?.name }}</div>
+                                                    <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit" :style="jobTagStyle(getJob(findMember(mId)?.jobId)?.color)">{{ getJob(findMember(mId)?.jobId)?.name }}</div>
                                                 </div>
                                             </div>
 
@@ -715,7 +715,7 @@
                     <div class="w-9 h-9 rounded-lg flex items-center justify-center text-xl shrink-0" :style="{backgroundColor:getJob(m.jobId)?.color+'15'}">{{ getJob(m.jobId)?.icon }}</div>
                     <div class="flex-1 min-w-0">
                         <div class="font-black text-sm" style="color:var(--text-secondary);">{{ m.name }}</div>
-                        <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit mt-1" :style="{backgroundColor: getJob(m.jobId)?.color + '15', color: getJob(m.jobId)?.color, border: '1px solid ' + getJob(m.jobId)?.color + '30'}">{{ getJob(m.jobId)?.name }}</div>
+                        <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit mt-1" :style="jobTagStyle(getJob(m.jobId)?.color)">{{ getJob(m.jobId)?.name }}</div>
                     </div>
                     <div v-if="m.isLeave" class="text-[12px] font-black px-1.5 py-0.5 rounded shrink-0" style="background:rgba(245,158,11,0.15);color:#f59e0b;">請假</div>
                 </div>
@@ -802,7 +802,7 @@
                                     <div v-if="getMemberGroup(m.id)" class="text-[12px] font-black px-2 py-0.5 rounded-md shrink-0 tracking-widest" style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">{{ getMemberGroup(m.id).name }}</div>
                                     <div v-else class="text-[12px] font-black px-2 py-0.5 rounded-md shrink-0 tracking-widest" style="background:rgba(0,0,0,0.03);color:#cbd5e1;border:1px solid var(--card-border);">未分配</div>
                                 </div>
-                                <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit mt-1" :style="{backgroundColor: getJob(m.jobId)?.color + '15', color: getJob(m.jobId)?.color, border: '1px solid ' + getJob(m.jobId)?.color + '30'}">{{ getJob(m.jobId)?.icon }} {{ getJob(m.jobId)?.name }}</div>
+                                <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit mt-1" :style="jobTagStyle(getJob(m.jobId)?.color)">{{ getJob(m.jobId)?.icon }} {{ getJob(m.jobId)?.name }}</div>
                             </div>
                             <div class="flex gap-1 shrink-0">
                                 <button v-if="!isReadOnly" @click="toggleLeave(m)" class="p-2 rounded-lg transition-colors" :style="m.isLeave?'background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.25);':'background:rgba(255,255,255,0.05);color:#cbd5e1;border:1px solid var(--card-border);'"><svg class="icon-svg text-xs"><use href="#icon-coffee"></use></svg></button>
@@ -930,7 +930,7 @@
                             <div class="w-9 h-9 rounded-lg flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform" :style="{backgroundColor:getJob(m.jobId).color+'15'}">{{ getJob(m.jobId).icon }}</div>
                             <div class="flex-1 min-w-0">
                                 <div class="font-black text-sm" style="color:var(--text-primary);">{{ m.name }}</div>
-                                <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit mt-1" :style="{backgroundColor: getJob(m.jobId).color + '15', color: getJob(m.jobId).color, border: '1px solid ' + getJob(m.jobId).color + '30'}">{{ getJob(m.jobId).name }}</div>
+                                <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit mt-1" :style="jobTagStyle(getJob(m.jobId).color)">{{ getJob(m.jobId).name }}</div>
                             </div>
                             <div v-if="getMemberGroup(m.id)" class="text-[12px] font-black px-2 py-0.5 rounded-lg shrink-0" style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">{{ getMemberGroup(m.id).name }}</div>
                         </div>
@@ -982,6 +982,13 @@
 
                 const findMember = (id) => members.value.find(m => m.id === id);
                 const getJob = (id) => jobs.value.find(j => j.id === id) || { name: '未知', icon: '❓', color: '#ccc' };
+                const jobTagStyle = (color) => {
+                    if (!color) color = '#4a84e8';
+                    if (ui.theme === 'dark') {
+                        return { backgroundColor: color + 'cc', color: '#ffffff', border: '1px solid ' + color };
+                    }
+                    return { backgroundColor: color + '15', color: color, border: '1px solid ' + color + '30' };
+                };
                 const getMemberGroup = (mid) => groups.value.find(g => g.members.includes(mid));
                 const unassignedMembers = computed(() => { const assigned = new Set(); groups.value.forEach(g => g.members.forEach(id => assigned.add(id))); return members.value.filter(m => !assigned.has(m.id)); });
                 const getSortedGroupMembers = (group) => { if (!group || !group.members || group.members.length === 0) return []; const list = [...group.members]; const effectiveLeader = group.leaderId || group.members[0]; const idx = list.indexOf(effectiveLeader); if (idx !== -1) { list.splice(idx, 1); list.unshift(effectiveLeader); } return list; };
