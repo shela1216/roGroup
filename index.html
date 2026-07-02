@@ -33,6 +33,10 @@
             --btn-gold-text: #78350f;
             --btn-blue: linear-gradient(to bottom, #60a5fa, #2563eb);
             --btn-blue-border: #1d4ed8;
+            --mobile-browser-top-inset: 0px;
+            --mobile-top-inset: max(env(safe-area-inset-top, 0px), var(--mobile-browser-top-inset));
+            --mobile-header-top-padding: calc(0.75rem + var(--mobile-top-inset));
+            --mobile-menu-top: calc(4.5rem + var(--mobile-top-inset));
         }
 
         .theme-dark {
@@ -117,6 +121,24 @@
         .sidebar-tooltip { position:absolute; left:100%; top:50%; transform:translateY(-50%); margin-left:12px; background: var(--card-bg); color: var(--nav-item-hover-text); padding:6px 10px; border-radius:6px; font-size:12px; white-space:nowrap; opacity:0; pointer-events:none; transition:all 0.2s; z-index:100; box-shadow:0 4px 12px rgba(74,132,232,0.25); border:1px solid var(--card-border); }
         .theme-dark .sidebar-tooltip { box-shadow:0 4px 6px rgba(0,0,0,0.6); }
         .group:hover .sidebar-tooltip { opacity:1; transform:translateY(-50%) translateX(4px); }
+
+        .mobile-top-nav {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--sidebar-border);
+            padding-top: var(--mobile-header-top-padding);
+            padding-bottom: 0.75rem;
+            backdrop-filter: blur(12px);
+        }
+        .mobile-top-nav button {
+            min-width: 2.75rem;
+            min-height: 2.75rem;
+            touch-action: manipulation;
+        }
+        .mobile-menu-panel {
+            top: var(--mobile-menu-top);
+            max-height: calc(100dvh - var(--mobile-menu-top) - env(safe-area-inset-bottom, 0px) - 1rem);
+            overflow-y: auto;
+        }
 
         /* Cards - RO Sleek Glass Style */
         .ro-card {
@@ -280,7 +302,7 @@
         <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
 
             <!-- 移動端導覽列 -->
-            <nav v-if="user" class="md:hidden p-4 sticky top-0 z-50 shrink-0" style="background:var(--card-bg);border-bottom:1px solid var(--sidebar-border);padding-top:calc(1rem + env(safe-area-inset-top));">
+            <nav v-if="user" class="mobile-top-nav md:hidden px-4 sticky top-0 z-50 shrink-0">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-2">
                         <span class="w-8 h-8 rounded-lg flex items-center justify-center poring-float text-white" style="background:linear-gradient(135deg,#1e3d7e,#4a84e8);"><svg class="icon-svg"><use href="#icon-poring"></use></svg></span>
@@ -301,7 +323,8 @@
             <!-- 手機版垂直選單彈窗 -->
             <div v-if="ui.modal === 'mobileMenu'" class="fixed inset-0 z-[300] md:hidden" style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click="ui.modal = null">
                 <div class="absolute right-4 w-56 p-2 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-4 duration-200" 
-                     style="background:var(--card-bg);border:1px solid var(--card-border);box-shadow:0 20px 50px rgba(0,0,0,0.5);top:calc(4.5rem + env(safe-area-inset-top));" @click.stop>
+                     class="mobile-menu-panel"
+                     style="background:var(--card-bg);border:1px solid var(--card-border);box-shadow:0 20px 50px rgba(0,0,0,0.5);" @click.stop>
                     <div class="p-3 mb-1 border-b" style="border-color:var(--sidebar-border);">
                         <div class="text-[10px] font-black uppercase tracking-[0.2em]" style="color:var(--text-muted);">選單功能</div>
                     </div>
@@ -1077,6 +1100,32 @@
                 const isShareLocked = ref(false); const linkCopied = ref(false); let tempSharedData = null;
                 const emojiList = ['⚔️', '🛡️', '🏹', '✨', '🔥', '❄️', '⚡', '🌪️', '💧', '🌿', '💀', '⚰️', '💊', '🔨', '🪓', '💰', '🛒', '🎸', '🎭', '🥊', '🥋', '槍', '💣', '🐱', '🦅', '⛪', '📖', '👑', '💎', '🆕', '👼', '🧛'];
                 const groupColorsBg = ['#4a84e8', '#ef4444', '#22c55e', '#f59e0b', '#a855f7', '#06b6d4', '#ec4899', '#10b981', '#f97316', '#6366f1', '#eab308', '#8b5cf6', '#14b8a6', '#f43f5e', '#64748b'];                const appId = 'ro-guild-v5-pro'; let db, auth;
+                const syncMobileBrowserInset = () => {
+                    const isMobile = window.matchMedia('(max-width: 767px)').matches;
+                    if (!isMobile) {
+                        document.documentElement.style.setProperty('--mobile-browser-top-inset', '0px');
+                        return;
+                    }
+                    const visualViewport = window.visualViewport;
+                    const viewportHeight = visualViewport ? visualViewport.height : window.innerHeight;
+                    const screenHeight = window.screen && window.screen.height ? window.screen.height : viewportHeight;
+                    const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+                    const visualTop = visualViewport ? visualViewport.offsetTop : 0;
+                    const chromeGap = standalone ? 0 : Math.max(0, screenHeight - viewportHeight);
+                    const inferredTopChrome = chromeGap > 96 ? 36 : 0;
+                    const inset = Math.ceil(Math.min(56, Math.max(visualTop, inferredTopChrome)));
+                    document.documentElement.style.setProperty('--mobile-browser-top-inset', `${inset}px`);
+                };
+                const watchMobileViewport = () => {
+                    const run = () => requestAnimationFrame(syncMobileBrowserInset);
+                    syncMobileBrowserInset();
+                    window.addEventListener('resize', run, { passive: true });
+                    window.addEventListener('orientationchange', run, { passive: true });
+                    if (window.visualViewport) {
+                        window.visualViewport.addEventListener('resize', run, { passive: true });
+                        window.visualViewport.addEventListener('scroll', run, { passive: true });
+                    }
+                };
 
                 const findMember = (id) => members.value.find(m => m.id === id);
                 const getJob = (id) => jobs.value.find(j => j.id === id) || { name: '未知', icon: '❓', color: '#ccc' };
@@ -1206,6 +1255,7 @@
                 const confirmImport = () => { if (previewImport.value.length === 0) return; let newCount = 0; let updateCount = 0; previewImport.value.forEach(p => { if (p.isExisting) { const idx = members.value.findIndex(m => m.id === p.existingId); if (idx !== -1) { members.value[idx].jobId = p.jobId; updateCount++; } } else { members.value.push({ id: crypto.randomUUID(), name: p.name, jobId: p.jobId, isLeave: false }); newCount++; } }); addLog(`匯入: 新增 ${newCount}人, 更新 ${updateCount}人`); importText.value = ''; ui.value.modal = null; syncData(); };
 
                 onMounted(async () => {
+                    watchMobileViewport();
                     const local = localStorage.getItem(`ro_data_${appId}`); if(local) { const d = JSON.parse(local); members.value = d.members || []; groups.value = d.groups || []; jobs.value = d.jobs || jobs.value; logs.value = d.logs || []; }
                     const urlParams = new URLSearchParams(window.location.search); const shareId = urlParams.get('share');
                     try { const res = await fetch('config.json'); const config = await res.json(); const app = initializeApp(config); auth = getAuth(app); db = getFirestore(app); if (shareId) { isReadOnly.value = true; onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'shared_guilds', shareId), snap => { if (snap.exists()) { const d = snap.data(); if (d.password) { tempSharedData = d; isShareLocked.value = true; } else { members.value = d.members || []; groups.value = d.groups || []; jobs.value = d.jobs || jobs.value; user.value = { uid: 'visitor', isAnonymous: true, email: 'Visitor' }; } loading.value = false; } }); } else { onAuthStateChanged(auth, u => { user.value = u; if (u && !u.isAnonymous) { onSnapshot(doc(db, 'artifacts', appId, 'users', u.uid, 'data', 'guild'), snap => { if (snap.exists()) { const d = snap.data(); members.value = d.members || []; groups.value = d.groups || []; jobs.value = d.jobs || jobs.value; logs.value = d.logs || []; } }); } loading.value = false; }); } } catch (e) { if (localStorage.getItem('ro_guest_mode') === 'true') loginAsGuest(); loading.value = false; }

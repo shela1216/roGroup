@@ -1,5 +1,5 @@
 // 快取版本號
-const CACHE_NAME = 'ro-guild-manager'; 
+const CACHE_NAME = 'ro-guild-manager-v2';
 
 // 需要快取的靜態資源列表
 const urlsToCache = [
