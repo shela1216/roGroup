@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>萬玖娛樂 | RO:世界之旅 公會活動行程</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -37,6 +37,12 @@
         }
     </script>
     <style>
+        html,
+        body {
+            touch-action: pan-x pan-y;
+            -webkit-text-size-adjust: 100%;
+        }
+
         body {
             background-color: #f0f4f8;
             background-image: radial-gradient(#dcebf7 2px, transparent 2px);
@@ -114,6 +120,14 @@
         iframe::-webkit-scrollbar {
             width: 0px;
             background: transparent;
+        }
+
+        @media (max-width: 767px) {
+            input,
+            select,
+            textarea {
+                font-size: 16px !important;
+            }
         }
     </style>
 </head>
@@ -304,6 +318,19 @@
     <div id="toast" class="toast">已複製行事曆 ID！</div>
 
     <script>
+        const preventMobileZoom = () => {
+            document.addEventListener('gesturestart', (event) => event.preventDefault(), { passive: false });
+            document.addEventListener('gesturechange', (event) => event.preventDefault(), { passive: false });
+            document.addEventListener('gestureend', (event) => event.preventDefault(), { passive: false });
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', (event) => {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) event.preventDefault();
+                lastTouchEnd = now;
+            }, { passive: false });
+        };
+        preventMobileZoom();
+
         // ==========================================
         // 設定區：請在這裡填入您的 Google Calendar ID
         // ==========================================

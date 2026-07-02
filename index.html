@@ -1,13 +1,17 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>RO 冒險公會分組管理系統 v5</title>
-    <link rel='icon' href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🏰</text></svg>'>
+    <link rel='icon'
+        href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🏰</text></svg>'>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --app-bg: #dde8fb;
@@ -59,67 +63,195 @@
             --accent-glow: rgba(168, 85, 247, 0.2);
         }
 
-        body { 
-            font-family: 'Noto Sans TC', sans-serif; 
-            -webkit-print-color-adjust: exact; 
-            background-color: var(--app-bg); 
-            height: 100vh; 
-            height: 100dvh; 
-            overflow: hidden; 
-            color: var(--text-secondary); 
-            transition: background-color 0.3s, color 0.3s; 
+        html,
+        body {
+            touch-action: pan-x pan-y;
+            -webkit-text-size-adjust: 100%;
         }
-        [v-cloak] { display: none; }
-        .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
-        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(74, 132, 232, 0.35); border-radius: 10px; }
-        .theme-dark .custom-scroll::-webkit-scrollbar-thumb { background: #2a3550; }
-        .poring-float { animation: floating 3s ease-in-out infinite; }
-        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        .list-enter-active, .list-leave-active { transition: all 0.3s ease; }
-        .list-enter-from, .list-leave-to { opacity: 0; transform: translateX(10px); }
-        .icon-svg { width: 1.2em; height: 1.2em; fill: currentColor; display: inline-block; vertical-align: middle; }
-        .no-print { @media print { display: none !important; } }
-        
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            -webkit-print-color-adjust: exact;
+            background-color: var(--app-bg);
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            color: var(--text-secondary);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(74, 132, 232, 0.35);
+            border-radius: 10px;
+        }
+
+        .theme-dark .custom-scroll::-webkit-scrollbar-thumb {
+            background: #2a3550;
+        }
+
+        .poring-float {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .list-enter-active,
+        .list-leave-active {
+            transition: all 0.3s ease;
+        }
+
+        .list-enter-from,
+        .list-leave-to {
+            opacity: 0;
+            transform: translateX(10px);
+        }
+
+        .icon-svg {
+            width: 1.2em;
+            height: 1.2em;
+            fill: currentColor;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .no-print {
+            @media print {
+                display: none !important;
+            }
+        }
+
         /* RO Sleek Buttons */
-        .ro-btn { 
-            transition: all 0.15s; 
-            position: relative; 
+        .ro-btn {
+            transition: all 0.15s;
+            position: relative;
             border: 1px solid var(--btn-blue-border);
             background: var(--btn-blue);
             color: white;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        .ro-btn:active { transform: translateY(1px); box-shadow: none; }
+
+        .ro-btn:active {
+            transform: translateY(1px);
+            box-shadow: none;
+        }
+
         .ro-btn-gold {
             background: var(--btn-gold);
             border-color: var(--btn-gold-border);
             color: var(--btn-gold-text);
             font-weight: 900;
         }
+
         .ro-btn-secondary {
             background: rgba(74, 132, 232, 0.08);
             border-color: var(--card-border);
             color: var(--text-secondary);
         }
+
         .theme-dark .ro-btn-secondary {
             background: rgba(148, 163, 184, 0.1);
         }
 
         /* Progress bars */
-        .prog-track { background: var(--app-bg); border-radius: 99px; height: 6px; overflow: hidden; border: 1px solid var(--sidebar-border); }
-        .prog-fill { height: 100%; border-radius: 99px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
-        .prog-normal { background: linear-gradient(90deg, #4a84e8, #7ca8f5); }
-        .prog-near   { background: linear-gradient(90deg, #f97316, #fb923c); }
-        .prog-full   { background: linear-gradient(90deg, #e8a838, #fbbf24); }
+        .prog-track {
+            background: var(--app-bg);
+            border-radius: 99px;
+            height: 6px;
+            overflow: hidden;
+            border: 1px solid var(--sidebar-border);
+        }
+
+        .prog-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .prog-normal {
+            background: linear-gradient(90deg, #4a84e8, #7ca8f5);
+        }
+
+        .prog-near {
+            background: linear-gradient(90deg, #f97316, #fb923c);
+        }
+
+        .prog-full {
+            background: linear-gradient(90deg, #e8a838, #fbbf24);
+        }
 
         /* Sidebar nav */
-        .nav-item { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:10px; font-size:12px; font-weight:700; color: var(--nav-item-color); transition:all 0.15s; width:100%; text-align:left; position:relative; }
-        .nav-item:hover { background: var(--nav-item-hover-bg); color: var(--nav-item-hover-text); }
-        .sidebar-tooltip { position:absolute; left:100%; top:50%; transform:translateY(-50%); margin-left:12px; background: var(--card-bg); color: var(--nav-item-hover-text); padding:6px 10px; border-radius:6px; font-size:12px; white-space:nowrap; opacity:0; pointer-events:none; transition:all 0.2s; z-index:100; box-shadow:0 4px 12px rgba(74,132,232,0.25); border:1px solid var(--card-border); }
-        .theme-dark .sidebar-tooltip { box-shadow:0 4px 6px rgba(0,0,0,0.6); }
-        .group:hover .sidebar-tooltip { opacity:1; transform:translateY(-50%) translateX(4px); }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--nav-item-color);
+            transition: all 0.15s;
+            width: 100%;
+            text-align: left;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: var(--nav-item-hover-bg);
+            color: var(--nav-item-hover-text);
+        }
+
+        .sidebar-tooltip {
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 12px;
+            background: var(--card-bg);
+            color: var(--nav-item-hover-text);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(74, 132, 232, 0.25);
+            border: 1px solid var(--card-border);
+        }
+
+        .theme-dark .sidebar-tooltip {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
+        }
+
+        .group:hover .sidebar-tooltip {
+            opacity: 1;
+            transform: translateY(-50%) translateX(4px);
+        }
 
         .mobile-top-nav {
             background: var(--card-bg);
@@ -128,15 +260,26 @@
             padding-bottom: 0.75rem;
             backdrop-filter: blur(12px);
         }
+
         .mobile-top-nav button {
             min-width: 2.75rem;
             min-height: 2.75rem;
             touch-action: manipulation;
         }
+
         .mobile-menu-panel {
             top: var(--mobile-menu-top);
             max-height: calc(100dvh - var(--mobile-menu-top) - env(safe-area-inset-bottom, 0px) - 1rem);
             overflow-y: auto;
+        }
+
+        @media (max-width: 767px) {
+
+            input,
+            select,
+            textarea {
+                font-size: 16px !important;
+            }
         }
 
         /* Cards - RO Sleek Glass Style */
@@ -149,148 +292,304 @@
             box-shadow: 0 4px 20px rgba(74, 132, 232, 0.12), 0 1px 4px rgba(74, 132, 232, 0.08);
             backdrop-filter: blur(12px);
         }
+
         .theme-dark .ro-card {
-            box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
             border-color: rgba(168, 85, 247, 0.1);
         }
-        .ro-card-header { background: var(--card-header-bg); border-bottom: 1px solid var(--card-border); padding: 12px 16px; display: flex; align-items: center; gap: 10px; position: relative; }
+
+        .ro-card-header {
+            background: var(--card-header-bg);
+            border-bottom: 1px solid var(--card-border);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+
         .ro-card-header::after {
-            content: ''; position: absolute; bottom: -1px; left: 0; width: 48px; height: 1px;
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 48px;
+            height: 1px;
             background: linear-gradient(90deg, #4a84e8, transparent);
         }
+
         .theme-dark .ro-card-header::after {
-            content: ''; position: absolute; bottom: -1px; left: 0; width: 40px; height: 1px;
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 40px;
+            height: 1px;
             background: linear-gradient(90deg, #a855f7, transparent);
         }
 
         /* Member Items */
-        .member-item { background: var(--item-bg); border: 1px solid var(--sidebar-border); transition: all 0.2s; cursor: pointer; color: var(--text-secondary); }
-        .member-item:hover { background: var(--item-hover-bg) !important; border-color: var(--item-hover-border) !important; color: var(--text-primary) !important; box-shadow: 0 0 15px var(--accent-glow); }
-        .theme-dark .member-item:hover { border-color: #a855f7 !important; }
+        .member-item {
+            background: var(--item-bg);
+            border: 1px solid var(--sidebar-border);
+            transition: all 0.2s;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .member-item:hover {
+            background: var(--item-hover-bg) !important;
+            border-color: var(--item-hover-border) !important;
+            color: var(--text-primary) !important;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .theme-dark .member-item:hover {
+            border-color: #a855f7 !important;
+        }
 
         /* Job section header in unassigned panel */
-        .job-sec-hdr { 
-            display:flex; 
-            align-items:center; 
-            gap:8px; 
-            padding:16px 0 6px 0; 
-            font-size:11px; 
-            font-weight:950; 
-            letter-spacing:0.15em; 
-            text-transform:uppercase; 
-            color: var(--text-muted); 
-            margin-top:4px; 
-            margin-bottom:8px;
+        .job-sec-hdr {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 0 6px 0;
+            font-size: 11px;
+            font-weight: 950;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-top: 4px;
+            margin-bottom: 8px;
             border-bottom: 2px solid var(--sidebar-border);
             position: sticky;
             top: 0;
             z-index: 10;
             background: var(--sidebar-bg);
         }
-        .job-sec-hdr:first-child { margin-top:0; }
+
+        .job-sec-hdr:first-child {
+            margin-top: 0;
+        }
     </style>
 </head>
+
 <body>
     <svg style="display:none;">
-        <symbol id="icon-poring" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></symbol>
-        <symbol id="icon-users" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
-        <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></symbol>
-        <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></symbol>
-        <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol>
-        <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
-        <symbol id="icon-chart" viewBox="0 0 24 24"><path d="M10 20h4V4h-4v16zm-6 0h4v-8H4v8zM16 9v11h4V9h-4z"/></symbol>
-        <symbol id="icon-briefcase" viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></symbol>
-        <symbol id="icon-import" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></symbol>
-        <symbol id="icon-share" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></symbol>
-        <symbol id="icon-lock" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z"/></symbol>
-        <symbol id="icon-logout" viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></symbol>
-        <symbol id="icon-copy" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></symbol>
-        <symbol id="icon-check" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
-        <symbol id="icon-crown" viewBox="0 0 24 24"><path d="M5 16L3 5l5 5 4-7 4 7 5-5-2 11H5zm14 3c0 1.1-.9 2-2 2H7c-1.1 0-2-.9-2-2v-1h14v1z"/></symbol>
-        <symbol id="icon-chevron-up" viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></symbol>
-        <symbol id="icon-chevron-left" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></symbol>
-        <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></symbol>
-        <symbol id="icon-limit" viewBox="0 0 24 24"><path d="M8 11h3v10h2V11h3l-4-4-4 4zM4 3v2h16V3H4z"/></symbol>
-        <symbol id="icon-add-user" viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
-        <symbol id="icon-palette" viewBox="0 0 24 24"><path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10c1.38 0 2.5-1.12 2.5-2.5 0-.61-.23-1.21-.64-1.67-.08-.09-.13-.21-.13-.33 0-.28.22-.5.5-.5H16c3.31 0 6-2.69 6-6 0-4.96-4.49-9-10-9zm-4.5 8c-.83 0-1.5-.67-1.5-1.5S6.67 7 7.5 7s1.5.67 1.5 1.5S8.33 10 7.5 10zm3 4c-.83 0-1.5-.67-1.5-1.5S9.67 11 10.5 11s1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-5.5c-.83 0-1.5-.67-1.5-1.5S15.67 5.5 16.5 5.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></symbol>
-        <symbol id="icon-history" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></symbol>
-        <symbol id="icon-coffee" viewBox="0 0 24 24"><path d="M18.5 3H6c-1.1 0-2 .9-2 2v5.71c0 3.83 2.95 7.18 6.78 7.29 3.96.12 7.22-3.06 7.22-7v-1h.5c1.93 0 3.5-1.57 3.5-3.5S20.43 3 18.5 3zM16 8v-1H6V5h10v3zm2.5 0h-.5V5h.5c.83 0 1.5.67 1.5 1.5S19.33 8 18.5 8zM4 19h16v2H4v-2z"/></symbol>
-        <symbol id="icon-search" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></symbol>
-        <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></symbol>
+        <symbol id="icon-poring" viewBox="0 0 24 24">
+            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
+        </symbol>
+        <symbol id="icon-users" viewBox="0 0 24 24">
+            <path
+                d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+        </symbol>
+        <symbol id="icon-settings" viewBox="0 0 24 24">
+            <path
+                d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+        </symbol>
+        <symbol id="icon-trash" viewBox="0 0 24 24">
+            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+        </symbol>
+        <symbol id="icon-edit" viewBox="0 0 24 24">
+            <path
+                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+        </symbol>
+        <symbol id="icon-plus" viewBox="0 0 24 24">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+        </symbol>
+        <symbol id="icon-chart" viewBox="0 0 24 24">
+            <path d="M10 20h4V4h-4v16zm-6 0h4v-8H4v8zM16 9v11h4V9h-4z" />
+        </symbol>
+        <symbol id="icon-briefcase" viewBox="0 0 24 24">
+            <path
+                d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z" />
+        </symbol>
+        <symbol id="icon-import" viewBox="0 0 24 24">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+        </symbol>
+        <symbol id="icon-share" viewBox="0 0 24 24">
+            <path
+                d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" />
+        </symbol>
+        <symbol id="icon-lock" viewBox="0 0 24 24">
+            <path
+                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z" />
+        </symbol>
+        <symbol id="icon-logout" viewBox="0 0 24 24">
+            <path
+                d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z" />
+        </symbol>
+        <symbol id="icon-copy" viewBox="0 0 24 24">
+            <path
+                d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
+        </symbol>
+        <symbol id="icon-check" viewBox="0 0 24 24">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+        </symbol>
+        <symbol id="icon-crown" viewBox="0 0 24 24">
+            <path d="M5 16L3 5l5 5 4-7 4 7 5-5-2 11H5zm14 3c0 1.1-.9 2-2 2H7c-1.1 0-2-.9-2-2v-1h14v1z" />
+        </symbol>
+        <symbol id="icon-chevron-up" viewBox="0 0 24 24">
+            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z" />
+        </symbol>
+        <symbol id="icon-chevron-left" viewBox="0 0 24 24">
+            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+        </symbol>
+        <symbol id="icon-chevron-right" viewBox="0 0 24 24">
+            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+        </symbol>
+        <symbol id="icon-limit" viewBox="0 0 24 24">
+            <path d="M8 11h3v10h2V11h3l-4-4-4 4zM4 3v2h16V3H4z" />
+        </symbol>
+        <symbol id="icon-add-user" viewBox="0 0 24 24">
+            <path
+                d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+        </symbol>
+        <symbol id="icon-palette" viewBox="0 0 24 24">
+            <path
+                d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10c1.38 0 2.5-1.12 2.5-2.5 0-.61-.23-1.21-.64-1.67-.08-.09-.13-.21-.13-.33 0-.28.22-.5.5-.5H16c3.31 0 6-2.69 6-6 0-4.96-4.49-9-10-9zm-4.5 8c-.83 0-1.5-.67-1.5-1.5S6.67 7 7.5 7s1.5.67 1.5 1.5S8.33 10 7.5 10zm3 4c-.83 0-1.5-.67-1.5-1.5S9.67 11 10.5 11s1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-5.5c-.83 0-1.5-.67-1.5-1.5S15.67 5.5 16.5 5.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
+        </symbol>
+        <symbol id="icon-history" viewBox="0 0 24 24">
+            <path
+                d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z" />
+        </symbol>
+        <symbol id="icon-coffee" viewBox="0 0 24 24">
+            <path
+                d="M18.5 3H6c-1.1 0-2 .9-2 2v5.71c0 3.83 2.95 7.18 6.78 7.29 3.96.12 7.22-3.06 7.22-7v-1h.5c1.93 0 3.5-1.57 3.5-3.5S20.43 3 18.5 3zM16 8v-1H6V5h10v3zm2.5 0h-.5V5h.5c.83 0 1.5.67 1.5 1.5S19.33 8 18.5 8zM4 19h16v2H4v-2z" />
+        </symbol>
+        <symbol id="icon-search" viewBox="0 0 24 24">
+            <path
+                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+        </symbol>
+        <symbol id="icon-menu" viewBox="0 0 24 24">
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+        </symbol>
     </svg>
 
-    <div id="app" v-cloak :class="ui.theme === 'dark' ? 'theme-dark' : ''" class="h-screen h-[100dvh] flex flex-col md:flex-row overflow-hidden bg-[var(--app-bg)]">
+    <div id="app" v-cloak :class="ui.theme === 'dark' ? 'theme-dark' : ''"
+        class="h-screen h-[100dvh] flex flex-col md:flex-row overflow-hidden bg-[var(--app-bg)]">
 
         <!-- ─── 左側導覽列 ─── -->
-        <aside v-if="user" class="hidden md:flex flex-col h-full shrink-0 transition-all duration-300 relative z-[100]" :class="ui.isSidebarCollapsed ? 'w-20' : 'w-60'" style="background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);overflow:visible;">
+        <aside v-if="user" class="hidden md:flex flex-col h-full shrink-0 transition-all duration-300 relative z-[100]"
+            :class="ui.isSidebarCollapsed ? 'w-20' : 'w-60'"
+            style="background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);overflow:visible;">
             <!-- 縮放按鈕 -->
-            <button @click="ui.isSidebarCollapsed = !ui.isSidebarCollapsed" 
-                    class="absolute top-6 -right-3 w-6 h-6 rounded-full flex items-center justify-center transition-all z-[110] shadow-md border hover:scale-110" 
-                    style="background:var(--sidebar-bg);border-color:var(--sidebar-border);color:var(--text-primary);">
-                <svg class="icon-svg text-[12px] transition-transform duration-300" :class="{'rotate-180': ui.isSidebarCollapsed}"><use href="#icon-chevron-left"></use></svg>
+            <button @click="ui.isSidebarCollapsed = !ui.isSidebarCollapsed"
+                class="absolute top-6 -right-3 w-6 h-6 rounded-full flex items-center justify-center transition-all z-[110] shadow-md border hover:scale-110"
+                style="background:var(--sidebar-bg);border-color:var(--sidebar-border);color:var(--text-primary);">
+                <svg class="icon-svg text-[12px] transition-transform duration-300"
+                    :class="{'rotate-180': ui.isSidebarCollapsed}">
+                    <use href="#icon-chevron-left"></use>
+                </svg>
             </button>
 
             <div class="flex flex-col h-full w-full overflow-y-auto custom-scroll overflow-x-hidden">
-                <div class="p-5 flex flex-col items-center shrink-0" style="border-bottom:1px solid var(--sidebar-border);">
-                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-3 poring-float" style="background:linear-gradient(135deg,#1e3d7e,#4a84e8);box-shadow:0 4px 15px rgba(74,132,232,0.35);">
-                        <svg class="icon-svg text-white text-2xl"><use href="#icon-poring"></use></svg>
+                <div class="p-5 flex flex-col items-center shrink-0"
+                    style="border-bottom:1px solid var(--sidebar-border);">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-3 poring-float"
+                        style="background:linear-gradient(135deg,#1e3d7e,#4a84e8);box-shadow:0 4px 15px rgba(74,132,232,0.35);">
+                        <svg class="icon-svg text-white text-2xl">
+                            <use href="#icon-poring"></use>
+                        </svg>
                     </div>
-                    <h1 v-show="!ui.isSidebarCollapsed" class="text-sm font-black tracking-tighter text-center transition-opacity" style="color:var(--text-primary);">RO 冒險公會管理</h1>
-                    <p v-show="!ui.isSidebarCollapsed" class="text-[12px] font-bold uppercase tracking-widest mt-1 transition-opacity" style="color:#e8a838;">Guild Manager v5</p>
+                    <h1 v-show="!ui.isSidebarCollapsed"
+                        class="text-sm font-black tracking-tighter text-center transition-opacity"
+                        style="color:var(--text-primary);">RO 冒險公會管理</h1>
+                    <p v-show="!ui.isSidebarCollapsed"
+                        class="text-[12px] font-bold uppercase tracking-widest mt-1 transition-opacity"
+                        style="color:#e8a838;">Guild Manager v5</p>
                 </div>
                 <nav class="flex-1 p-3 space-y-0.5">
-                    <div v-show="!ui.isSidebarCollapsed" class="px-2 py-2 text-[12px] font-black uppercase tracking-[0.2em]" style="color:var(--text-muted);">Dashboard</div>
-                    <button @click="ui.modal = 'jobStats'" class="nav-item group" :class="{'justify-center': ui.isSidebarCollapsed}">
-                        <svg class="icon-svg opacity-60"><use href="#icon-chart"></use></svg>
+                    <div v-show="!ui.isSidebarCollapsed"
+                        class="px-2 py-2 text-[12px] font-black uppercase tracking-[0.2em]"
+                        style="color:var(--text-muted);">Dashboard</div>
+                    <button @click="ui.modal = 'jobStats'" class="nav-item group"
+                        :class="{'justify-center': ui.isSidebarCollapsed}">
+                        <svg class="icon-svg opacity-60">
+                            <use href="#icon-chart"></use>
+                        </svg>
                         <span v-show="!ui.isSidebarCollapsed">戰力統計</span>
                         <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">戰力統計</div>
                     </button>
                     <template v-if="!isReadOnly">
-                        <button @click="ui.modal = 'memberList'" class="nav-item group" :class="{'justify-center': ui.isSidebarCollapsed}">
-                            <svg class="icon-svg opacity-60"><use href="#icon-users"></use></svg>
+                        <button @click="ui.modal = 'memberList'" class="nav-item group"
+                            :class="{'justify-center': ui.isSidebarCollapsed}">
+                            <svg class="icon-svg opacity-60">
+                                <use href="#icon-users"></use>
+                            </svg>
                             <span v-show="!ui.isSidebarCollapsed">成員管理</span>
                             <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">成員管理</div>
                         </button>
-                        <button @click="ui.modal = 'logsModal'" class="nav-item group" :class="{'justify-center': ui.isSidebarCollapsed}">
-                            <svg class="icon-svg opacity-60"><use href="#icon-history"></use></svg>
+                        <button @click="ui.modal = 'logsModal'" class="nav-item group"
+                            :class="{'justify-center': ui.isSidebarCollapsed}">
+                            <svg class="icon-svg opacity-60">
+                                <use href="#icon-history"></use>
+                            </svg>
                             <span v-show="!ui.isSidebarCollapsed">操作紀錄</span>
                             <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">操作紀錄</div>
                         </button>
-                        <button @click="ui.modal = 'jobSettings'" class="nav-item group" :class="{'justify-center': ui.isSidebarCollapsed}">
-                            <svg class="icon-svg opacity-60"><use href="#icon-briefcase"></use></svg>
+                        <button @click="ui.modal = 'jobSettings'" class="nav-item group"
+                            :class="{'justify-center': ui.isSidebarCollapsed}">
+                            <svg class="icon-svg opacity-60">
+                                <use href="#icon-briefcase"></use>
+                            </svg>
                             <span v-show="!ui.isSidebarCollapsed">職業設定</span>
                             <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">職業設定</div>
                         </button>
-                        <div v-show="!ui.isSidebarCollapsed" class="px-2 pt-4 pb-1 text-[12px] font-black uppercase tracking-[0.2em]" style="color:var(--text-muted);">Admin</div>
-                        <button @click="ui.modal = 'importMembers'" class="nav-item group" style="color:#fb923c;" :class="{'justify-center': ui.isSidebarCollapsed}">
-                            <svg class="icon-svg"><use href="#icon-import"></use></svg>
+                        <div v-show="!ui.isSidebarCollapsed"
+                            class="px-2 pt-4 pb-1 text-[12px] font-black uppercase tracking-[0.2em]"
+                            style="color:var(--text-muted);">Admin</div>
+                        <button @click="ui.modal = 'importMembers'" class="nav-item group" style="color:#fb923c;"
+                            :class="{'justify-center': ui.isSidebarCollapsed}">
+                            <svg class="icon-svg">
+                                <use href="#icon-import"></use>
+                            </svg>
                             <span v-show="!ui.isSidebarCollapsed">批量匯入</span>
                             <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">批量匯入</div>
                         </button>
-                        <button @click="openShareModal" class="nav-item group" style="color:#f472b6;" :class="{'justify-center': ui.isSidebarCollapsed}">
-                            <svg class="icon-svg"><use href="#icon-share"></use></svg>
+                        <button @click="openShareModal" class="nav-item group" style="color:#f472b6;"
+                            :class="{'justify-center': ui.isSidebarCollapsed}">
+                            <svg class="icon-svg">
+                                <use href="#icon-share"></use>
+                            </svg>
                             <span v-show="!ui.isSidebarCollapsed">分享連結</span>
                             <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">分享連結</div>
                         </button>
-                        <button @click="openAddMember" class="w-full flex items-center gap-2 rounded-xl font-black text-xs mt-3 ro-btn ro-btn-gold group" :class="ui.isSidebarCollapsed ? 'p-2 justify-center' : 'px-3 py-2.5 justify-center'" style="position:relative;">
-                            <svg class="icon-svg"><use href="#icon-plus"></use></svg>
+                        <button @click="openAddMember"
+                            class="w-full flex items-center gap-2 rounded-xl font-black text-xs mt-3 ro-btn ro-btn-gold group"
+                            :class="ui.isSidebarCollapsed ? 'p-2 justify-center' : 'px-3 py-2.5 justify-center'"
+                            style="position:relative;">
+                            <svg class="icon-svg">
+                                <use href="#icon-plus"></use>
+                            </svg>
                             <span v-show="!ui.isSidebarCollapsed">招募成員</span>
                             <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">招募成員</div>
                         </button>
                     </template>
                 </nav>
-                <div class="p-3 shrink-0 flex gap-2" :class="ui.isSidebarCollapsed ? 'flex-col' : ''" style="border-top:1px solid var(--sidebar-border);">
-                    <button @click="ui.theme = (ui.theme === 'dark' ? 'light' : 'dark')" class="flex-1 p-2 rounded-lg flex items-center justify-center transition-colors group relative" style="background:var(--item-bg);color:var(--text-muted);border:1px solid var(--card-border);">
+                <div class="p-3 shrink-0 flex gap-2" :class="ui.isSidebarCollapsed ? 'flex-col' : ''"
+                    style="border-top:1px solid var(--sidebar-border);">
+                    <button @click="ui.theme = (ui.theme === 'dark' ? 'light' : 'dark')"
+                        class="flex-1 p-2 rounded-lg flex items-center justify-center transition-colors group relative"
+                        style="background:var(--item-bg);color:var(--text-muted);border:1px solid var(--card-border);">
                         <span v-if="ui.theme === 'dark'">🌙</span>
                         <span v-else>☀️</span>
                         <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">切換主題</div>
                     </button>
-                    <button @click="ui.modal = 'userProfile'" class="flex-1 p-2 rounded-lg flex items-center justify-center transition-colors group relative" style="background:var(--item-bg);color:var(--text-muted);border:1px solid var(--card-border);">
-                        <svg class="icon-svg text-xs"><use href="#icon-settings"></use></svg>
+                    <button @click="ui.modal = 'userProfile'"
+                        class="flex-1 p-2 rounded-lg flex items-center justify-center transition-colors group relative"
+                        style="background:var(--item-bg);color:var(--text-muted);border:1px solid var(--card-border);">
+                        <svg class="icon-svg text-xs">
+                            <use href="#icon-settings"></use>
+                        </svg>
                         <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">管理帳號設定</div>
                     </button>
-                    <button @click="handleLogout" class="flex-1 p-2 rounded-lg flex items-center justify-center transition-colors group relative" style="background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2);">
-                        <svg class="icon-svg text-xs"><use href="#icon-logout"></use></svg>
+                    <button @click="handleLogout"
+                        class="flex-1 p-2 rounded-lg flex items-center justify-center transition-colors group relative"
+                        style="background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2);">
+                        <svg class="icon-svg text-xs">
+                            <use href="#icon-logout"></use>
+                        </svg>
                         <div v-if="ui.isSidebarCollapsed" class="sidebar-tooltip">登出</div>
                     </button>
                 </div>
@@ -304,122 +603,205 @@
             <nav v-if="user" class="mobile-top-nav md:hidden px-4 sticky top-0 z-50 shrink-0">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-lg flex items-center justify-center poring-float text-white" style="background:linear-gradient(135deg,#1e3d7e,#4a84e8);"><svg class="icon-svg"><use href="#icon-poring"></use></svg></span>
-                        <span class="text-lg font-black tracking-tighter italic" style="color:var(--text-primary);">RO Guild</span>
+                        <span class="w-8 h-8 rounded-lg flex items-center justify-center poring-float text-white"
+                            style="background:linear-gradient(135deg,#1e3d7e,#4a84e8);"><svg class="icon-svg">
+                                <use href="#icon-poring"></use>
+                            </svg></span>
+                        <span class="text-lg font-black tracking-tighter italic" style="color:var(--text-primary);">RO
+                            Guild</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button @click="ui.theme = (ui.theme === 'dark' ? 'light' : 'dark')" class="p-2 rounded-lg" style="background:rgba(74,132,232,0.1);color:var(--text-secondary);">
+                        <button @click="ui.theme = (ui.theme === 'dark' ? 'light' : 'dark')" class="p-2 rounded-lg"
+                            style="background:rgba(74,132,232,0.1);color:var(--text-secondary);">
                             <span v-if="ui.theme === 'dark'">🌙</span>
                             <span v-else>☀️</span>
                         </button>
-                        <button @click="ui.modal = 'mobileMenu'" class="p-2 rounded-lg" style="background:rgba(74,132,232,0.1);color:#4a84e8;">
-                            <svg class="icon-svg"><use href="#icon-menu"></use></svg>
+                        <button @click="ui.modal = 'mobileMenu'" class="p-2 rounded-lg"
+                            style="background:rgba(74,132,232,0.1);color:#4a84e8;">
+                            <svg class="icon-svg">
+                                <use href="#icon-menu"></use>
+                            </svg>
                         </button>
                     </div>
                 </div>
             </nav>
 
             <!-- 手機版垂直選單彈窗 -->
-            <div v-if="ui.modal === 'mobileMenu'" class="fixed inset-0 z-[300] md:hidden" style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click="ui.modal = null">
-                <div class="absolute right-4 w-56 p-2 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-4 duration-200" 
-                     class="mobile-menu-panel"
-                     style="background:var(--card-bg);border:1px solid var(--card-border);box-shadow:0 20px 50px rgba(0,0,0,0.5);" @click.stop>
+            <div v-if="ui.modal === 'mobileMenu'" class="fixed inset-0 z-[300] md:hidden"
+                style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click="ui.modal = null">
+                <div class="absolute right-4 w-56 p-2 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-4 duration-200"
+                    class="mobile-menu-panel"
+                    style="background:var(--card-bg);border:1px solid var(--card-border);box-shadow:0 20px 50px rgba(0,0,0,0.5);"
+                    @click.stop>
                     <div class="p-3 mb-1 border-b" style="border-color:var(--sidebar-border);">
-                        <div class="text-[10px] font-black uppercase tracking-[0.2em]" style="color:var(--text-muted);">選單功能</div>
+                        <div class="text-[10px] font-black uppercase tracking-[0.2em]" style="color:var(--text-muted);">
+                            選單功能</div>
                     </div>
                     <div class="space-y-1">
-                        <button @click="ui.modal = 'jobStats'" class="w-full flex items-center gap-3 p-3 rounded-xl font-bold text-sm transition-colors hover:bg-[var(--item-hover-bg)]" style="color:var(--text-secondary);">
-                            <svg class="icon-svg opacity-60"><use href="#icon-chart"></use></svg> 戰力統計
+                        <button @click="ui.modal = 'jobStats'"
+                            class="w-full flex items-center gap-3 p-3 rounded-xl font-bold text-sm transition-colors hover:bg-[var(--item-hover-bg)]"
+                            style="color:var(--text-secondary);">
+                            <svg class="icon-svg opacity-60">
+                                <use href="#icon-chart"></use>
+                            </svg> 戰力統計
                         </button>
                         <template v-if="!isReadOnly">
-                            <button @click="ui.modal = 'memberList'" class="w-full flex items-center gap-3 p-3 rounded-xl font-bold text-sm transition-colors hover:bg-[var(--item-hover-bg)]" style="color:var(--text-secondary);">
-                                <svg class="icon-svg opacity-60"><use href="#icon-users"></use></svg> 成員管理
+                            <button @click="ui.modal = 'memberList'"
+                                class="w-full flex items-center gap-3 p-3 rounded-xl font-bold text-sm transition-colors hover:bg-[var(--item-hover-bg)]"
+                                style="color:var(--text-secondary);">
+                                <svg class="icon-svg opacity-60">
+                                    <use href="#icon-users"></use>
+                                </svg> 成員管理
                             </button>
-                            <button @click="ui.modal = 'logsModal'" class="w-full flex items-center gap-3 p-3 rounded-xl font-bold text-sm transition-colors hover:bg-[var(--item-hover-bg)]" style="color:var(--text-secondary);">
-                                <svg class="icon-svg opacity-60"><use href="#icon-history"></use></svg> 操作紀錄
+                            <button @click="ui.modal = 'logsModal'"
+                                class="w-full flex items-center gap-3 p-3 rounded-xl font-bold text-sm transition-colors hover:bg-[var(--item-hover-bg)]"
+                                style="color:var(--text-secondary);">
+                                <svg class="icon-svg opacity-60">
+                                    <use href="#icon-history"></use>
+                                </svg> 操作紀錄
                             </button>
-                            <button @click="ui.modal = 'jobSettings'" class="w-full flex items-center gap-3 p-3 rounded-xl font-bold text-sm transition-colors hover:bg-[var(--item-hover-bg)]" style="color:var(--text-secondary);">
-                                <svg class="icon-svg opacity-60"><use href="#icon-briefcase"></use></svg> 職業設定
+                            <button @click="ui.modal = 'jobSettings'"
+                                class="w-full flex items-center gap-3 p-3 rounded-xl font-bold text-sm transition-colors hover:bg-[var(--item-hover-bg)]"
+                                style="color:var(--text-secondary);">
+                                <svg class="icon-svg opacity-60">
+                                    <use href="#icon-briefcase"></use>
+                                </svg> 職業設定
                             </button>
                             <div class="h-px mx-2 my-2" style="background:var(--sidebar-border);"></div>
-                            <button @click="openAddMember" class="w-full flex items-center gap-3 p-3 rounded-xl font-black text-sm" style="color:#e8a838;">
-                                <svg class="icon-svg"><use href="#icon-plus"></use></svg> 招募成員
+                            <button @click="openAddMember"
+                                class="w-full flex items-center gap-3 p-3 rounded-xl font-black text-sm"
+                                style="color:#e8a838;">
+                                <svg class="icon-svg">
+                                    <use href="#icon-plus"></use>
+                                </svg> 招募成員
                             </button>
-                            <button @click="ui.modal = 'importMembers'" class="w-full flex items-center gap-3 p-3 rounded-xl font-black text-sm" style="color:#fb923c;">
-                                <svg class="icon-svg"><use href="#icon-import"></use></svg> 批量匯入
+                            <button @click="ui.modal = 'importMembers'"
+                                class="w-full flex items-center gap-3 p-3 rounded-xl font-black text-sm"
+                                style="color:#fb923c;">
+                                <svg class="icon-svg">
+                                    <use href="#icon-import"></use>
+                                </svg> 批量匯入
                             </button>
-                            <button @click="openShareModal" class="w-full flex items-center gap-3 p-3 rounded-xl font-black text-sm" style="color:#f472b6;">
-                                <svg class="icon-svg"><use href="#icon-share"></use></svg> 分享連結
+                            <button @click="openShareModal"
+                                class="w-full flex items-center gap-3 p-3 rounded-xl font-black text-sm"
+                                style="color:#f472b6;">
+                                <svg class="icon-svg">
+                                    <use href="#icon-share"></use>
+                                </svg> 分享連結
                             </button>
                         </template>
                         <div class="h-px mx-2 my-2" style="background:var(--sidebar-border);"></div>
-                        <button @click="ui.modal = 'userProfile'" class="w-full flex items-center gap-3 p-3 rounded-xl font-bold text-sm" style="color:var(--text-muted);">
-                            <svg class="icon-svg opacity-60"><use href="#icon-settings"></use></svg> 帳號設定
+                        <button @click="ui.modal = 'userProfile'"
+                            class="w-full flex items-center gap-3 p-3 rounded-xl font-bold text-sm"
+                            style="color:var(--text-muted);">
+                            <svg class="icon-svg opacity-60">
+                                <use href="#icon-settings"></use>
+                            </svg> 帳號設定
                         </button>
-                        <button @click="handleLogout" class="w-full flex items-center gap-3 p-3 rounded-xl font-bold text-sm" style="color:#f87171;">
-                            <svg class="icon-svg opacity-60"><use href="#icon-logout"></use></svg> 登出
+                        <button @click="handleLogout"
+                            class="w-full flex items-center gap-3 p-3 rounded-xl font-bold text-sm"
+                            style="color:#f87171;">
+                            <svg class="icon-svg opacity-60">
+                                <use href="#icon-logout"></use>
+                            </svg> 登出
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div v-if="isReadOnly" class="text-white text-center py-1.5 text-[12px] font-black tracking-widest uppercase shrink-0" style="background:linear-gradient(90deg,#d97706,#f59e0b);">
+            <div v-if="isReadOnly"
+                class="text-white text-center py-1.5 text-[12px] font-black tracking-widest uppercase shrink-0"
+                style="background:linear-gradient(90deg,#d97706,#f59e0b);">
                 ⚔️ Visitor Mode (Read Only)
-                <button v-if="isOwner" @click="exitReadOnly" class="ml-2 px-2 py-0.5 rounded hover:bg-white/20 transition-colors" style="background:rgba(255,255,255,0.05);">Admin Login</button>
+                <button v-if="isOwner" @click="exitReadOnly"
+                    class="ml-2 px-2 py-0.5 rounded hover:bg-white/20 transition-colors"
+                    style="background:rgba(255,255,255,0.05);">Admin Login</button>
             </div>
 
             <!-- ─── 主佈局區域 ─── -->
             <div class="flex-1 flex flex-row overflow-hidden h-full">
 
                 <!-- 中間部署概況 -->
-                <main class="flex-1 overflow-y-auto custom-scroll p-2 md:p-4 md:pr-6 pb-20 md:pb-12 bg-[var(--app-bg)] transition-all">
+                <main
+                    class="flex-1 overflow-y-auto custom-scroll p-2 md:p-4 md:pr-6 pb-20 md:pb-12 bg-[var(--app-bg)] transition-all">
 
                     <div v-if="loading" class="flex flex-col items-center justify-center py-20 h-full">
-                        <div class="w-10 h-10 border-2 border-[#ffffff] border-t-[#4a84e8] rounded-full animate-spin mb-4"></div>
-                        <p class="font-black text-[12px] tracking-widest uppercase" style="color:#4a84e8;">Initializing...</p>
+                        <div
+                            class="w-10 h-10 border-2 border-[#ffffff] border-t-[#4a84e8] rounded-full animate-spin mb-4">
+                        </div>
+                        <p class="font-black text-[12px] tracking-widest uppercase" style="color:#4a84e8;">
+                            Initializing...</p>
                     </div>
 
                     <!-- 密碼鎖定畫面 -->
                     <div v-else-if="isShareLocked" class="max-w-md mx-auto mt-12 px-4">
-                        <div class="ro-card p-10 text-center" style="border-top:4px solid #f472b6;box-shadow:0 20px 50px rgba(0,0,0,0.5);">
-                            <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6" style="background:rgba(244,114,182,0.1);border:1px solid rgba(244,114,182,0.2);color:#f472b6;">
-                                <svg class="icon-svg text-4xl"><use href="#icon-lock"></use></svg>
+                        <div class="ro-card p-10 text-center"
+                            style="border-top:4px solid #f472b6;box-shadow:0 20px 50px rgba(0,0,0,0.5);">
+                            <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6"
+                                style="background:rgba(244,114,182,0.1);border:1px solid rgba(244,114,182,0.2);color:#f472b6;">
+                                <svg class="icon-svg text-4xl">
+                                    <use href="#icon-lock"></use>
+                                </svg>
                             </div>
-                            <h1 class="text-2xl font-black mb-2 tracking-tighter uppercase" style="color:var(--text-primary);">情報已加密</h1>
-                            <p class="text-[12px] font-bold uppercase tracking-widest mb-8" style="color:var(--text-muted);">Restricted Access</p>
+                            <h1 class="text-2xl font-black mb-2 tracking-tighter uppercase"
+                                style="color:var(--text-primary);">情報已加密</h1>
+                            <p class="text-[12px] font-bold uppercase tracking-widest mb-8"
+                                style="color:var(--text-muted);">Restricted Access</p>
                             <div class="space-y-4">
-                                <input v-model="visitorPassword" type="password" placeholder="請輸入存取密碼" class="w-full px-4 py-3 rounded-xl font-bold text-sm text-center outline-none" style="background:var(--item-hover-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
-                                <button @click="unlockShare" class="w-full py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold">解鎖內容</button>
+                                <input v-model="visitorPassword" type="password" placeholder="請輸入存取密碼"
+                                    class="w-full px-4 py-3 rounded-xl font-bold text-sm text-center outline-none"
+                                    style="background:var(--item-hover-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
+                                <button @click="unlockShare"
+                                    class="w-full py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold">解鎖內容</button>
                             </div>
                         </div>
                     </div>
 
                     <!-- 登入卡片 -->
                     <div v-else-if="!user" class="max-w-md mx-auto mt-12 px-4">
-                        <div class="ro-card p-10 text-center" style="border-top:4px solid #4a84e8;box-shadow:0 20px 50px rgba(0,0,0,0.5);">
-                            <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 poring-float" style="background:rgba(74,132,232,0.1);border:1px solid rgba(74,132,232,0.2);color:#4a84e8;">
-                                <svg class="icon-svg text-4xl"><use href="#icon-poring"></use></svg>
+                        <div class="ro-card p-10 text-center"
+                            style="border-top:4px solid #4a84e8;box-shadow:0 20px 50px rgba(0,0,0,0.5);">
+                            <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 poring-float"
+                                style="background:rgba(74,132,232,0.1);border:1px solid rgba(74,132,232,0.2);color:#4a84e8;">
+                                <svg class="icon-svg text-4xl">
+                                    <use href="#icon-poring"></use>
+                                </svg>
                             </div>
-                            <h1 class="text-2xl font-black mb-8 tracking-tighter uppercase" style="color:var(--text-primary);">冒險公會登入</h1>
+                            <h1 class="text-2xl font-black mb-8 tracking-tighter uppercase"
+                                style="color:var(--text-primary);">冒險公會登入</h1>
                             <div class="space-y-4">
                                 <template v-if="authView !== 'guest'">
-                                    <input v-model="authForm.email" type="email" placeholder="Email" class="w-full px-4 py-3 rounded-xl font-bold text-sm outline-none" style="background:var(--item-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
-                                    <input v-model="authForm.password" type="password" placeholder="Password" class="w-full px-4 py-3 rounded-xl font-bold text-sm outline-none" style="background:var(--item-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
+                                    <input v-model="authForm.email" type="email" placeholder="Email"
+                                        class="w-full px-4 py-3 rounded-xl font-bold text-sm outline-none"
+                                        style="background:var(--item-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
+                                    <input v-model="authForm.password" type="password" placeholder="Password"
+                                        class="w-full px-4 py-3 rounded-xl font-bold text-sm outline-none"
+                                        style="background:var(--item-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
                                 </template>
                                 <div v-if="authView === 'login'">
-                                    <button @click="handleEmailAuth('login')" class="w-full py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold">啟程探險</button>
-                                    <div class="flex items-center gap-4 text-[12px] font-black justify-center mt-6" style="color:var(--text-muted);">
-                                        <button @click="authView = 'register'" class="underline hover:text-var(--text-primary) transition-colors">新成員登記</button>
-                                        <button @click="authView = 'guest'" class="underline hover:text-var(--text-primary) transition-colors">訪客試用</button>
+                                    <button @click="handleEmailAuth('login')"
+                                        class="w-full py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold">啟程探險</button>
+                                    <div class="flex items-center gap-4 text-[12px] font-black justify-center mt-6"
+                                        style="color:var(--text-muted);">
+                                        <button @click="authView = 'register'"
+                                            class="underline hover:text-var(--text-primary) transition-colors">新成員登記</button>
+                                        <button @click="authView = 'guest'"
+                                            class="underline hover:text-var(--text-primary) transition-colors">訪客試用</button>
                                     </div>
                                 </div>
                                 <div v-if="authView === 'register'">
-                                    <button @click="handleEmailAuth('register')" class="w-full py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold">完成登記</button>
-                                    <button @click="authView = 'login'" class="text-[12px] font-black mt-4 block mx-auto underline hover:text-var(--text-primary) transition-colors" style="color:var(--text-muted);">返回登入</button>
+                                    <button @click="handleEmailAuth('register')"
+                                        class="w-full py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold">完成登記</button>
+                                    <button @click="authView = 'login'"
+                                        class="text-[12px] font-black mt-4 block mx-auto underline hover:text-var(--text-primary) transition-colors"
+                                        style="color:var(--text-muted);">返回登入</button>
                                 </div>
                                 <div v-if="authView === 'guest'">
-                                    <button @click="loginAsGuest" class="w-full py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold">本地試用</button>
-                                    <button @click="authView = 'login'" class="text-[12px] font-black mt-4 block mx-auto underline hover:text-var(--text-primary) transition-colors" style="color:var(--text-muted);">返回登入</button>
+                                    <button @click="loginAsGuest"
+                                        class="w-full py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold">本地試用</button>
+                                    <button @click="authView = 'login'"
+                                        class="text-[12px] font-black mt-4 block mx-auto underline hover:text-var(--text-primary) transition-colors"
+                                        style="color:var(--text-muted);">返回登入</button>
                                 </div>
                             </div>
                         </div>
@@ -429,31 +811,44 @@
                         <!-- 頂部資訊列 -->
                         <div class="mb-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4 shrink-0">
                             <div>
-                                <h2 class="text-xl font-black tracking-tighter" style="color:var(--text-primary);">當前部署概況</h2>
-                                <p class="text-[12px] font-bold uppercase tracking-widest mt-1" style="color:var(--text-muted);">Active Deployment Status</p>
+                                <h2 class="text-xl font-black tracking-tighter" style="color:var(--text-primary);">
+                                    當前部署概況</h2>
+                                <p class="text-[12px] font-bold uppercase tracking-widest mt-1"
+                                    style="color:var(--text-muted);">Active Deployment Status</p>
                             </div>
                             <div class="flex gap-2 flex-wrap items-center">
-                                <div class="px-3 py-2 rounded-xl flex items-center gap-3 shadow-sm shrink-0" style="background:var(--card-bg);border:1px solid var(--card-border);">
-                                    <span class="text-[12px] font-bold uppercase" style="color:var(--text-muted);">Team</span>
+                                <div class="px-3 py-2 rounded-xl flex items-center gap-3 shadow-sm shrink-0"
+                                    style="background:var(--card-bg);border:1px solid var(--card-border);">
+                                    <span class="text-[12px] font-bold uppercase"
+                                        style="color:var(--text-muted);">Team</span>
                                     <span class="text-base font-black" style="color:#4a84e8;">{{ groups.length }}</span>
                                 </div>
-                                <div class="px-3 py-2 rounded-xl flex items-center gap-3 shadow-sm shrink-0" style="background:var(--card-bg);border:1px solid var(--card-border);">
-                                    <span class="text-[12px] font-bold uppercase" style="color:var(--text-muted);">Total</span>
-                                    <span class="text-base font-black" style="color:#4a84e8;">{{ members.length }}</span>
+                                <div class="px-3 py-2 rounded-xl flex items-center gap-3 shadow-sm shrink-0"
+                                    style="background:var(--card-bg);border:1px solid var(--card-border);">
+                                    <span class="text-[12px] font-bold uppercase"
+                                        style="color:var(--text-muted);">Total</span>
+                                    <span class="text-base font-black" style="color:#4a84e8;">{{ members.length
+                                        }}</span>
                                 </div>
                                 <!-- 待指派 toggle (desktop) -->
                                 <button @click="ui.expandUnassigned = !ui.expandUnassigned"
-                                        class="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl font-bold text-[12px] transition-all shrink-0"
-                                        :style="ui.expandUnassigned
+                                    class="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl font-bold text-[12px] transition-all shrink-0"
+                                    :style="ui.expandUnassigned
                                             ? 'background:linear-gradient(135deg,#2a55c0,#4a84e8);color:white;border:1px solid #1a3a90;box-shadow:0 2px 8px rgba(74,132,232,0.3);'
                                             : 'background:var(--card-bg);color:#4a84e8;border:1px solid var(--card-border);'">
-                                    <svg class="icon-svg text-xs"><use href="#icon-users"></use></svg>
+                                    <svg class="icon-svg text-xs">
+                                        <use href="#icon-users"></use>
+                                    </svg>
                                     待指派名單
-                                    <span class="font-black text-xs rounded-full w-5 h-5 flex items-center justify-center"
-                                          :style="ui.expandUnassigned ? 'background:rgba(255,255,255,0.15);' : 'background:#4a84e8;color:white;'">
+                                    <span
+                                        class="font-black text-xs rounded-full w-5 h-5 flex items-center justify-center"
+                                        :style="ui.expandUnassigned ? 'background:rgba(255,255,255,0.15);' : 'background:#4a84e8;color:white;'">
                                         {{ unassignedMembers.length }}
                                     </span>
-                                    <svg class="icon-svg transition-transform duration-300" :class="{'rotate-180': ui.expandUnassigned}"><use href="#icon-chevron-right"></use></svg>
+                                    <svg class="icon-svg transition-transform duration-300"
+                                        :class="{'rotate-180': ui.expandUnassigned}">
+                                        <use href="#icon-chevron-right"></use>
+                                    </svg>
                                 </button>
                             </div>
                         </div>
@@ -461,166 +856,201 @@
                         <!-- 分隊網格 -->
                         <div class="grid grid-cols-[repeat(auto-fill,minmax(268px,1fr))] gap-2 no-print">
                             <div v-for="(group, gIndex) in groups" :key="group.id"
-                                 class="ro-card flex flex-col relative"
-                                 :class="{'opacity-50 scale-95': ui.draggedGroupIndex === gIndex}"
-                                 :style="ui.draggedGroupIndex === gIndex ? 'border-style:dashed;border-color:#4a84e8;' : ''"
-                                 :draggable="!isReadOnly" @dragstart="onDragStart(gIndex,$event)" @dragover.prevent @dragenter.prevent @drop="onDrop(gIndex)" @dragend="ui.draggedGroupIndex=null">
+                                class="ro-card flex flex-col relative"
+                                :class="{'opacity-50 scale-95': ui.draggedGroupIndex === gIndex}"
+                                :style="ui.draggedGroupIndex === gIndex ? 'border-style:dashed;border-color:#4a84e8;' : ''"
+                                :draggable="!isReadOnly" @dragstart="onDragStart(gIndex,$event)" @dragover.prevent
+                                @dragenter.prevent @drop="onDrop(gIndex)" @dragend="ui.draggedGroupIndex=null">
 
                                 <!-- 手機版浮動換色按鈕 -->
                                 <button v-if="!isReadOnly" @click="ui.openColorPickerId = group.id"
-                                        class="md:hidden absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center shadow-lg z-[60] border-2 border-white transition-transform active:scale-95"
-                                        :style="{ background: group.color || '#4a84e8' }">
-                                    <svg class="icon-svg text-white text-[12px]"><use href="#icon-palette"></use></svg>
+                                    class="md:hidden absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center shadow-lg z-[60] border-2 border-white transition-transform active:scale-95"
+                                    :style="{ background: group.color || '#4a84e8' }">
+                                    <svg class="icon-svg text-white text-[12px]">
+                                        <use href="#icon-palette"></use>
+                                    </svg>
                                 </button>
 
                                 <!-- 彩色頂部 accent 條 -->
                                 <div class="relative group/accent">
-                                    <div class="w-full shrink-0 cursor-pointer transition-all flex items-center justify-center overflow-hidden" 
-                                         :class="ui.theme === 'dark' ? 'md:h-1.5 md:hover:h-6 h-4' : 'md:h-1.5 md:hover:h-6 h-4'"
-                                         :style="{ background: group.color || '#4a84e8' }"
-                                         @click="ui.openColorPickerId = group.id">
+                                    <div class="w-full shrink-0 cursor-pointer transition-all flex items-center justify-center overflow-hidden"
+                                        :class="ui.theme === 'dark' ? 'md:h-1.5 md:hover:h-6 h-4' : 'md:h-1.5 md:hover:h-6 h-4'"
+                                        :style="{ background: group.color || '#4a84e8' }"
+                                        @click="ui.openColorPickerId = group.id">
                                         <!-- 電腦版懸浮文字提示 -->
-                                        <span class="hidden md:group-hover/accent:block text-[12px] font-black text-white/90 uppercase tracking-widest animate-in slide-in-from-top-1">
+                                        <span
+                                            class="hidden md:group-hover/accent:block text-[12px] font-black text-white/90 uppercase tracking-widest animate-in slide-in-from-top-1">
                                             點擊修改顏色
                                         </span>
                                     </div>
-                                    
+
                                     <!-- 顏色選擇器彈窗 -->
-                                    <div v-if="ui.openColorPickerId === group.id" 
-                                         class="absolute top-full left-0 mt-1 p-2 rounded-xl border z-[100] grid grid-cols-5 gap-1.5 w-44 shadow-2xl animate-in zoom-in duration-200"
-                                         style="background:var(--card-bg);border-color:var(--card-border);">
-                                        <div v-for="color in groupColorsBg" :key="color" 
-                                             @click="group.color = color; ui.openColorPickerId = null; syncData()"
-                                             class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform border border-white/20"
-                                             :style="{ background: color }"></div>
+                                    <div v-if="ui.openColorPickerId === group.id"
+                                        class="absolute top-full left-0 mt-1 p-2 rounded-xl border z-[100] grid grid-cols-5 gap-1.5 w-44 shadow-2xl animate-in zoom-in duration-200"
+                                        style="background:var(--card-bg);border-color:var(--card-border);">
+                                        <div v-for="color in groupColorsBg" :key="color"
+                                            @click="group.color = color; ui.openColorPickerId = null; syncData()"
+                                            class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform border border-white/20"
+                                            :style="{ background: color }"></div>
                                         <div class="fixed inset-0 -z-10" @click="ui.openColorPickerId = null"></div>
                                     </div>
                                 </div>
 
                                 <!-- 標題列 -->
                                 <div class="ro-card-header">
-                                    <div class="w-3 h-3 rounded-full shrink-0 transition-all shadow-inner"
-                                         :style="group.members.length >= group.max
+                                    <div class="w-3 h-3 rounded-full shrink-0 transition-all shadow-inner" :style="group.members.length >= group.max
                                              ? 'background:#e8a838;box-shadow:0 0 8px rgba(232,168,56,0.6);'
                                              : 'background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,0.5);'">
                                     </div>
-                                    <input :value="group.name" @input="updateGroupName(group, $event)" @blur="!isReadOnly && syncData()" :disabled="isReadOnly"
-                                           class="flex-1 font-black text-sm bg-transparent outline-none p-0 border-none focus:ring-0 tracking-tight min-w-0"
-                                           style="color:var(--text-primary);" maxlength="11">
-                                    
+                                    <input :value="group.name" @input="updateGroupName(group, $event)"
+                                        @blur="!isReadOnly && syncData()" :disabled="isReadOnly"
+                                        class="flex-1 font-black text-sm bg-transparent outline-none p-0 border-none focus:ring-0 tracking-tight min-w-0"
+                                        style="color:var(--text-primary);" maxlength="11">
+
                                     <div class="flex items-center gap-1.5 shrink-0">
                                         <button v-if="!isReadOnly" @click="openSelectMemberForGroup(group)"
-                                                class="w-6 h-6 rounded-md flex items-center justify-center transition-all hover:scale-110"
-                                                style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">
-                                            <svg class="icon-svg text-[12px]"><use href="#icon-plus"></use></svg>
+                                            class="w-6 h-6 rounded-md flex items-center justify-center transition-all hover:scale-110"
+                                            style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">
+                                            <svg class="icon-svg text-[12px]">
+                                                <use href="#icon-plus"></use>
+                                            </svg>
                                         </button>
                                         <button v-if="!isReadOnly" @click="deleteGroup(gIndex)"
-                                                class="w-6 h-6 rounded-md flex items-center justify-center transition-all hover:bg-[rgba(248,113,113,0.12)] hover:text-[#f87171]"
-                                                style="color:var(--text-muted);border:1px solid transparent;">
-                                            <svg class="icon-svg text-[12px]"><use href="#icon-trash"></use></svg>
+                                            class="w-6 h-6 rounded-md flex items-center justify-center transition-all hover:bg-[rgba(248,113,113,0.12)] hover:text-[#f87171]"
+                                            style="color:var(--text-muted);border:1px solid transparent;">
+                                            <svg class="icon-svg text-[12px]">
+                                                <use href="#icon-trash"></use>
+                                            </svg>
                                         </button>
                                     </div>
                                 </div>
 
                                 <!-- 進度條與狀態 -->
-                                <div class="px-4 py-2 flex items-center justify-between border-b" 
-                                     style="background:rgba(0,0,0,0.04); border-color:var(--card-border); box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);">
+                                <div class="px-4 py-2 flex items-center justify-between border-b"
+                                    style="background:rgba(0,0,0,0.04); border-color:var(--card-border); box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);">
                                     <div class="flex-1 max-w-[140px] prog-track">
                                         <div class="prog-fill"
-                                             :class="group.members.length >= group.max ? 'prog-full' : group.members.length >= group.max * 0.6 ? 'prog-near' : 'prog-normal'"
-                                             :style="{width: group.max > 0 ? Math.min(100, Math.round(group.members.length / group.max * 100)) + '%' : '0%'}">
+                                            :class="group.members.length >= group.max ? 'prog-full' : group.members.length >= group.max * 0.6 ? 'prog-near' : 'prog-normal'"
+                                            :style="{width: group.max > 0 ? Math.min(100, Math.round(group.members.length / group.max * 100)) + '%' : '0%'}">
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <span class="text-[12px] font-black tabular-nums" :style="group.members.length >= group.max ? 'color:#e8a838;' : 'color:#4a84e8;'">
-                                            {{ group.members.length }}<span style="color:var(--text-muted);">/{{ group.max }}</span>
+                                        <span class="text-[12px] font-black tabular-nums"
+                                            :style="group.members.length >= group.max ? 'color:#e8a838;' : 'color:#4a84e8;'">
+                                            {{ group.members.length }}<span style="color:var(--text-muted);">/{{
+                                                group.max }}</span>
                                         </span>
                                     </div>
                                 </div>
 
                                 <!-- 成員列表 -->
-                                <div class="px-3 py-2 flex-1 overflow-y-auto custom-scroll space-y-1" style="min-height:140px; background:rgba(0,0,0,0.01);">
+                                <div class="px-3 py-2 flex-1 overflow-y-auto custom-scroll space-y-1"
+                                    style="min-height:140px; background:rgba(0,0,0,0.01);">
                                     <transition-group name="list" tag="div" class="space-y-1">
                                         <div v-for="mId in getSortedGroupMembers(group)" :key="mId"
-                                             @click="openAssignMenu(findMember(mId))"
-                                             class="flex justify-between items-center p-1.5 rounded-lg member-item">
+                                            @click="openAssignMenu(findMember(mId))"
+                                            class="flex justify-between items-center p-1.5 rounded-lg member-item">
 
                                             <div class="flex items-center gap-2 flex-1 min-w-0">
                                                 <div class="w-7 h-7 rounded-lg flex items-center justify-center text-sm shrink-0 border shadow-sm"
-                                                     :style="ui.theme==='dark' ? {backgroundColor:(getJob(findMember(mId)?.jobId)?.color||'#4a84e8')+'cc',borderColor:(getJob(findMember(mId)?.jobId)?.color||'#4a84e8')} : {backgroundColor:(getJob(findMember(mId)?.jobId)?.color||'#4a84e8')+'15',borderColor:(getJob(findMember(mId)?.jobId)?.color||'#4a84e8')+'30'}">
+                                                    :style="ui.theme==='dark' ? {backgroundColor:(getJob(findMember(mId)?.jobId)?.color||'#4a84e8')+'cc',borderColor:(getJob(findMember(mId)?.jobId)?.color||'#4a84e8')} : {backgroundColor:(getJob(findMember(mId)?.jobId)?.color||'#4a84e8')+'15',borderColor:(getJob(findMember(mId)?.jobId)?.color||'#4a84e8')+'30'}">
                                                     {{ getJob(findMember(mId)?.jobId)?.icon }}
                                                 </div>
                                                 <div class="flex flex-col min-w-0 leading-none gap-0.5">
                                                     <div class="flex items-center gap-1">
                                                         <svg v-if="group.leaderId === mId || (!group.leaderId && group.members[0] === mId)"
-                                                             class="icon-svg text-[10px] shrink-0" style="color:#e8a838;"><use href="#icon-crown"></use></svg>
-                                                        <span class="text-xs font-black whitespace-nowrap">{{ findMember(mId)?.name }}</span>
+                                                            class="icon-svg text-[10px] shrink-0"
+                                                            style="color:#e8a838;">
+                                                            <use href="#icon-crown"></use>
+                                                        </svg>
+                                                        <span class="text-xs font-black whitespace-nowrap">{{
+                                                            findMember(mId)?.name }}</span>
                                                     </div>
-                                                    <div class="inline-block px-1 py-0.5 rounded text-[10px] font-black uppercase tracking-wider w-fit" :style="jobTagStyle(getJob(findMember(mId)?.jobId)?.color)">{{ getJob(findMember(mId)?.jobId)?.name }}</div>
+                                                    <div class="inline-block px-1 py-0.5 rounded text-[10px] font-black uppercase tracking-wider w-fit"
+                                                        :style="jobTagStyle(getJob(findMember(mId)?.jobId)?.color)">{{
+                                                        getJob(findMember(mId)?.jobId)?.name }}</div>
                                                 </div>
                                             </div>
 
                                             <div class="flex items-center gap-1 shrink-0 ml-1">
                                                 <button v-if="!isReadOnly" @click.stop="toggleLeader(group, mId)"
-                                                        class="p-0.5 rounded flex items-center justify-center transition-all"
-                                                        :style="(group.leaderId === mId || (!group.leaderId && group.members[0] === mId))
+                                                    class="p-0.5 rounded flex items-center justify-center transition-all"
+                                                    :style="(group.leaderId === mId || (!group.leaderId && group.members[0] === mId))
                                                             ? 'background:rgba(232,168,56,0.1);color:#e8a838;border:1px solid rgba(232,168,56,0.2);'
                                                             : 'color:var(--text-muted);'">
-                                                    <svg class="icon-svg text-[10px]"><use href="#icon-crown"></use></svg>
+                                                    <svg class="icon-svg text-[10px]">
+                                                        <use href="#icon-crown"></use>
+                                                    </svg>
                                                 </button>
                                                 <button v-if="!isReadOnly" @click.stop="removeFromGroup(group, mId)"
-                                                        class="w-4 h-4 rounded flex items-center justify-center transition-all text-[10px] font-black hover:bg-[#f87171] hover:text-white"
-                                                        style="background:rgba(248,113,113,0.05);color:#f87171;border:1px solid rgba(248,113,113,0.1);">✕</button>
+                                                    class="w-4 h-4 rounded flex items-center justify-center transition-all text-[10px] font-black hover:bg-[#f87171] hover:text-white"
+                                                    style="background:rgba(248,113,113,0.05);color:#f87171;border:1px solid rgba(248,113,113,0.1);">✕</button>
                                             </div>
                                         </div>
                                     </transition-group>
 
                                     <!-- 空槽位 -->
                                     <div v-if="!isReadOnly && group.members.length < group.max"
-                                         v-for="i in (group.max - group.members.length)"
-                                         @click="openSelectMemberForGroup(group)"
-                                         class="border border-dashed rounded-lg p-1.5 flex items-center gap-2 transition-all cursor-pointer opacity-40 hover:opacity-100 hover:bg-[var(--accent-glow)]"
-                                         style="border-color:var(--card-border);">
-                                        <div class="w-7 h-7 rounded-lg flex items-center justify-center border border-dashed" style="border-color:var(--card-border);color:var(--text-muted);">
-                                            <svg class="icon-svg text-[10px]"><use href="#icon-plus"></use></svg>
+                                        v-for="i in (group.max - group.members.length)"
+                                        @click="openSelectMemberForGroup(group)"
+                                        class="border border-dashed rounded-lg p-1.5 flex items-center gap-2 transition-all cursor-pointer opacity-40 hover:opacity-100 hover:bg-[var(--accent-glow)]"
+                                        style="border-color:var(--card-border);">
+                                        <div class="w-7 h-7 rounded-lg flex items-center justify-center border border-dashed"
+                                            style="border-color:var(--card-border);color:var(--text-muted);">
+                                            <svg class="icon-svg text-[10px]">
+                                                <use href="#icon-plus"></use>
+                                            </svg>
                                         </div>
-                                        <span class="text-[10px] font-black uppercase tracking-widest" style="color:var(--text-muted);">待分配成員</span>
+                                        <span class="text-[10px] font-black uppercase tracking-widest"
+                                            style="color:var(--text-muted);">待分配成員</span>
                                     </div>
                                 </div>
 
                                 <!-- 底部控制列 -->
-                                <div class="px-4 py-2.5 flex justify-between items-center shrink-0 border-t" style="border-color:var(--card-border);background:rgba(0,0,0,0.02);">
+                                <div class="px-4 py-2.5 flex justify-between items-center shrink-0 border-t"
+                                    style="border-color:var(--card-border);background:rgba(0,0,0,0.02);">
                                     <div class="flex gap-1">
                                         <button v-if="!isReadOnly" @click="moveGroup(gIndex,-1)" :disabled="gIndex===0"
-                                                class="w-6 h-6 rounded-md flex items-center justify-center transition-all disabled:opacity-20 hover:text-[#4a84e8]"
-                                                style="background:var(--card-bg);color:var(--text-muted);border:1px solid var(--card-border);">
-                                            <svg class="icon-svg text-[12px]"><use href="#icon-chevron-left"></use></svg>
+                                            class="w-6 h-6 rounded-md flex items-center justify-center transition-all disabled:opacity-20 hover:text-[#4a84e8]"
+                                            style="background:var(--card-bg);color:var(--text-muted);border:1px solid var(--card-border);">
+                                            <svg class="icon-svg text-[12px]">
+                                                <use href="#icon-chevron-left"></use>
+                                            </svg>
                                         </button>
-                                        <button v-if="!isReadOnly" @click="moveGroup(gIndex,1)" :disabled="gIndex===groups.length-1"
-                                                class="w-6 h-6 rounded-md flex items-center justify-center transition-all disabled:opacity-20 hover:text-[#4a84e8]"
-                                                style="background:var(--card-bg);color:var(--text-muted);border:1px solid var(--card-border);">
-                                            <svg class="icon-svg text-[12px]"><use href="#icon-chevron-right"></use></svg>
+                                        <button v-if="!isReadOnly" @click="moveGroup(gIndex,1)"
+                                            :disabled="gIndex===groups.length-1"
+                                            class="w-6 h-6 rounded-md flex items-center justify-center transition-all disabled:opacity-20 hover:text-[#4a84e8]"
+                                            style="background:var(--card-bg);color:var(--text-muted);border:1px solid var(--card-border);">
+                                            <svg class="icon-svg text-[12px]">
+                                                <use href="#icon-chevron-right"></use>
+                                            </svg>
                                         </button>
                                     </div>
-                                    <div class="flex items-center gap-2 px-2 py-1 rounded-lg text-[12px] font-black" style="background:var(--card-bg);border:1px solid var(--card-border);">
+                                    <div class="flex items-center gap-2 px-2 py-1 rounded-lg text-[12px] font-black"
+                                        style="background:var(--card-bg);border:1px solid var(--card-border);">
                                         <span class="tracking-widest uppercase opacity-60">人數上限</span>
-                                        <input type="number" v-model.number="group.max" @change="!isReadOnly && syncData()" :disabled="isReadOnly"
-                                               class="w-8 text-center border-none p-0 focus:ring-0 bg-transparent font-black outline-none" style="color:#4a84e8;">
+                                        <input type="number" v-model.number="group.max"
+                                            @change="!isReadOnly && syncData()" :disabled="isReadOnly"
+                                            class="w-8 text-center border-none p-0 focus:ring-0 bg-transparent font-black outline-none"
+                                            style="color:#4a84e8;">
                                     </div>
                                 </div>
                             </div>
 
                             <!-- 新增隊伍按鈕 -->
                             <button v-if="!isReadOnly" @click="addNewGroup"
-                                    class="ro-card border-dashed border-2 flex flex-col items-center justify-center p-6 transition-all group opacity-60 hover:opacity-100"
-                                    style="min-height:280px;border-color:var(--card-border);background:transparent;"
-                                    @mouseenter="$event.currentTarget.style.borderColor='#4a84e8';"
-                                    @mouseleave="$event.currentTarget.style.borderColor='var(--card-border)';">
+                                class="ro-card border-dashed border-2 flex flex-col items-center justify-center p-6 transition-all group opacity-60 hover:opacity-100"
+                                style="min-height:280px;border-color:var(--card-border);background:transparent;"
+                                @mouseenter="$event.currentTarget.style.borderColor='#4a84e8';"
+                                @mouseleave="$event.currentTarget.style.borderColor='var(--card-border)';">
                                 <div class="w-10 h-10 rounded-xl border border-dashed flex items-center justify-center mb-2 transition-transform group-hover:scale-110"
-                                     style="border-color:var(--card-border);color:var(--text-muted);">
-                                    <svg class="icon-svg text-lg"><use href="#icon-plus"></use></svg>
+                                    style="border-color:var(--card-border);color:var(--text-muted);">
+                                    <svg class="icon-svg text-lg">
+                                        <use href="#icon-plus"></use>
+                                    </svg>
                                 </div>
-                                <span class="font-black text-[12px] tracking-[0.2em] uppercase" style="color:var(--text-muted);">New Team</span>
+                                <span class="font-black text-[12px] tracking-[0.2em] uppercase"
+                                    style="color:var(--text-muted);">New Team</span>
                             </button>
                         </div>
                     </template>
@@ -628,36 +1058,48 @@
 
                 <!-- ─── 右側待指派面板 ─── -->
                 <aside v-if="user && !loading && ui.expandUnassigned"
-                       class="hidden md:flex flex-col h-full shrink-0 overflow-hidden"
-                       style="width:280px;background:var(--sidebar-bg);border-left:1px solid var(--sidebar-border);">
+                    class="hidden md:flex flex-col h-full shrink-0 overflow-hidden"
+                    style="width:280px;background:var(--sidebar-bg);border-left:1px solid var(--sidebar-border);">
 
                     <!-- 面板標題 -->
-                    <div class="px-5 py-4 flex justify-between items-center shrink-0" style="border-bottom:1px solid var(--sidebar-border);">
+                    <div class="px-5 py-4 flex justify-between items-center shrink-0"
+                        style="border-bottom:1px solid var(--sidebar-border);">
                         <div class="flex items-center gap-3">
-                            <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black text-white" style="background:linear-gradient(135deg,#2a55c0,#4a84e8);">{{ unassignedMembers.length }}</div>
-                            <h2 class="font-black tracking-tighter text-sm uppercase" style="color:var(--text-primary);">待指派名單</h2>
+                            <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black text-white"
+                                style="background:linear-gradient(135deg,#2a55c0,#4a84e8);">{{ unassignedMembers.length
+                                }}</div>
+                            <h2 class="font-black tracking-tighter text-sm uppercase"
+                                style="color:var(--text-primary);">待指派名單</h2>
                         </div>
-                        <button @click="ui.expandUnassigned = false" class="p-1.5 rounded-lg transition-colors hover:bg-var(--item-hover-bg)" style="color:var(--text-muted);" title="關閉面板">
-                            <svg class="icon-svg text-sm"><use href="#icon-chevron-right"></use></svg>
+                        <button @click="ui.expandUnassigned = false"
+                            class="p-1.5 rounded-lg transition-colors hover:bg-var(--item-hover-bg)"
+                            style="color:var(--text-muted);" title="關閉面板">
+                            <svg class="icon-svg text-sm">
+                                <use href="#icon-chevron-right"></use>
+                            </svg>
                         </button>
                     </div>
 
                     <!-- 搜尋 -->
                     <div class="p-3 shrink-0" style="border-bottom:1px solid var(--sidebar-border);">
                         <div class="relative">
-                            <svg class="icon-svg absolute left-3 top-1/2 -translate-y-1/2 text-[12px]" style="color:var(--text-muted);"><use href="#icon-search"></use></svg>
+                            <svg class="icon-svg absolute left-3 top-1/2 -translate-y-1/2 text-[12px]"
+                                style="color:var(--text-muted);">
+                                <use href="#icon-search"></use>
+                            </svg>
                             <input v-model="searchQuery" placeholder="搜尋冒險者..."
-                                   class="w-full pl-8 pr-4 py-2 rounded-xl text-[12px] font-bold outline-none transition-all"
-                                   style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
+                                class="w-full pl-8 pr-4 py-2 rounded-xl text-[12px] font-bold outline-none transition-all"
+                                style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
                         </div>
                     </div>
 
                     <!-- 職業小統計 (兼過濾器) -->
-                    <div class="px-3 py-2 flex gap-1.5 flex-wrap shrink-0" style="border-bottom:1px solid var(--sidebar-border);background:var(--accent-glow);">
+                    <div class="px-3 py-2 flex gap-1.5 flex-wrap shrink-0"
+                        style="border-bottom:1px solid var(--sidebar-border);background:var(--accent-glow);">
                         <!-- 取消過濾按鈕 -->
                         <div @click="ui.filterJobId = null"
-                             class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
-                             :style="{
+                            class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
+                            :style="{
                                  background: !ui.filterJobId ? 'linear-gradient(135deg,#2a55c0,#4a84e8)' : 'var(--card-bg)',
                                  color: !ui.filterJobId ? '#fff' : 'var(--text-muted)',
                                  border: '1px solid ' + (!ui.filterJobId ? '#1a3a90' : 'var(--card-border)'),
@@ -668,21 +1110,22 @@
 
                         <template v-for="j in jobs" :key="'stat-'+j.id">
                             <div v-if="unassignedMembers.filter(m => m.jobId===j.id && !m.isLeave).length > 0"
-                                 @click="ui.filterJobId = ui.filterJobId === j.id ? null : j.id"
-                                 class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
-                                 :style="{
+                                @click="ui.filterJobId = ui.filterJobId === j.id ? null : j.id"
+                                class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
+                                :style="{
                                      background: ui.filterJobId === j.id ? j.color : j.color+'18',
                                      color: ui.filterJobId === j.id ? '#fff' : j.color,
                                      border: '1px solid ' + (ui.filterJobId === j.id ? j.color : j.color+'30'),
                                      boxShadow: ui.filterJobId === j.id ? '0 0 10px '+j.color+'40' : 'none'
                                  }">
-                                <span>{{ j.icon }}</span><span>{{ unassignedMembers.filter(m=>m.jobId===j.id&&!m.isLeave).length }}</span>
+                                <span>{{ j.icon }}</span><span>{{
+                                    unassignedMembers.filter(m=>m.jobId===j.id&&!m.isLeave).length }}</span>
                             </div>
                         </template>
                         <div v-if="unassignedMembers.filter(m=>m.isLeave).length > 0"
-                             @click="ui.filterJobId = ui.filterJobId === 'leave' ? null : 'leave'"
-                             class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
-                             :style="{
+                            @click="ui.filterJobId = ui.filterJobId === 'leave' ? null : 'leave'"
+                            class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
+                            :style="{
                                  background: ui.filterJobId === 'leave' ? '#f59e0b' : 'rgba(245,158,11,0.1)',
                                  color: ui.filterJobId === 'leave' ? '#fff' : '#f59e0b',
                                  border: '1px solid ' + (ui.filterJobId === 'leave' ? '#f59e0b' : 'rgba(245,158,11,0.2)'),
@@ -695,46 +1138,68 @@
                     <!-- 成員列表（依職業分組） -->
                     <div class="flex-1 overflow-y-auto custom-scroll px-3 pb-3">
                         <template v-for="j in jobs" :key="'grp-'+j.id">
-                            <template v-if="(!ui.filterJobId || ui.filterJobId === j.id) && unassignedMembers.filter(m=>m.jobId===j.id&&!m.isLeave&&(!searchQuery||m.name.toLowerCase().includes(searchQuery.toLowerCase()))).length > 0">
+                            <template
+                                v-if="(!ui.filterJobId || ui.filterJobId === j.id) && unassignedMembers.filter(m=>m.jobId===j.id&&!m.isLeave&&(!searchQuery||m.name.toLowerCase().includes(searchQuery.toLowerCase()))).length > 0">
                                 <div class="job-sec-hdr">
                                     <span>{{ j.icon }}</span>
                                     <span :style="{color:j.color}">{{ j.name }}</span>
-                                    <span class="ml-auto px-1.5 rounded text-[12px]" :style="{background:j.color+'20',color:j.color}">
+                                    <span class="ml-auto px-1.5 rounded text-[12px]"
+                                        :style="{background:j.color+'20',color:j.color}">
                                         {{ unassignedMembers.filter(m=>m.jobId===j.id&&!m.isLeave).length }}
                                     </span>
                                 </div>
                                 <div v-for="m in unassignedMembers.filter(m=>m.jobId===j.id&&!m.isLeave&&(!searchQuery||m.name.toLowerCase().includes(searchQuery.toLowerCase())))"
-                                      :key="m.id" @click="openAssignMenu(m)"
-                                      class="flex items-center gap-2.5 p-2 rounded-xl member-item mb-1">
-                                     <div class="w-8 h-8 rounded-lg flex items-center justify-center text-lg shrink-0"
-                                          :style="{backgroundColor:j.color+'15',border:'1px solid '+j.color+'25'}">{{ j.icon }}</div>                                    <div class="flex-1 min-w-0">
-                                        <div class="font-black text-sm whitespace-nowrap" style="color:var(--text-secondary);">{{ m.name }}</div>
+                                    :key="m.id" @click="openAssignMenu(m)"
+                                    class="flex items-center gap-2.5 p-2 rounded-xl member-item mb-1">
+                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-lg shrink-0"
+                                        :style="{backgroundColor:j.color+'15',border:'1px solid '+j.color+'25'}">{{
+                                        j.icon }}</div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="font-black text-sm whitespace-nowrap"
+                                            style="color:var(--text-secondary);">{{ m.name }}</div>
                                     </div>
-                                    <svg class="icon-svg text-[12px] shrink-0" style="color:var(--text-muted);"><use href="#icon-chevron-right"></use></svg>
+                                    <svg class="icon-svg text-[12px] shrink-0" style="color:var(--text-muted);">
+                                        <use href="#icon-chevron-right"></use>
+                                    </svg>
                                 </div>
                             </template>
                         </template>
 
                         <!-- 請假區塊 -->
-                        <template v-if="(!ui.filterJobId || ui.filterJobId === 'leave') && unassignedMembers.filter(m=>m.isLeave).length > 0">
+                        <template
+                            v-if="(!ui.filterJobId || ui.filterJobId === 'leave') && unassignedMembers.filter(m=>m.isLeave).length > 0">
                             <div class="job-sec-hdr">
                                 <span>☕</span><span style="color:#f59e0b;">請假中</span>
-                                <span class="ml-auto px-1.5 rounded text-[12px]" style="background:rgba(245,158,11,0.15);color:#f59e0b;">{{ unassignedMembers.filter(m=>m.isLeave).length }}</span>
+                                <span class="ml-auto px-1.5 rounded text-[12px]"
+                                    style="background:rgba(245,158,11,0.15);color:#f59e0b;">{{
+                                    unassignedMembers.filter(m=>m.isLeave).length }}</span>
                             </div>
                             <div v-for="m in unassignedMembers.filter(m=>m.isLeave)" :key="m.id+'-lv'"
-                                  @click="openAssignMenu(m)"
-                                  class="flex items-center gap-2.5 p-2 rounded-xl member-item mb-1 opacity-60">
-                                 <div class="w-8 h-8 rounded-lg flex items-center justify-center text-lg shrink-0" :style="{backgroundColor:getJob(m.jobId)?.color+'15'}">{{ getJob(m.jobId)?.icon }}</div>                                <div class="flex-1 min-w-0"><div class="font-black text-sm" style="color:var(--text-secondary);">{{ m.name }}</div></div>
-                                <span class="text-[12px] font-black px-1.5 py-0.5 rounded shrink-0" style="background:rgba(245,158,11,0.15);color:#f59e0b;">請假</span>
+                                @click="openAssignMenu(m)"
+                                class="flex items-center gap-2.5 p-2 rounded-xl member-item mb-1 opacity-60">
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center text-lg shrink-0"
+                                    :style="{backgroundColor:getJob(m.jobId)?.color+'15'}">{{ getJob(m.jobId)?.icon }}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="font-black text-sm" style="color:var(--text-secondary);">{{ m.name }}
+                                    </div>
+                                </div>
+                                <span class="text-[12px] font-black px-1.5 py-0.5 rounded shrink-0"
+                                    style="background:rgba(245,158,11,0.15);color:#f59e0b;">請假</span>
                             </div>
                         </template>
 
                         <!-- 全部已指派 -->
-                        <div v-if="unassignedMembers.length === 0" class="py-16 text-center flex flex-col items-center opacity-30">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center mb-4" style="background:rgba(0,0,0,0.03);">
-                                <svg class="icon-svg text-lg"><use href="#icon-check"></use></svg>
+                        <div v-if="unassignedMembers.length === 0"
+                            class="py-16 text-center flex flex-col items-center opacity-30">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center mb-4"
+                                style="background:rgba(0,0,0,0.03);">
+                                <svg class="icon-svg text-lg">
+                                    <use href="#icon-check"></use>
+                                </svg>
                             </div>
-                            <p class="text-[12px] font-black uppercase tracking-widest italic" style="color:var(--text-muted);">All Deployed</p>
+                            <p class="text-[12px] font-black uppercase tracking-widest italic"
+                                style="color:var(--text-muted);">All Deployed</p>
                         </div>
                     </div>
                 </aside>
@@ -743,26 +1208,33 @@
 
         <!-- ─── 移動端底部待分配 ─── -->
         <div v-if="user && !loading && (unassignedMembers.length > 0 || isReadOnly)"
-             class="md:hidden fixed bottom-0 left-0 right-0 z-[100] flex flex-col no-print transition-transform duration-500 ease-out"
-             :style="{ transform: ui.expandUnassigned ? 'translateY(0)' : 'translateY(calc(100% - 4.5rem - env(safe-area-inset-bottom)))', height:'45vh', background: 'var(--card-bg)', borderTop:'2px solid #4a84e8', borderRadius:'20px 20px 0 0', boxShadow: ui.theme === 'dark' ? '0 -10px 40px rgba(0,0,0,0.8)' : '0 -10px 40px rgba(0,0,0,0.1)', paddingBottom: 'env(safe-area-inset-bottom)' }">
+            class="md:hidden fixed bottom-0 left-0 right-0 z-[100] flex flex-col no-print transition-transform duration-500 ease-out"
+            :style="{ transform: ui.expandUnassigned ? 'translateY(0)' : 'translateY(calc(100% - 4.5rem - env(safe-area-inset-bottom)))', height:'45vh', background: 'var(--card-bg)', borderTop:'2px solid #4a84e8', borderRadius:'20px 20px 0 0', boxShadow: ui.theme === 'dark' ? '0 -10px 40px rgba(0,0,0,0.8)' : '0 -10px 40px rgba(0,0,0,0.1)', paddingBottom: 'env(safe-area-inset-bottom)' }">
             <div @click="ui.expandUnassigned = !ui.expandUnassigned"
-                 class="flex justify-between items-center px-5 cursor-pointer shrink-0 h-16"
-                 style="border-bottom:1px solid var(--sidebar-border);background:var(--card-header-bg);border-radius:20px 20px 0 0;">
+                class="flex justify-between items-center px-5 cursor-pointer shrink-0 h-16"
+                style="border-bottom:1px solid var(--sidebar-border);background:var(--card-header-bg);border-radius:20px 20px 0 0;">
                 <div class="flex items-center gap-3">
-                    <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black text-white" style="background:var(--btn-gold);border:1px solid var(--btn-gold-border);color:var(--btn-gold-text);">{{ unassignedMembers.length }}</div>
+                    <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black text-white"
+                        style="background:var(--btn-gold);border:1px solid var(--btn-gold-border);color:var(--btn-gold-text);">
+                        {{ unassignedMembers.length }}</div>
                     <span class="font-black text-sm tracking-tight" style="color:var(--text-primary);">待分配名單</span>
                 </div>
-                <div class="flex items-center gap-2 px-3 py-1 rounded-lg text-[12px] font-black uppercase tracking-widest ro-btn ro-btn-gold">
+                <div
+                    class="flex items-center gap-2 px-3 py-1 rounded-lg text-[12px] font-black uppercase tracking-widest ro-btn ro-btn-gold">
                     {{ ui.expandUnassigned ? 'Close' : 'View' }}
-                    <svg class="icon-svg transition-transform duration-500" :class="{'rotate-180': ui.expandUnassigned}"><use href="#icon-chevron-up"></use></svg>
+                    <svg class="icon-svg transition-transform duration-500"
+                        :class="{'rotate-180': ui.expandUnassigned}">
+                        <use href="#icon-chevron-up"></use>
+                    </svg>
                 </div>
             </div>
 
             <!-- 手機版職業篩選列 -->
-            <div v-show="ui.expandUnassigned" class="px-3 py-2 flex gap-1.5 overflow-x-auto shrink-0 custom-scroll" style="background:var(--accent-glow);border-bottom:1px solid var(--sidebar-border);scrollbar-width:none;">
+            <div v-show="ui.expandUnassigned" class="px-3 py-2 flex gap-1.5 overflow-x-auto shrink-0 custom-scroll"
+                style="background:var(--accent-glow);border-bottom:1px solid var(--sidebar-border);scrollbar-width:none;">
                 <div @click="ui.filterJobId = null"
-                     class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-black shrink-0 transition-all"
-                     :style="{
+                    class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-black shrink-0 transition-all"
+                    :style="{
                          background: !ui.filterJobId ? 'linear-gradient(135deg,#2a55c0,#4a84e8)' : 'var(--card-bg)',
                          color: !ui.filterJobId ? '#fff' : 'var(--text-muted)',
                          border: '1px solid ' + (!ui.filterJobId ? '#1a3a90' : 'var(--card-border)')
@@ -771,20 +1243,21 @@
                 </div>
                 <template v-for="j in jobs" :key="'mob-filter-'+j.id">
                     <div v-if="unassignedMembers.filter(m => m.jobId===j.id && !m.isLeave).length > 0"
-                         @click="ui.filterJobId = ui.filterJobId === j.id ? null : j.id"
-                         class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-black shrink-0 transition-all"
-                         :style="{
+                        @click="ui.filterJobId = ui.filterJobId === j.id ? null : j.id"
+                        class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-black shrink-0 transition-all"
+                        :style="{
                              background: ui.filterJobId === j.id ? j.color : 'var(--card-bg)',
                              color: ui.filterJobId === j.id ? '#fff' : j.color,
                              border: '1px solid ' + (ui.filterJobId === j.id ? j.color : 'var(--card-border)')
                          }">
-                        <span>{{ j.icon }}</span><span>{{ unassignedMembers.filter(m=>m.jobId===j.id&&!m.isLeave).length }}</span>
+                        <span>{{ j.icon }}</span><span>{{ unassignedMembers.filter(m=>m.jobId===j.id&&!m.isLeave).length
+                            }}</span>
                     </div>
                 </template>
                 <div v-if="unassignedMembers.filter(m=>m.isLeave).length > 0"
-                     @click="ui.filterJobId = ui.filterJobId === 'leave' ? null : 'leave'"
-                     class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-black shrink-0 transition-all"
-                     :style="{
+                    @click="ui.filterJobId = ui.filterJobId === 'leave' ? null : 'leave'"
+                    class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-black shrink-0 transition-all"
+                    :style="{
                          background: ui.filterJobId === 'leave' ? '#f59e0b' : 'var(--card-bg)',
                          color: ui.filterJobId === 'leave' ? '#fff' : '#f59e0b',
                          border: '1px solid ' + (ui.filterJobId === 'leave' ? '#f59e0b' : 'var(--card-border)')
@@ -794,16 +1267,18 @@
             </div>
 
             <div class="flex-1 overflow-y-auto custom-scroll p-3 space-y-1.5" style="background:var(--app-bg);">
-                <div v-for="m in unassignedMembers.filter(m => !ui.filterJobId || (ui.filterJobId === 'leave' ? m.isLeave : (m.jobId === ui.filterJobId && !m.isLeave)))" 
-                     :key="m.id" @click="openAssignMenu(m)"
-                     class="flex items-center gap-3 p-2.5 rounded-xl member-item"
-                     :class="{'opacity-50':m.isLeave}">
-                    <div class="w-9 h-9 rounded-lg flex items-center justify-center text-xl shrink-0" :style="{backgroundColor:getJob(m.jobId)?.color+'15'}">{{ getJob(m.jobId)?.icon }}</div>
+                <div v-for="m in unassignedMembers.filter(m => !ui.filterJobId || (ui.filterJobId === 'leave' ? m.isLeave : (m.jobId === ui.filterJobId && !m.isLeave)))"
+                    :key="m.id" @click="openAssignMenu(m)" class="flex items-center gap-3 p-2.5 rounded-xl member-item"
+                    :class="{'opacity-50':m.isLeave}">
+                    <div class="w-9 h-9 rounded-lg flex items-center justify-center text-xl shrink-0"
+                        :style="{backgroundColor:getJob(m.jobId)?.color+'15'}">{{ getJob(m.jobId)?.icon }}</div>
                     <div class="flex-1 min-w-0">
                         <div class="font-black text-sm" style="color:var(--text-secondary);">{{ m.name }}</div>
-                        <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit mt-1" :style="jobTagStyle(getJob(m.jobId)?.color)">{{ getJob(m.jobId)?.name }}</div>
+                        <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit mt-1"
+                            :style="jobTagStyle(getJob(m.jobId)?.color)">{{ getJob(m.jobId)?.name }}</div>
                     </div>
-                    <div v-if="m.isLeave" class="text-[12px] font-black px-1.5 py-0.5 rounded shrink-0" style="background:rgba(245,158,11,0.15);color:#f59e0b;">請假</div>
+                    <div v-if="m.isLeave" class="text-[12px] font-black px-1.5 py-0.5 rounded shrink-0"
+                        style="background:rgba(245,158,11,0.15);color:#f59e0b;">請假</div>
                 </div>
             </div>
         </div>
@@ -812,22 +1287,35 @@
         <template v-if="user">
 
             <!-- 戰力統計 -->
-            <div v-if="ui.modal === 'jobStats'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="max-w-md w-full p-6 max-h-[80vh] flex flex-col overflow-hidden rounded-2xl" style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <div class="border-b pb-4 mb-4 flex justify-between items-center shrink-0" style="border-color:var(--sidebar-border);">
-                        <h2 class="text-xl font-black flex items-center gap-2" style="color:var(--text-primary);"><svg class="icon-svg" style="color:#4a84e8;"><use href="#icon-chart"></use></svg> 職業戰力統計</h2>
-                        <button @click="ui.modal = null" class="font-black text-xl px-2 rounded transition-colors hover:bg-var(--item-hover-bg)" style="color:var(--text-muted);">✕</button>
+            <div v-if="ui.modal === 'jobStats'" class="fixed inset-0 flex items-center justify-center z-[250] p-4"
+                style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="max-w-md w-full p-6 max-h-[80vh] flex flex-col overflow-hidden rounded-2xl"
+                    style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+                    <div class="border-b pb-4 mb-4 flex justify-between items-center shrink-0"
+                        style="border-color:var(--sidebar-border);">
+                        <h2 class="text-xl font-black flex items-center gap-2" style="color:var(--text-primary);"><svg
+                                class="icon-svg" style="color:#4a84e8;">
+                                <use href="#icon-chart"></use>
+                            </svg> 職業戰力統計</h2>
+                        <button @click="ui.modal = null"
+                            class="font-black text-xl px-2 rounded transition-colors hover:bg-var(--item-hover-bg)"
+                            style="color:var(--text-muted);">✕</button>
                     </div>
                     <div class="flex-1 overflow-y-auto space-y-3 custom-scroll pr-2">
-                        <div v-for="job in jobStats" :key="job.id" class="p-3 rounded-xl border flex items-center gap-4" style="background:var(--item-bg);border-color:var(--sidebar-border);">
-                            <div class="w-10 h-10 rounded-lg flex items-center justify-center text-xl shrink-0" :style="{backgroundColor:job.color+'15'}">{{ job.icon }}</div>
+                        <div v-for="job in jobStats" :key="job.id" class="p-3 rounded-xl border flex items-center gap-4"
+                            style="background:var(--item-bg);border-color:var(--sidebar-border);">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center text-xl shrink-0"
+                                :style="{backgroundColor:job.color+'15'}">{{ job.icon }}</div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex justify-between items-center mb-1.5">
                                     <span class="font-black text-sm" :style="{color:job.color}">{{ job.name }}</span>
-                                    <span class="font-black text-sm" style="color:var(--text-secondary);">{{ job.count }} <span class="font-bold text-xs" style="color:var(--text-muted);">人</span></span>
+                                    <span class="font-black text-sm" style="color:var(--text-secondary);">{{ job.count
+                                        }} <span class="font-bold text-xs"
+                                            style="color:var(--text-muted);">人</span></span>
                                 </div>
                                 <div class="prog-track">
-                                    <div class="prog-fill transition-all duration-700" :style="{width:job.percent+'%',background:job.color}"></div>
+                                    <div class="prog-fill transition-all duration-700"
+                                        :style="{width:job.percent+'%',background:job.color}"></div>
                                 </div>
                             </div>
                         </div>
@@ -836,65 +1324,125 @@
             </div>
 
             <!-- 日誌 -->
-            <div v-if="ui.modal === 'logsModal'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="max-w-lg w-full p-6 max-h-[80vh] flex flex-col overflow-hidden rounded-2xl" style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <div class="flex justify-between items-center mb-5 border-b pb-4 shrink-0" style="border-color:var(--sidebar-border);">
+            <div v-if="ui.modal === 'logsModal'" class="fixed inset-0 flex items-center justify-center z-[250] p-4"
+                style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="max-w-lg w-full p-6 max-h-[80vh] flex flex-col overflow-hidden rounded-2xl"
+                    style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+                    <div class="flex justify-between items-center mb-5 border-b pb-4 shrink-0"
+                        style="border-color:var(--sidebar-border);">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(74,132,232,0.15);color:#4a84e8;"><svg class="icon-svg"><use href="#icon-history"></use></svg></div>
-                            <h2 class="text-xl font-black tracking-tighter" style="color:var(--text-primary);">冒險公會日誌</h2>
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                                style="background:rgba(74,132,232,0.15);color:#4a84e8;"><svg class="icon-svg">
+                                    <use href="#icon-history"></use>
+                                </svg></div>
+                            <h2 class="text-xl font-black tracking-tighter" style="color:var(--text-primary);">冒險公會日誌
+                            </h2>
                         </div>
-                        <button @click="clearLogs" class="text-[12px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest transition-colors" style="color:#f87171;border:1px solid rgba(248,113,113,0.2);">清空紀錄</button>
+                        <button @click="clearLogs"
+                            class="text-[12px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest transition-colors"
+                            style="color:#f87171;border:1px solid rgba(248,113,113,0.2);">清空紀錄</button>
                     </div>
                     <div class="flex-1 overflow-y-auto custom-scroll pr-2 space-y-2">
-                        <div v-for="log in logs" :key="log.id" class="p-3 rounded-2xl flex items-start gap-3 border transition-all member-item"
-                             style="cursor: default;">
+                        <div v-for="log in logs" :key="log.id"
+                            class="p-3 rounded-2xl flex items-start gap-3 border transition-all member-item"
+                            style="cursor: default;">
                             <div class="shrink-0 mt-0.5">
-                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black" style="background:var(--card-bg);border:1px solid var(--card-border);">
-                                    {{ log.message.includes('新增')?'➕':log.message.includes('刪除')?'🗑️':log.message.includes('加入')?'🛡️':log.message.includes('指派')?'🏹':log.message.includes('解散')?'💣':log.message.includes('請假')?'☕':'✨' }}
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black"
+                                    style="background:var(--card-bg);border:1px solid var(--card-border);">
+                                    {{
+                                    log.message.includes('新增')?'➕':log.message.includes('刪除')?'🗑️':log.message.includes('加入')?'🛡️':log.message.includes('指派')?'🏹':log.message.includes('解散')?'💣':log.message.includes('請假')?'☕':'✨'
+                                    }}
                                 </div>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <span class="text-[12px] font-black uppercase" style="color:var(--text-muted);">{{ new Date(log.timestamp).toLocaleTimeString() }}</span>
-                                <p class="text-sm font-bold leading-relaxed mt-0.5" style="color:var(--text-secondary);" v-html="formatLogMessage(log.message)"></p>
+                                <span class="text-[12px] font-black uppercase" style="color:var(--text-muted);">{{ new
+                                    Date(log.timestamp).toLocaleTimeString() }}</span>
+                                <p class="text-sm font-bold leading-relaxed mt-0.5" style="color:var(--text-secondary);"
+                                    v-html="formatLogMessage(log.message)"></p>
                             </div>
                         </div>
-                        <div v-if="logs.length === 0" class="py-20 text-center font-black uppercase tracking-[0.3em] italic" style="color:var(--text-muted);">No Logs</div>
+                        <div v-if="logs.length === 0"
+                            class="py-20 text-center font-black uppercase tracking-[0.3em] italic"
+                            style="color:var(--text-muted);">No Logs</div>
                     </div>
-                    <button @click="ui.modal = null" class="w-full mt-5 py-3.5 font-black rounded-2xl uppercase tracking-widest text-[12px] transition-colors" style="background:var(--item-bg);color:var(--text-muted);border:1px solid var(--card-border);">Back to Guild</button>
+                    <button @click="ui.modal = null"
+                        class="w-full mt-5 py-3.5 font-black rounded-2xl uppercase tracking-widest text-[12px] transition-colors"
+                        style="background:var(--item-bg);color:var(--text-muted);border:1px solid var(--card-border);">Back
+                        to Guild</button>
                 </div>
             </div>
 
             <!-- 成員管理 -->
-            <div v-if="ui.modal === 'memberList'" class="fixed inset-0 flex items-center justify-center z-[250] p-0 md:p-4" style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="w-full h-full md:h-auto md:max-w-3xl md:max-h-[85vh] flex flex-col overflow-hidden md:rounded-2xl" style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <div class="p-5 flex justify-between items-center shrink-0" style="border-bottom:1px solid var(--sidebar-border);background:var(--card-header-bg);">
-                        <h2 class="text-xl font-black flex items-center gap-2 tracking-tighter" style="color:var(--text-primary);"><svg class="icon-svg" style="color:#4a84e8;"><use href="#icon-users"></use></svg> 成員名冊管理</h2>
-                        <button @click="ui.modal = null" class="font-black text-xl px-2 rounded transition-colors" style="color:var(--text-muted);">✕</button>
+            <div v-if="ui.modal === 'memberList'"
+                class="fixed inset-0 flex items-center justify-center z-[250] p-0 md:p-4"
+                style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="w-full h-full md:h-auto md:max-w-3xl md:max-h-[85vh] flex flex-col overflow-hidden md:rounded-2xl"
+                    style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+                    <div class="p-5 flex justify-between items-center shrink-0"
+                        style="border-bottom:1px solid var(--sidebar-border);background:var(--card-header-bg);">
+                        <h2 class="text-xl font-black flex items-center gap-2 tracking-tighter"
+                            style="color:var(--text-primary);"><svg class="icon-svg" style="color:#4a84e8;">
+                                <use href="#icon-users"></use>
+                            </svg> 成員名冊管理</h2>
+                        <button @click="ui.modal = null" class="font-black text-xl px-2 rounded transition-colors"
+                            style="color:var(--text-muted);">✕</button>
                     </div>
-                    <div class="p-3 flex gap-2 shrink-0 border-b flex-col md:flex-row" style="background:var(--item-bg);border-color:var(--sidebar-border);">
-                        <input v-model="searchQuery" placeholder="搜尋冒險者..." class="flex-1 px-4 py-2.5 rounded-xl font-bold text-sm outline-none" style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
+                    <div class="p-3 flex gap-2 shrink-0 border-b flex-col md:flex-row"
+                        style="background:var(--item-bg);border-color:var(--sidebar-border);">
+                        <input v-model="searchQuery" placeholder="搜尋冒險者..."
+                            class="flex-1 px-4 py-2.5 rounded-xl font-bold text-sm outline-none"
+                            style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
                         <div class="flex gap-2">
-                            <button @click="ui.sortBy='name'" class="px-3 py-2 rounded-xl text-xs font-bold transition-colors" :style="ui.sortBy==='name'?'background:#4a84e8;color:white;':'background:var(--card-bg);color:var(--text-muted);border:1px solid var(--card-border);'">名稱</button>
-                            <button @click="ui.sortBy='job'" class="px-3 py-2 rounded-xl text-xs font-bold transition-colors" :style="ui.sortBy==='job'?'background:#4a84e8;color:white;':'background:var(--card-bg);color:var(--text-muted);border:1px solid var(--card-border);'">職業</button>
-                            <button @click="ui.sortBy='group'" class="px-3 py-2 rounded-xl text-xs font-bold transition-colors" :style="ui.sortBy==='group'?'background:#4a84e8;color:white;':'background:var(--card-bg);color:var(--text-muted);border:1px solid var(--card-border);'">隊伍</button>
+                            <button @click="ui.sortBy='name'"
+                                class="px-3 py-2 rounded-xl text-xs font-bold transition-colors"
+                                :style="ui.sortBy==='name'?'background:#4a84e8;color:white;':'background:var(--card-bg);color:var(--text-muted);border:1px solid var(--card-border);'">名稱</button>
+                            <button @click="ui.sortBy='job'"
+                                class="px-3 py-2 rounded-xl text-xs font-bold transition-colors"
+                                :style="ui.sortBy==='job'?'background:#4a84e8;color:white;':'background:var(--card-bg);color:var(--text-muted);border:1px solid var(--card-border);'">職業</button>
+                            <button @click="ui.sortBy='group'"
+                                class="px-3 py-2 rounded-xl text-xs font-bold transition-colors"
+                                :style="ui.sortBy==='group'?'background:#4a84e8;color:white;':'background:var(--card-bg);color:var(--text-muted);border:1px solid var(--card-border);'">隊伍</button>
                         </div>
                     </div>
                     <div class="flex-1 overflow-y-auto p-3 space-y-1.5 custom-scroll">
-                        <div v-for="m in filteredMembers" :key="m.id" class="flex items-center gap-3 p-3 rounded-xl member-item">
+                        <div v-for="m in filteredMembers" :key="m.id"
+                            class="flex items-center gap-3 p-3 rounded-xl member-item">
                             <div class="w-9 h-9 rounded-xl flex items-center justify-center text-xl border shrink-0 shadow-sm"
-                                 :style="ui.theme==='dark' ? {backgroundColor:(getJob(m.jobId)?.color||'#4a84e8')+'cc',borderColor:(getJob(m.jobId)?.color||'#4a84e8')} : {backgroundColor:(getJob(m.jobId)?.color||'#4a84e8')+'15',borderColor:(getJob(m.jobId)?.color||'#4a84e8')+'30'}">
+                                :style="ui.theme==='dark' ? {backgroundColor:(getJob(m.jobId)?.color||'#4a84e8')+'cc',borderColor:(getJob(m.jobId)?.color||'#4a84e8')} : {backgroundColor:(getJob(m.jobId)?.color||'#4a84e8')+'15',borderColor:(getJob(m.jobId)?.color||'#4a84e8')+'30'}">
                                 {{ getJob(m.jobId)?.icon }}
                             </div>
                             <div class="flex-1 min-w-0">
-                                <div class="font-black text-sm truncate" style="color:var(--text-primary);">{{ m.name }}</div>
-                                <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit mt-1" :style="jobTagStyle(getJob(m.jobId)?.color)">{{ getJob(m.jobId)?.name }}</div>
+                                <div class="font-black text-sm truncate" style="color:var(--text-primary);">{{ m.name }}
+                                </div>
+                                <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit mt-1"
+                                    :style="jobTagStyle(getJob(m.jobId)?.color)">{{ getJob(m.jobId)?.name }}</div>
                             </div>
-                            <div v-if="getMemberGroup(m.id)" class="text-[12px] font-black px-2 py-1 rounded-md shrink-0 tracking-widest" style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">{{ getMemberGroup(m.id).name }}</div>
-                            <div v-else class="text-[12px] font-black px-2 py-1 rounded-md shrink-0 tracking-widest" style="background:rgba(0,0,0,0.03);color:var(--text-muted);border:1px solid var(--card-border);">未分配</div>
+                            <div v-if="getMemberGroup(m.id)"
+                                class="text-[12px] font-black px-2 py-1 rounded-md shrink-0 tracking-widest"
+                                style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">
+                                {{ getMemberGroup(m.id).name }}</div>
+                            <div v-else class="text-[12px] font-black px-2 py-1 rounded-md shrink-0 tracking-widest"
+                                style="background:rgba(0,0,0,0.03);color:var(--text-muted);border:1px solid var(--card-border);">
+                                未分配</div>
                             <div class="flex gap-1 shrink-0">
-                                <button v-if="!isReadOnly" @click="toggleLeave(m)" class="p-2 rounded-lg transition-colors" :style="m.isLeave?'background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.25);':'background:rgba(255,255,255,0.05);color:#cbd5e1;border:1px solid var(--card-border);'"><svg class="icon-svg text-xs"><use href="#icon-coffee"></use></svg></button>
-                                <button v-if="!isReadOnly" @click="editMember(m)" class="p-2 rounded-lg transition-colors" style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);"><svg class="icon-svg text-xs"><use href="#icon-edit"></use></svg></button>
-                                <button v-if="!isReadOnly" @click="deleteMember(m.id)" class="p-2 rounded-lg transition-colors" style="background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.2);"><svg class="icon-svg text-xs"><use href="#icon-trash"></use></svg></button>
+                                <button v-if="!isReadOnly" @click="toggleLeave(m)"
+                                    class="p-2 rounded-lg transition-colors"
+                                    :style="m.isLeave?'background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.25);':'background:rgba(255,255,255,0.05);color:#cbd5e1;border:1px solid var(--card-border);'"><svg
+                                        class="icon-svg text-xs">
+                                        <use href="#icon-coffee"></use>
+                                    </svg></button>
+                                <button v-if="!isReadOnly" @click="editMember(m)"
+                                    class="p-2 rounded-lg transition-colors"
+                                    style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);"><svg
+                                        class="icon-svg text-xs">
+                                        <use href="#icon-edit"></use>
+                                    </svg></button>
+                                <button v-if="!isReadOnly" @click="deleteMember(m.id)"
+                                    class="p-2 rounded-lg transition-colors"
+                                    style="background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.2);"><svg
+                                        class="icon-svg text-xs">
+                                        <use href="#icon-trash"></use>
+                                    </svg></button>
                             </div>
                         </div>
                     </div>
@@ -902,124 +1450,205 @@
             </div>
 
             <!-- 職業設定 -->
-            <div v-if="ui.modal === 'jobSettings'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="max-w-md w-full p-6 flex flex-col max-h-[85vh] overflow-hidden rounded-2xl" style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <div class="flex justify-between items-center mb-5 border-b pb-4 shrink-0" style="border-color:var(--sidebar-border);">
-                        <h2 class="text-xl font-black flex items-center gap-2 tracking-tighter" style="color:var(--text-primary);">🛠️ 職業屬性管理</h2>
-                        <button @click="ui.modal = null" class="px-2 rounded transition-colors" style="color:var(--text-muted);">✕</button>
+            <div v-if="ui.modal === 'jobSettings'" class="fixed inset-0 flex items-center justify-center z-[250] p-4"
+                style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="max-w-md w-full p-6 flex flex-col max-h-[85vh] overflow-hidden rounded-2xl"
+                    style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+                    <div class="flex justify-between items-center mb-5 border-b pb-4 shrink-0"
+                        style="border-color:var(--sidebar-border);">
+                        <h2 class="text-xl font-black flex items-center gap-2 tracking-tighter"
+                            style="color:var(--text-primary);">🛠️ 職業屬性管理</h2>
+                        <button @click="ui.modal = null" class="px-2 rounded transition-colors"
+                            style="color:var(--text-muted);">✕</button>
                     </div>
                     <div class="flex-1 overflow-y-auto space-y-2 custom-scroll pr-1">
-                        <div v-for="job in jobs" :key="job.id" class="flex items-center gap-3 p-3 rounded-2xl border transition-all member-item" style="cursor: default;">
+                        <div v-for="job in jobs" :key="job.id"
+                            class="flex items-center gap-3 p-3 rounded-2xl border transition-all member-item"
+                            style="cursor: default;">
                             <div class="relative shrink-0">
-                                <button @click="ui.openIconPickerId = job.id" class="w-10 h-10 rounded-lg border flex items-center justify-center text-xl hover:border-[#4a84e8] transition-all" style="background:var(--card-bg);border-color:var(--card-border);">{{ job.icon }}</button>
-                                <div v-if="ui.openIconPickerId === job.id" @click="ui.openIconPickerId = null" class="fixed inset-0 z-[290]"></div>
-                                <div v-if="ui.openIconPickerId === job.id" class="absolute top-full left-0 mt-2 p-2 shadow-2xl rounded-2xl border z-[300] grid grid-cols-6 gap-1 w-48 animate-in zoom-in duration-200" style="background:var(--card-bg);border-color:var(--card-border);box-shadow:0 10px 40px rgba(0,0,0,0.6);">
-                                    <button v-for="emoji in emojiList" @click="updateJobIcon(emoji)" class="w-7 h-7 flex items-center justify-center rounded transition-colors hover:bg-[rgba(74,132,232,0.15)]">{{ emoji }}</button>
+                                <button @click="ui.openIconPickerId = job.id"
+                                    class="w-10 h-10 rounded-lg border flex items-center justify-center text-xl hover:border-[#4a84e8] transition-all"
+                                    style="background:var(--card-bg);border-color:var(--card-border);">{{ job.icon
+                                    }}</button>
+                                <div v-if="ui.openIconPickerId === job.id" @click="ui.openIconPickerId = null"
+                                    class="fixed inset-0 z-[290]"></div>
+                                <div v-if="ui.openIconPickerId === job.id"
+                                    class="absolute top-full left-0 mt-2 p-2 shadow-2xl rounded-2xl border z-[300] grid grid-cols-6 gap-1 w-48 animate-in zoom-in duration-200"
+                                    style="background:var(--card-bg);border-color:var(--card-border);box-shadow:0 10px 40px rgba(0,0,0,0.6);">
+                                    <button v-for="emoji in emojiList" @click="updateJobIcon(emoji)"
+                                        class="w-7 h-7 flex items-center justify-center rounded transition-colors hover:bg-[rgba(74,132,232,0.15)]">{{
+                                        emoji }}</button>
                                 </div>
                             </div>
-                            <input v-model="job.name" @blur="syncData" class="flex-1 px-3 py-2 rounded-lg font-bold outline-none text-xs min-w-0" style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
-                            <input type="color" v-model="job.color" @change="syncData" class="w-8 h-8 p-0 border-none bg-transparent cursor-pointer rounded overflow-hidden shrink-0">
-                            <button @click="deleteJob(job.id)" class="p-1 shrink-0 transition-colors hover:text-[#f87171]" style="color:var(--text-muted);"><svg class="icon-svg text-xs"><use href="#icon-trash"></use></svg></button>
+                            <input v-model="job.name" @blur="syncData"
+                                class="flex-1 px-3 py-2 rounded-lg font-bold outline-none text-xs min-w-0"
+                                style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
+                            <input type="color" v-model="job.color" @change="syncData"
+                                class="w-8 h-8 p-0 border-none bg-transparent cursor-pointer rounded overflow-hidden shrink-0">
+                            <button @click="deleteJob(job.id)"
+                                class="p-1 shrink-0 transition-colors hover:text-[#f87171]"
+                                style="color:var(--text-muted);"><svg class="icon-svg text-xs">
+                                    <use href="#icon-trash"></use>
+                                </svg></button>
                         </div>
                     </div>
-                    <button @click="addNewJob" class="w-full mt-5 py-3.5 font-black rounded-xl transition-colors text-[12px] tracking-widest uppercase" style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">+ New Job Class</button>
+                    <button @click="addNewJob"
+                        class="w-full mt-5 py-3.5 font-black rounded-xl transition-colors text-[12px] tracking-widest uppercase"
+                        style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">+
+                        New Job Class</button>
                 </div>
             </div>
 
             <!-- 批次導入 -->
-            <div v-if="ui.modal === 'importMembers'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="max-w-lg w-full p-6 rounded-2xl" style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #fb923c;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <h2 class="text-xl font-black mb-5 flex items-center gap-2 tracking-tighter" style="color:var(--text-primary);">📥 批量名單導入</h2>
-                    <textarea v-model="importText" placeholder="名稱,職業 (每行一位)" class="w-full h-48 p-4 rounded-xl outline-none font-bold text-sm mb-4 custom-scroll" style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);resize:none;"></textarea>
-                    <div v-if="previewImport.length > 0" class="mb-5 max-h-40 overflow-y-auto rounded-xl p-2 custom-scroll" style="border:1px solid var(--card-border);background:var(--item-bg);">
-                        <div v-for="(p,i) in previewImport" :key="i" class="flex items-center justify-between p-2 text-xs" style="border-bottom:1px solid var(--sidebar-border);">
+            <div v-if="ui.modal === 'importMembers'" class="fixed inset-0 flex items-center justify-center z-[250] p-4"
+                style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="max-w-lg w-full p-6 rounded-2xl"
+                    style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #fb923c;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+                    <h2 class="text-xl font-black mb-5 flex items-center gap-2 tracking-tighter"
+                        style="color:var(--text-primary);">📥 批量名單導入</h2>
+                    <textarea v-model="importText" placeholder="名稱,職業 (每行一位)"
+                        class="w-full h-48 p-4 rounded-xl outline-none font-bold text-sm mb-4 custom-scroll"
+                        style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);resize:none;"></textarea>
+                    <div v-if="previewImport.length > 0"
+                        class="mb-5 max-h-40 overflow-y-auto rounded-xl p-2 custom-scroll"
+                        style="border:1px solid var(--card-border);background:var(--item-bg);">
+                        <div v-for="(p,i) in previewImport" :key="i"
+                            class="flex items-center justify-between p-2 text-xs"
+                            style="border-bottom:1px solid var(--sidebar-border);">
                             <div class="flex items-center gap-2">
                                 <span class="font-bold" style="color:var(--text-primary);">{{ p.name }}</span>
                                 <span style="color:var(--text-muted);">/</span>
                                 <span style="color:var(--text-muted);">{{ getJob(p.jobId).name }}</span>
                             </div>
-                            <span class="px-2 py-0.5 rounded-full font-black text-[12px]" :style="p.isExisting?'background:rgba(74,132,232,0.15);color:#4a84e8;':'background:rgba(34,197,94,0.15);color:#22c55e;'">{{ p.isExisting?'更新':'新增' }}</span>
+                            <span class="px-2 py-0.5 rounded-full font-black text-[12px]"
+                                :style="p.isExisting?'background:rgba(74,132,232,0.15);color:#4a84e8;':'background:rgba(34,197,94,0.15);color:#22c55e;'">{{
+                                p.isExisting?'更新':'新增' }}</span>
                         </div>
                     </div>
                     <div class="flex gap-3">
-                        <button @click="ui.modal = null" class="flex-1 py-3.5 font-bold rounded-xl uppercase tracking-widest text-[12px] transition-colors ro-btn ro-btn-secondary">Cancel</button>
-                        <button @click="confirmImport" class="flex-1 py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold uppercase tracking-widest text-[12px]">Confirm Import</button>
+                        <button @click="ui.modal = null"
+                            class="flex-1 py-3.5 font-bold rounded-xl uppercase tracking-widest text-[12px] transition-colors ro-btn ro-btn-secondary">Cancel</button>
+                        <button @click="confirmImport"
+                            class="flex-1 py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold uppercase tracking-widest text-[12px]">Confirm
+                            Import</button>
                     </div>
                 </div>
             </div>
 
             <!-- 分享 -->
-            <div v-if="ui.modal === 'shareModal'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="max-w-sm w-full p-8 text-center rounded-2xl" style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #f472b6;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <h2 class="text-xl font-black mb-6 flex items-center justify-center gap-2 tracking-tighter" style="color:var(--text-primary);">💖 部署情報分享</h2>
+            <div v-if="ui.modal === 'shareModal'" class="fixed inset-0 flex items-center justify-center z-[250] p-4"
+                style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="max-w-sm w-full p-8 text-center rounded-2xl"
+                    style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #f472b6;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+                    <h2 class="text-xl font-black mb-6 flex items-center justify-center gap-2 tracking-tighter"
+                        style="color:var(--text-primary);">💖 部署情報分享</h2>
                     <div class="space-y-4 mb-7">
-                        <input v-model="sharePassword" placeholder="存取密碼 (選填)" class="w-full px-4 py-3 rounded-xl font-bold text-sm text-center outline-none" style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
+                        <input v-model="sharePassword" placeholder="存取密碼 (選填)"
+                            class="w-full px-4 py-3 rounded-xl font-bold text-sm text-center outline-none"
+                            style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
                         <div class="flex gap-2">
-                            <input readonly :value="sharedLink" class="flex-1 px-4 py-3 rounded-xl font-bold text-[12px] outline-none" style="background:var(--app-bg);border:1px solid var(--card-border);color:#f472b6;">
-                            <button @click="copyLink" class="px-4 py-2 rounded-xl active:scale-90 transition-transform shrink-0" style="background:#f472b6;color:white;"><svg class="icon-svg"><use :href="linkCopied ? '#icon-check' : '#icon-copy'"></use></svg></button>
+                            <input readonly :value="sharedLink"
+                                class="flex-1 px-4 py-3 rounded-xl font-bold text-[12px] outline-none"
+                                style="background:var(--app-bg);border:1px solid var(--card-border);color:#f472b6;">
+                            <button @click="copyLink"
+                                class="px-4 py-2 rounded-xl active:scale-90 transition-transform shrink-0"
+                                style="background:#f472b6;color:white;"><svg class="icon-svg">
+                                    <use :href="linkCopied ? '#icon-check' : '#icon-copy'"></use>
+                                </svg></button>
                         </div>
                     </div>
-                    <button @click="publishGuild" class="w-full py-4 text-white font-black rounded-xl ro-btn ro-btn-gold tracking-widest uppercase text-[12px]">Publish Link</button>
+                    <button @click="publishGuild"
+                        class="w-full py-4 text-white font-black rounded-xl ro-btn ro-btn-gold tracking-widest uppercase text-[12px]">Publish
+                        Link</button>
                 </div>
             </div>
 
             <!-- 成員指派 -->
-            <div v-if="ui.assigningMember" class="fixed inset-0 flex items-center justify-center z-[300] p-4" style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.assigningMember = null">
-                <div class="max-w-xs w-full p-7 text-center rounded-2xl" style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+            <div v-if="ui.assigningMember" class="fixed inset-0 flex items-center justify-center z-[300] p-4"
+                style="background:var(--modal-overlay);backdrop-filter:blur(4px);"
+                @click.self="ui.assigningMember = null">
+                <div class="max-w-xs w-full p-7 text-center rounded-2xl"
+                    style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
                     <div class="flex items-center justify-center gap-2 mb-5">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-xl" :style="{backgroundColor:getJob(ui.assigningMember.jobId)?.color+'20'}">{{ getJob(ui.assigningMember.jobId)?.icon }}</div>
-                        <h4 class="font-black text-sm" style="color:var(--text-primary);">派遣 <span style="color:#4a84e8;">「{{ ui.assigningMember.name }}」</span></h4>
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-xl"
+                            :style="{backgroundColor:getJob(ui.assigningMember.jobId)?.color+'20'}">{{
+                            getJob(ui.assigningMember.jobId)?.icon }}</div>
+                        <h4 class="font-black text-sm" style="color:var(--text-primary);">派遣 <span
+                                style="color:#4a84e8;">「{{ ui.assigningMember.name }}」</span></h4>
                     </div>
                     <div class="space-y-1.5 max-h-64 overflow-y-auto custom-scroll pr-1 mb-5">
-                        <button v-for="group in groups" :key="group.id" @click="assignToGroup(group)" :disabled="group.members.length >= group.max"
-                                class="w-full p-3 rounded-xl font-bold text-xs flex justify-between items-center member-item disabled:opacity-30">
-                            <span>{{ group.name }}</span>                            <div class="flex items-center gap-2">
+                        <button v-for="group in groups" :key="group.id" @click="assignToGroup(group)"
+                            :disabled="group.members.length >= group.max"
+                            class="w-full p-3 rounded-xl font-bold text-xs flex justify-between items-center member-item disabled:opacity-30">
+                            <span>{{ group.name }}</span>
+                            <div class="flex items-center gap-2">
                                 <div class="w-14 prog-track">
-                                    <div class="prog-fill prog-normal" :style="{width:group.max>0?Math.round(group.members.length/group.max*100)+'%':'0%'}"></div>
+                                    <div class="prog-fill prog-normal"
+                                        :style="{width:group.max>0?Math.round(group.members.length/group.max*100)+'%':'0%'}">
+                                    </div>
                                 </div>
-                                <span class="text-[12px] font-black tabular-nums" style="color:#4a84e8;">{{ group.members.length }}/{{ group.max }}</span>
+                                <span class="text-[12px] font-black tabular-nums" style="color:#4a84e8;">{{
+                                    group.members.length }}/{{ group.max }}</span>
                             </div>
                         </button>
                     </div>
                     <div class="pt-4 border-t flex flex-col gap-2.5" style="border-color:var(--sidebar-border);">
-                        <button @click="toggleLeave(ui.assigningMember); ui.assigningMember = null" class="w-full py-2.5 rounded-xl font-black text-xs transition-colors border"
-                                :style="ui.assigningMember.isLeave?'background:rgba(34,197,94,0.1);color:#22c55e;border-color:rgba(34,197,94,0.2);':'background:rgba(245,158,11,0.1);color:#f59e0b;border-color:rgba(245,158,11,0.2);'">
+                        <button @click="toggleLeave(ui.assigningMember); ui.assigningMember = null"
+                            class="w-full py-2.5 rounded-xl font-black text-xs transition-colors border"
+                            :style="ui.assigningMember.isLeave?'background:rgba(34,197,94,0.1);color:#22c55e;border-color:rgba(34,197,94,0.2);':'background:rgba(245,158,11,0.1);color:#f59e0b;border-color:rgba(245,158,11,0.2);'">
                             {{ ui.assigningMember.isLeave ? '取消請假 (狀態回歸)' : '設定為請假狀態' }}
                         </button>
-                        <button @click="ui.assigningMember = null" class="font-black text-[12px] transition-colors uppercase tracking-widest" style="color:var(--text-muted);">Close</button>
+                        <button @click="ui.assigningMember = null"
+                            class="font-black text-[12px] transition-colors uppercase tracking-widest"
+                            style="color:var(--text-muted);">Close</button>
                     </div>
                 </div>
             </div>
 
             <!-- 成員編輯 -->
-            <div v-if="ui.modal === 'memberEdit'" class="fixed inset-0 flex items-center justify-center z-[300] p-4" style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="max-w-sm w-full p-8 text-center rounded-2xl" style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <h3 class="font-black mb-6 text-lg tracking-tighter" style="color:var(--text-primary);">{{ form.id ? '修正成員資訊' : '新成員入團登記' }}</h3>
-                    <input v-model="form.name" placeholder="名稱" class="w-full p-3.5 rounded-xl mb-4 font-bold outline-none text-center text-sm" style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
-                    <select v-model="form.jobId" class="w-full p-3.5 rounded-xl mb-7 font-bold outline-none text-sm" style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
+            <div v-if="ui.modal === 'memberEdit'" class="fixed inset-0 flex items-center justify-center z-[300] p-4"
+                style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="max-w-sm w-full p-8 text-center rounded-2xl"
+                    style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+                    <h3 class="font-black mb-6 text-lg tracking-tighter" style="color:var(--text-primary);">{{ form.id ?
+                        '修正成員資訊' : '新成員入團登記' }}</h3>
+                    <input v-model="form.name" placeholder="名稱"
+                        class="w-full p-3.5 rounded-xl mb-4 font-bold outline-none text-center text-sm"
+                        style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
+                    <select v-model="form.jobId" class="w-full p-3.5 rounded-xl mb-7 font-bold outline-none text-sm"
+                        style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
                         <option v-for="job in jobs" :key="job.id" :value="job.id">{{ job.icon }} {{ job.name }}</option>
                     </select>
                     <div class="flex gap-3">
-                        <button @click="ui.modal = null" class="flex-1 py-3.5 font-bold rounded-xl uppercase tracking-widest text-[12px] transition-colors ro-btn ro-btn-secondary">Cancel</button>
-                        <button @click="saveMember" class="flex-1 py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold uppercase tracking-widest text-[12px]">Save</button>
+                        <button @click="ui.modal = null"
+                            class="flex-1 py-3.5 font-bold rounded-xl uppercase tracking-widest text-[12px] transition-colors ro-btn ro-btn-secondary">Cancel</button>
+                        <button @click="saveMember"
+                            class="flex-1 py-3.5 text-white font-black rounded-xl ro-btn ro-btn-gold uppercase tracking-widest text-[12px]">Save</button>
                     </div>
                 </div>
             </div>
 
             <!-- 選擇成員加入 -->
-            <div v-if="ui.modal === 'selectMemberForGroup'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="max-w-md w-full p-6 max-h-[85vh] flex flex-col overflow-hidden rounded-2xl" style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <h2 class="text-xl font-black mb-4 tracking-tighter" style="color:var(--text-primary);">加入至 <span style="color:#4a84e8;">{{ ui.targetGroup?.name }}</span></h2>
-                    
+            <div v-if="ui.modal === 'selectMemberForGroup'"
+                class="fixed inset-0 flex items-center justify-center z-[250] p-4"
+                style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="max-w-md w-full p-6 max-h-[85vh] flex flex-col overflow-hidden rounded-2xl"
+                    style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+                    <h2 class="text-xl font-black mb-4 tracking-tighter" style="color:var(--text-primary);">加入至 <span
+                            style="color:#4a84e8;">{{ ui.targetGroup?.name }}</span></h2>
+
                     <!-- 搜尋與篩選 -->
                     <div class="space-y-3 mb-4 shrink-0">
-                        <input v-model="ui.modalSearchQuery" placeholder="搜尋冒險者..." class="w-full px-4 py-3 rounded-xl font-bold outline-none text-sm transition-all" style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
-                        
+                        <input v-model="ui.modalSearchQuery" placeholder="搜尋冒險者..."
+                            class="w-full px-4 py-3 rounded-xl font-bold outline-none text-sm transition-all"
+                            style="background:var(--app-bg);border:1px solid var(--card-border);color:var(--text-secondary);">
+
                         <!-- 職業小統計 (過濾器) -->
-                        <div class="flex gap-1.5 flex-wrap p-2 rounded-xl" style="background:var(--accent-glow);border:1px solid var(--card-border);">
+                        <div class="flex gap-1.5 flex-wrap p-2 rounded-xl"
+                            style="background:var(--accent-glow);border:1px solid var(--card-border);">
                             <div @click="ui.modalFilterJobId = null"
-                                 class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
-                                 :style="{
+                                class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
+                                :style="{
                                      background: !ui.modalFilterJobId ? 'linear-gradient(135deg,#2a55c0,#4a84e8)' : 'var(--card-bg)',
                                      color: !ui.modalFilterJobId ? '#fff' : 'var(--text-muted)',
                                      border: '1px solid ' + (!ui.modalFilterJobId ? '#1a3a90' : 'var(--card-border)'),
@@ -1029,9 +1658,9 @@
                             </div>
                             <template v-for="j in jobs" :key="'modal-stat-'+j.id">
                                 <div v-if="members.filter(m => m.jobId===j.id).length > 0"
-                                     @click="ui.modalFilterJobId = ui.modalFilterJobId === j.id ? null : j.id"
-                                     class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
-                                     :style="{
+                                    @click="ui.modalFilterJobId = ui.modalFilterJobId === j.id ? null : j.id"
+                                    class="flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-black cursor-pointer transition-all hover:scale-105"
+                                    :style="{
                                          background: ui.modalFilterJobId === j.id ? j.color : j.color+'18',
                                          color: ui.modalFilterJobId === j.id ? '#fff' : j.color,
                                          border: '1px solid ' + (ui.modalFilterJobId === j.id ? j.color : j.color+'30'),
@@ -1045,30 +1674,43 @@
 
                     <div class="flex-1 overflow-y-auto space-y-1.5 custom-scroll pr-1">
                         <div v-for="m in modalFilteredMembers" :key="m.id" @click="addMemberToGroup(m)"
-                             class="flex items-center gap-3 p-2.5 rounded-xl member-item group">
-                            <div class="w-9 h-9 rounded-lg flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform" 
-                                 :style="ui.theme==='dark' ? {backgroundColor:(getJob(m.jobId)?.color||'#4a84e8')+'cc',borderColor:(getJob(m.jobId)?.color||'#4a84e8')} : {backgroundColor:(getJob(m.jobId)?.color||'#4a84e8')+'15',borderColor:(getJob(m.jobId)?.color||'#4a84e8')+'30'}">{{ getJob(m.jobId).icon }}</div>
+                            class="flex items-center gap-3 p-2.5 rounded-xl member-item group">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform"
+                                :style="ui.theme==='dark' ? {backgroundColor:(getJob(m.jobId)?.color||'#4a84e8')+'cc',borderColor:(getJob(m.jobId)?.color||'#4a84e8')} : {backgroundColor:(getJob(m.jobId)?.color||'#4a84e8')+'15',borderColor:(getJob(m.jobId)?.color||'#4a84e8')+'30'}">
+                                {{ getJob(m.jobId).icon }}</div>
                             <div class="flex-1 min-w-0">
                                 <div class="font-black text-sm" style="color:var(--text-primary);">{{ m.name }}</div>
-                                <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit mt-1" :style="jobTagStyle(getJob(m.jobId).color)">{{ getJob(m.jobId).name }}</div>
+                                <div class="inline-block px-1.5 py-0.5 rounded-md text-[12px] font-black uppercase tracking-wider w-fit mt-1"
+                                    :style="jobTagStyle(getJob(m.jobId).color)">{{ getJob(m.jobId).name }}</div>
                             </div>
-                            <div v-if="getMemberGroup(m.id)" class="text-[12px] font-black px-2 py-1 rounded-md shrink-0 tracking-widest" style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">{{ getMemberGroup(m.id).name }}</div>
+                            <div v-if="getMemberGroup(m.id)"
+                                class="text-[12px] font-black px-2 py-1 rounded-md shrink-0 tracking-widest"
+                                style="background:rgba(74,132,232,0.1);color:#4a84e8;border:1px solid rgba(74,132,232,0.2);">
+                                {{ getMemberGroup(m.id).name }}</div>
                         </div>
-                        <div v-if="modalFilteredMembers.length === 0" class="py-10 text-center opacity-30 font-black text-sm">查無符合條件的成員</div>
+                        <div v-if="modalFilteredMembers.length === 0"
+                            class="py-10 text-center opacity-30 font-black text-sm">查無符合條件的成員</div>
                     </div>
                 </div>
             </div>
 
             <!-- 個人資料 -->
-            <div v-if="ui.modal === 'userProfile'" class="fixed inset-0 flex items-center justify-center z-[250] p-4" style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
-                <div class="max-w-sm w-full p-8 rounded-2xl" style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-                    <h2 class="text-xl font-black mb-6 tracking-tighter flex items-center gap-2" style="color:var(--text-primary);">⚙️ 管理帳號設定</h2>
+            <div v-if="ui.modal === 'userProfile'" class="fixed inset-0 flex items-center justify-center z-[250] p-4"
+                style="background:var(--modal-overlay);backdrop-filter:blur(4px);" @click.self="ui.modal = null">
+                <div class="max-w-sm w-full p-8 rounded-2xl"
+                    style="background:var(--card-bg);border:1px solid var(--card-border);border-top:4px solid #4a84e8;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+                    <h2 class="text-xl font-black mb-6 tracking-tighter flex items-center gap-2"
+                        style="color:var(--text-primary);">⚙️ 管理帳號設定</h2>
                     <div class="space-y-4">
-                        <div class="p-4 rounded-xl" style="background:var(--item-bg);border:1px solid var(--card-border);">
-                            <div class="text-[12px] font-black mb-1 uppercase tracking-widest" style="color:var(--text-muted);">Account</div>
-                            <div class="font-black text-sm break-all mt-1" style="color:#4a84e8;">{{ user.isAnonymous ? 'Temporary Visitor' : user.email }}</div>
+                        <div class="p-4 rounded-xl"
+                            style="background:var(--item-bg);border:1px solid var(--card-border);">
+                            <div class="text-[12px] font-black mb-1 uppercase tracking-widest"
+                                style="color:var(--text-muted);">Account</div>
+                            <div class="font-black text-sm break-all mt-1" style="color:#4a84e8;">{{ user.isAnonymous ?
+                                'Temporary Visitor' : user.email }}</div>
                         </div>
-                        <button @click="ui.modal = null" class="w-full py-3.5 font-bold rounded-xl uppercase tracking-widest text-[12px] transition-colors ro-btn ro-btn-secondary">Close</button>
+                        <button @click="ui.modal = null"
+                            class="w-full py-3.5 font-bold rounded-xl uppercase tracking-widest text-[12px] transition-colors ro-btn ro-btn-secondary">Close</button>
                     </div>
                 </div>
             </div>
@@ -1079,6 +1721,19 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword, updatePassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const preventMobileZoom = () => {
+            document.addEventListener('gesturestart', (event) => event.preventDefault(), { passive: false });
+            document.addEventListener('gesturechange', (event) => event.preventDefault(), { passive: false });
+            document.addEventListener('gestureend', (event) => event.preventDefault(), { passive: false });
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', (event) => {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) event.preventDefault();
+                lastTouchEnd = now;
+            }, { passive: false });
+        };
+        preventMobileZoom();
 
         const { createApp, ref, computed, onMounted, watch } = window.Vue;
 
@@ -1098,7 +1753,7 @@
                 const importText = ref(''); const sharedLink = ref(''); const sharePassword = ref(''); const visitorPassword = ref('');
                 const isShareLocked = ref(false); const linkCopied = ref(false); let tempSharedData = null;
                 const emojiList = ['⚔️', '🛡️', '🏹', '✨', '🔥', '❄️', '⚡', '🌪️', '💧', '🌿', '💀', '⚰️', '💊', '🔨', '🪓', '💰', '🛒', '🎸', '🎭', '🥊', '🥋', '槍', '💣', '🐱', '🦅', '⛪', '📖', '👑', '💎', '🆕', '👼', '🧛'];
-                const groupColorsBg = ['#4a84e8', '#ef4444', '#22c55e', '#f59e0b', '#a855f7', '#06b6d4', '#ec4899', '#10b981', '#f97316', '#6366f1', '#eab308', '#8b5cf6', '#14b8a6', '#f43f5e', '#64748b'];                const appId = 'ro-guild-v5-pro'; let db, auth;
+                const groupColorsBg = ['#4a84e8', '#ef4444', '#22c55e', '#f59e0b', '#a855f7', '#06b6d4', '#ec4899', '#10b981', '#f97316', '#6366f1', '#eab308', '#8b5cf6', '#14b8a6', '#f43f5e', '#64748b']; const appId = 'ro-guild-v5-pro'; let db, auth;
 
                 const findMember = (id) => members.value.find(m => m.id === id);
                 const getJob = (id) => jobs.value.find(j => j.id === id) || { name: '未知', icon: '❓', color: '#ccc' };
@@ -1110,58 +1765,58 @@
                     return { backgroundColor: color + '15', color: color, border: '1px solid ' + color + '30' };
                 };
                 const getMemberGroup = (mid) => groups.value.find(g => g.members.includes(mid));
-                const unassignedMembers = computed(() => { 
-                    const assigned = new Set(); 
+                const unassignedMembers = computed(() => {
+                    const assigned = new Set();
                     if (groups.value) {
-                        groups.value.forEach(g => { 
-                            if (g && g.members) g.members.forEach(id => assigned.add(id)); 
-                        }); 
+                        groups.value.forEach(g => {
+                            if (g && g.members) g.members.forEach(id => assigned.add(id));
+                        });
                     }
-                    return (members.value || []).filter(m => m && !assigned.has(m.id)); 
+                    return (members.value || []).filter(m => m && !assigned.has(m.id));
                 });
-                const getSortedGroupMembers = (group) => { 
-                    if (!group || !group.members || group.members.length === 0) return []; 
-                    const list = [...group.members]; 
-                    const effectiveLeader = group.leaderId || group.members[0]; 
-                    const idx = list.indexOf(effectiveLeader); 
-                    if (idx !== -1) { list.splice(idx, 1); list.unshift(effectiveLeader); } 
-                    return list; 
+                const getSortedGroupMembers = (group) => {
+                    if (!group || !group.members || group.members.length === 0) return [];
+                    const list = [...group.members];
+                    const effectiveLeader = group.leaderId || group.members[0];
+                    const idx = list.indexOf(effectiveLeader);
+                    if (idx !== -1) { list.splice(idx, 1); list.unshift(effectiveLeader); }
+                    return list;
                 };
-                const jobStats = computed(() => { 
+                const jobStats = computed(() => {
                     const mems = members.value || [];
-                    const total = mems.length || 1; 
-                    return (jobs.value || []).map(j => { 
-                        const count = mems.filter(m => m && m.jobId === j.id).length; 
-                        return { ...j, count, percent: Math.round((count / total) * 100) }; 
-                    }); 
+                    const total = mems.length || 1;
+                    return (jobs.value || []).map(j => {
+                        const count = mems.filter(m => m && m.jobId === j.id).length;
+                        return { ...j, count, percent: Math.round((count / total) * 100) };
+                    });
                 });
-                const filteredMembers = computed(() => { 
-                    let res = [...(members.value || [])]; 
-                    if (searchQuery.value && searchQuery.value.trim()) { 
-                        const q = searchQuery.value.trim().toLowerCase(); 
-                        res = res.filter(m => m && m.name.toLowerCase().includes(q)); 
-                    } 
-                    return res.sort((a,b) => { 
-                        if(ui.value.sortBy === 'job') { 
-                            const ja = (jobs.value || []).findIndex(j => j.id === a.jobId); 
-                            const jb = (jobs.value || []).findIndex(j => j.id === b.jobId); 
-                            return ja - jb; 
-                        } else if(ui.value.sortBy === 'group') { 
-                            const ga = (groups.value || []).findIndex(g => g.members && g.members.includes(a.id)); 
-                            const gb = (groups.value || []).findIndex(g => g.members && g.members.includes(b.id)); 
-                            return (ga === -1 ? 999 : ga) - (gb === -1 ? 999 : gb); 
-                        } 
-                        return (a.name || '').localeCompare(b.name || '', 'zh-TW'); 
-                    }); 
+                const filteredMembers = computed(() => {
+                    let res = [...(members.value || [])];
+                    if (searchQuery.value && searchQuery.value.trim()) {
+                        const q = searchQuery.value.trim().toLowerCase();
+                        res = res.filter(m => m && m.name.toLowerCase().includes(q));
+                    }
+                    return res.sort((a, b) => {
+                        if (ui.value.sortBy === 'job') {
+                            const ja = (jobs.value || []).findIndex(j => j.id === a.jobId);
+                            const jb = (jobs.value || []).findIndex(j => j.id === b.jobId);
+                            return ja - jb;
+                        } else if (ui.value.sortBy === 'group') {
+                            const ga = (groups.value || []).findIndex(g => g.members && g.members.includes(a.id));
+                            const gb = (groups.value || []).findIndex(g => g.members && g.members.includes(b.id));
+                            return (ga === -1 ? 999 : ga) - (gb === -1 ? 999 : gb);
+                        }
+                        return (a.name || '').localeCompare(b.name || '', 'zh-TW');
+                    });
                 });
-                const modalFilteredMembers = computed(() => { 
+                const modalFilteredMembers = computed(() => {
                     let res = [...(members.value || [])];
                     if (ui.value.modalFilterJobId) res = res.filter(m => m.jobId === ui.value.modalFilterJobId);
                     if (ui.value.modalSearchQuery && ui.value.modalSearchQuery.trim()) {
                         const q = ui.value.modalSearchQuery.trim().toLowerCase();
                         res = res.filter(m => m && m.name.toLowerCase().includes(q));
                     }
-                    return res.sort((a,b) => (a.name || '').localeCompare(b.name || '', 'zh-TW'));
+                    return res.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'zh-TW'));
                 });
                 const previewImport = computed(() => { if (!importText.value) return []; return importText.value.split(/\r?\n/).map(line => { const parts = line.split(/,|\t/).map(s => s.trim()).filter(s => s); if (parts.length > 0) { const name = parts[0]; const jobName = parts[1] || ''; let jobId = jobs.value[0].id; if (jobName) { const found = jobs.value.find(j => j.name.includes(jobName) || jobName.includes(j.name)); if (found) jobId = found.id; } const existing = members.value.find(m => m.name === name); return { name, jobId, isExisting: !!existing, existingId: existing ? existing.id : null }; } return null; }).filter(x => x); });
 
@@ -1175,60 +1830,60 @@
 
                 const saveMember = () => { if (!form.value.name) return; if (form.value.id) { const idx = members.value.findIndex(m => m.id === form.value.id); if (idx !== -1) members.value[idx] = { ...form.value }; } else { members.value.push({ id: crypto.randomUUID(), name: form.value.name, jobId: form.value.jobId, isLeave: false }); addLog(`新增成員：[${form.value.name}]`); } syncData(); ui.value.modal = null; };
                 const editMember = (m) => { form.value = { ...m }; ui.value.modal = 'memberEdit'; };
-                const deleteMember = (id) => { if(!confirm('確定刪除？')) return; const m = findMember(id); if(m) addLog(`刪除成員：[${m.name}]`); members.value = members.value.filter(m => m.id !== id); groups.value.forEach(g => { g.members = g.members.filter(mid => mid !== id); if (g.leaderId === id) g.leaderId = null; }); syncData(); };
+                const deleteMember = (id) => { if (!confirm('確定刪除？')) return; const m = findMember(id); if (m) addLog(`刪除成員：[${m.name}]`); members.value = members.value.filter(m => m.id !== id); groups.value.forEach(g => { g.members = g.members.filter(mid => mid !== id); if (g.leaderId === id) g.leaderId = null; }); syncData(); };
                 const openAddMember = () => { form.value = { id: null, name: '', jobId: jobs.value[0].id }; ui.value.modal = 'memberEdit'; };
                 const toggleLeave = (m) => { m.isLeave = !m.isLeave; if (m.isLeave) { addLog(`請假：[${m.name}]`); groups.value.forEach(g => { const idx = g.members.indexOf(m.id); if (idx !== -1) { g.members.splice(idx, 1); if (g.leaderId === m.id) g.leaderId = null; } }); } else { addLog(`回歸：[${m.name}]`); } syncData(); };
 
                 const addNewGroup = () => { const g = { id: crypto.randomUUID(), name: `小隊 ${groups.value.length + 1}`, max: 5, members: [], leaderId: null, color: '#4a84e8' }; groups.value.push(g); addLog(`擴充：[${g.name}]`); syncData(); };
-                const deleteGroup = (i) => { if(confirm('解散隊伍？')) { addLog(`解散：[${groups.value[i].name}]`); groups.value.splice(i, 1); syncData(); } };
+                const deleteGroup = (i) => { if (confirm('解散隊伍？')) { addLog(`解散：[${groups.value[i].name}]`); groups.value.splice(i, 1); syncData(); } };
                 const moveGroup = (index, dir) => { const newIdx = index + dir; if (newIdx < 0 || newIdx >= groups.value.length) return; const item = groups.value.splice(index, 1)[0]; groups.value.splice(newIdx, 0, item); syncData(); };
                 const openAssignMenu = (m) => { if (!isReadOnly.value && m) ui.value.assigningMember = m; };
-                const assignToGroup = (g) => { if (g.members.length >= g.max) return alert('滿了'); groups.value.forEach(grp => { const idx = grp.members.indexOf(ui.value.assigningMember.id); if(idx !== -1) grp.members.splice(idx, 1); if(grp.leaderId === ui.value.assigningMember.id) grp.leaderId = null; }); ui.value.assigningMember.isLeave = false; g.members.push(ui.value.assigningMember.id); addLog(`指派：[${ui.value.assigningMember.name}] 至 [${g.name}]`); ui.value.assigningMember = null; syncData(); };
+                const assignToGroup = (g) => { if (g.members.length >= g.max) return alert('滿了'); groups.value.forEach(grp => { const idx = grp.members.indexOf(ui.value.assigningMember.id); if (idx !== -1) grp.members.splice(idx, 1); if (grp.leaderId === ui.value.assigningMember.id) grp.leaderId = null; }); ui.value.assigningMember.isLeave = false; g.members.push(ui.value.assigningMember.id); addLog(`指派：[${ui.value.assigningMember.name}] 至 [${g.name}]`); ui.value.assigningMember = null; syncData(); };
                 const updateGroupName = (group, e) => { const limit = 10; if (e.target.value.length > limit) { alert(`隊伍名稱限 ${limit} 字以內`); e.target.value = e.target.value.slice(0, limit); } group.name = e.target.value; };
-                const removeFromGroup = (g, mid) => { const m = findMember(mid); if(m) addLog(`退出：[${m.name}] 離開 [${g.name}]`); g.members = g.members.filter(id => id !== mid); if (g.leaderId === mid) g.leaderId = null; syncData(); };
+                const removeFromGroup = (g, mid) => { const m = findMember(mid); if (m) addLog(`退出：[${m.name}] 離開 [${g.name}]`); g.members = g.members.filter(id => id !== mid); if (g.leaderId === mid) g.leaderId = null; syncData(); };
                 const toggleLeader = (g, mid) => { g.leaderId = g.leaderId === mid ? null : mid; syncData(); };
-                const openSelectMemberForGroup = (g) => { 
+                const openSelectMemberForGroup = (g) => {
                     if (!g) return;
-                    ui.value.targetGroup = g; 
-                    ui.value.modalFilterJobId = null; 
+                    ui.value.targetGroup = g;
+                    ui.value.modalFilterJobId = null;
                     ui.value.modalSearchQuery = '';
-                    ui.value.modal = 'selectMemberForGroup'; 
+                    ui.value.modal = 'selectMemberForGroup';
                 };
-                const addMemberToGroup = (m) => { 
+                const addMemberToGroup = (m) => {
                     if (!m || !ui.value.targetGroup) return;
                     const group = ui.value.targetGroup;
                     if (!group.members) group.members = [];
-                    if (group.members.length >= group.max) return alert('滿了'); 
-                    groups.value.forEach(grp => { 
+                    if (group.members.length >= group.max) return alert('滿了');
+                    groups.value.forEach(grp => {
                         if (grp && grp.members) {
-                            const idx = grp.members.indexOf(m.id); 
-                            if(idx !== -1) grp.members.splice(idx, 1); 
-                            if(grp.leaderId === m.id) grp.leaderId = null; 
+                            const idx = grp.members.indexOf(m.id);
+                            if (idx !== -1) grp.members.splice(idx, 1);
+                            if (grp.leaderId === m.id) grp.leaderId = null;
                         }
-                    }); 
-                    m.isLeave = false; 
-                    group.members.push(m.id); 
-                    addLog(`指派：[${m.name}] 加入 [${group.name}]`); 
-                    ui.value.modal = null; 
-                    syncData(); 
+                    });
+                    m.isLeave = false;
+                    group.members.push(m.id);
+                    addLog(`指派：[${m.name}] 加入 [${group.name}]`);
+                    ui.value.modal = null;
+                    syncData();
                 };
 
                 const onDragStart = (idx, e) => { if (isReadOnly.value || e.target.tagName === 'INPUT') { e.preventDefault(); return; } ui.value.draggedGroupIndex = idx; };
                 const onDrop = (idx) => { if (isReadOnly.value) return; const dragged = ui.value.draggedGroupIndex; if (dragged === null || dragged === idx) return; const item = groups.value.splice(dragged, 1)[0]; groups.value.splice(idx, 0, item); ui.value.draggedGroupIndex = null; syncData(); };
 
                 const copyLink = () => { navigator.clipboard.writeText(sharedLink.value); linkCopied.value = true; setTimeout(() => linkCopied.value = false, 2000); };
-                const publishGuild = async () => { if (!user.value || user.value.isAnonymous) return alert("請登入"); try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_guilds', user.value.uid), { members: members.value, groups: groups.value, jobs: jobs.value, logs: logs.value, password: sharePassword.value, updatedAt: new Date().toISOString() }); alert("已發佈"); } catch(e) { alert("失敗"); } };
+                const publishGuild = async () => { if (!user.value || user.value.isAnonymous) return alert("請登入"); try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_guilds', user.value.uid), { members: members.value, groups: groups.value, jobs: jobs.value, logs: logs.value, password: sharePassword.value, updatedAt: new Date().toISOString() }); alert("已發佈"); } catch (e) { alert("失敗"); } };
                 const openShareModal = () => { if (!user.value || user.value.isAnonymous) return alert("請登入正式帳號"); sharedLink.value = `${window.location.origin}${window.location.pathname}?share=${user.value.uid}`; ui.value.modal = 'shareModal'; };
                 const unlockShare = () => { if (visitorPassword.value === tempSharedData.password) { members.value = tempSharedData.members || []; groups.value = tempSharedData.groups || []; jobs.value = tempSharedData.jobs || jobs.value; logs.value = tempSharedData.logs || []; isShareLocked.value = false; user.value = { uid: 'visitor', isAnonymous: true, email: 'Visitor' }; } else alert("錯誤"); };
                 const exitReadOnly = () => { window.location.href = window.location.pathname; };
-                const clearLogs = () => { if(confirm("清空？")) { logs.value = []; syncData(); } };
+                const clearLogs = () => { if (confirm("清空？")) { logs.value = []; syncData(); } };
                 const updateJobIcon = (emoji) => { const job = jobs.value.find(j => j.id === ui.value.openIconPickerId); if (job) { job.icon = emoji; ui.value.openIconPickerId = null; syncData(); } };
                 const addNewJob = () => { jobs.value.push({ id: 'j' + Date.now(), name: '新職業', color: '#3b82f6', icon: '🆕' }); syncData(); };
                 const deleteJob = (id) => { if (jobs.value.length <= 1) return; jobs.value = jobs.value.filter(j => j.id !== id); syncData(); };
                 const confirmImport = () => { if (previewImport.value.length === 0) return; let newCount = 0; let updateCount = 0; previewImport.value.forEach(p => { if (p.isExisting) { const idx = members.value.findIndex(m => m.id === p.existingId); if (idx !== -1) { members.value[idx].jobId = p.jobId; updateCount++; } } else { members.value.push({ id: crypto.randomUUID(), name: p.name, jobId: p.jobId, isLeave: false }); newCount++; } }); addLog(`匯入: 新增 ${newCount}人, 更新 ${updateCount}人`); importText.value = ''; ui.value.modal = null; syncData(); };
 
                 onMounted(async () => {
-                    const local = localStorage.getItem(`ro_data_${appId}`); if(local) { const d = JSON.parse(local); members.value = d.members || []; groups.value = d.groups || []; jobs.value = d.jobs || jobs.value; logs.value = d.logs || []; }
+                    const local = localStorage.getItem(`ro_data_${appId}`); if (local) { const d = JSON.parse(local); members.value = d.members || []; groups.value = d.groups || []; jobs.value = d.jobs || jobs.value; logs.value = d.logs || []; }
                     const urlParams = new URLSearchParams(window.location.search); const shareId = urlParams.get('share');
                     try { const res = await fetch('config.json'); const config = await res.json(); const app = initializeApp(config); auth = getAuth(app); db = getFirestore(app); if (shareId) { isReadOnly.value = true; onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'shared_guilds', shareId), snap => { if (snap.exists()) { const d = snap.data(); if (d.password) { tempSharedData = d; isShareLocked.value = true; } else { members.value = d.members || []; groups.value = d.groups || []; jobs.value = d.jobs || jobs.value; user.value = { uid: 'visitor', isAnonymous: true, email: 'Visitor' }; } loading.value = false; } }); } else { onAuthStateChanged(auth, u => { user.value = u; if (u && !u.isAnonymous) { onSnapshot(doc(db, 'artifacts', appId, 'users', u.uid, 'data', 'guild'), snap => { if (snap.exists()) { const d = snap.data(); members.value = d.members || []; groups.value = d.groups || []; jobs.value = d.jobs || jobs.value; logs.value = d.logs || []; } }); } loading.value = false; }); } } catch (e) { if (localStorage.getItem('ro_guest_mode') === 'true') loginAsGuest(); loading.value = false; }
                 });
@@ -1238,4 +1893,5 @@
         }).mount('#app');
     </script>
 </body>
+
 </html>
