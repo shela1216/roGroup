@@ -255,22 +255,15 @@
         }
 
         .mobile-top-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            position: relative;
             z-index: 220;
+            flex: 0 0 auto;
             background: var(--card-bg);
             border-bottom: 1px solid var(--sidebar-border);
             padding-top: var(--mobile-header-top-padding);
             padding-bottom: 0.75rem;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-        }
-
-        .mobile-top-nav-spacer {
-            height: var(--mobile-header-height);
-            flex: 0 0 var(--mobile-header-height);
         }
 
         .mobile-top-nav button {
@@ -612,7 +605,7 @@
         <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
 
             <!-- 移動端導覽列 -->
-            <nav v-if="user" class="mobile-top-nav md:hidden px-4">
+            <nav v-if="user" class="mobile-top-nav md:hidden px-4 shrink-0">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-2">
                         <span class="w-8 h-8 rounded-lg flex items-center justify-center poring-float text-white"
@@ -637,7 +630,6 @@
                     </div>
                 </div>
             </nav>
-            <div v-if="user" class="mobile-top-nav-spacer md:hidden"></div>
 
             <!-- 手機版垂直選單彈窗 -->
             <div v-if="ui.modal === 'mobileMenu'" class="fixed inset-0 z-[300] md:hidden"
